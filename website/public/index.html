@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AnkiGammon - Convert backgammon analysis into Anki flashcards instantly. Supports XGID, OGID, and GNUID formats with automated board rendering, MCQ generation, and direct Anki integration.">
+    <meta name="keywords" content="backgammon, anki, flashcards, extreme gammon, xg, gnubg, gnu backgammon, opengammon, xgid, ogid, gnuid, spaced repetition, position study">
+    <meta name="author" content="AnkiGammon">
+    <title>AnkiGammon - Convert Backgammon Analysis to Anki Flashcards</title>
+    <link rel="icon" type="image/png" href="assets/images/icon.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- TODO: Replace 'yourusername' with your actual GitLab username in all links below -->
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav-container">
+            <a href="#home" class="nav-logo">
+                <img src="assets/images/icon.png" alt="AnkiGammon" style="width: 32px; height: 32px; vertical-align: middle; margin-right: 0.5rem;">
+                AnkiGammon
+            </a>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#install" class="nav-link">Install</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+                <a href="https://gitlab.com/yourusername/ankigammon" class="nav-link nav-cta" target="_blank">GitLab</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero section">
+        <div class="container">
+            <h1>Convert Backgammon Analysis to Anki Flashcards</h1>
+            <p class="hero-subtitle">
+                Your backgammon analysis tool shows you the best move. AnkiGammon helps you remember it forever.
+                Supports XG, GnuBG, and OpenGammon formats with automatic analysis, score matrices, and instant Anki export.
+            </p>
+
+            <div class="terminal-box">
+                <div style="padding: 1.5rem; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                        <span style="color: var(--accent-success); font-weight: 600; font-size: 1.25rem;">1</span>
+                        <span style="color: var(--text-primary);">Launch the desktop application</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                        <span style="color: var(--accent-success); font-weight: 600; font-size: 1.25rem;">2</span>
+                        <span style="color: var(--text-primary);">Paste XG analysis or position IDs (XGID/OGID/GNUID)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="color: var(--accent-success); font-weight: 600; font-size: 1.25rem;">3</span>
+                        <span style="color: var(--text-primary);">Preview positions visually → Export to Anki</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="#install" class="btn btn-primary">Download for Windows</a>
+                <a href="https://gitlab.com/yourusername/ankigammon" class="btn btn-secondary" target="_blank">View on GitLab</a>
+            </div>
+
+            <div class="quick-stats">
+                <span>
+                    <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Free & Open Source
+                </span>
+                <span>
+                    <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    GUI Desktop Application
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features section">
+        <div class="container">
+            <h2>Desktop Application Features</h2>
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2.5rem; font-size: 1.05rem;">
+                AnkiGammon combines a graphical interface with automatic analysis. No command line needed.
+            </p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <h3>Live Board Preview</h3>
+                    <p>See positions rendered as scalable SVG boards in real-time. Choose from 6 color schemes and toggle between clockwise/counter-clockwise board orientation to match your learning style.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h3>Automatic GnuBG Analysis</h3>
+                    <p>Paste position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. No manual rollout needed.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <h3>Score Matrix Generation</h3>
+                    <p>For cube decisions, AnkiGammon generates detailed score matrices showing equity at different match scores. Essential for understanding cube actions in tournament play.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <h3>One-Click Export</h3>
+                    <p>Cards appear in Anki instantly via AnkiConnect—no import step, no file management. Visual progress tracking with background workers keeps the interface responsive.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="6"/>
+                            <circle cx="12" cy="12" r="2"/>
+                        </svg>
+                    </div>
+                    <h3>Interactive Move Visualization</h3>
+                    <p>Click moves in the analysis table to see resulting positions with smooth animations. A unique learning aid that brings positions to life.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <line x1="12" y1="20" x2="12" y2="10"/>
+                            <line x1="18" y1="20" x2="18" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="16"/>
+                        </svg>
+                    </div>
+                    <h3>Complete Analysis</h3>
+                    <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Learn the why, not just the what.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works section">
+        <div class="container">
+            <h2>How It Works</h2>
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <h3>Launch the App</h3>
+                    <p>Double-click the desktop application—dark theme interface opens instantly</p>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <h3>Add Positions</h3>
+                    <p>Paste XG analysis or just position IDs (XGID/OGID/GNUID)—GnuBG automatically analyzes unanalyzed positions in the background</p>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <h3>Preview & Manage</h3>
+                    <p>See live board previews with score matrices for cube decisions, manage your position list visually</p>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <h3>Export to Anki</h3>
+                    <p>One click exports all positions—watch the progress bar as complete analysis cards are created</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo section">
+        <div class="container">
+            <h2>See It In Action</h2>
+            <div class="demo-placeholder">
+                <p>📹 Demo video or screenshots coming soon</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="install" class="installation section">
+        <div class="container">
+            <h2>Get Started</h2>
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
+                AnkiGammon is a desktop application developed for <strong style="color: var(--accent-success);">Windows</strong>. macOS and Linux support is experimental.
+            </p>
+
+            <div class="platform-buttons">
+                <div class="platform-btn active" onclick="showPlatform('windows')">
+                    <div class="platform-icon">
+                        <svg class="icon icon-lg" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="9" y1="3" x2="9" y2="21"/>
+                            <line x1="3" y1="9" x2="21" y2="9"/>
+                        </svg>
+                    </div>
+                    <div class="platform-name">Windows</div>
+                </div>
+                <div class="platform-btn" onclick="showPlatform('macos')">
+                    <div class="platform-icon">
+                        <svg class="icon icon-lg" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                    </div>
+                    <div class="platform-name">macOS</div>
+                </div>
+                <div class="platform-btn" onclick="showPlatform('linux')">
+                    <div class="platform-icon">
+                        <svg class="icon icon-lg" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div class="platform-name">Linux</div>
+                </div>
+            </div>
+
+            <div class="install-content">
+                <!-- Windows Instructions -->
+                <div id="windows-install" class="install-section active">
+                    <h3>Windows <span style="font-size: 0.9rem; color: var(--accent-success); font-weight: 400;">(Recommended)</span></h3>
+
+                    <p style="padding: 0.75rem; background: rgba(95, 184, 120, 0.1); border-left: 3px solid var(--accent-success); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong style="color: var(--accent-success);">✓ Fully Supported:</strong> Pre-built GUI desktop application, no Python required, automatic builds with every release.
+                    </p>
+
+                    <ol>
+                        <li>Download <code>ankigammon.exe</code> from the <a href="https://gitlab.com/yourusername/ankigammon/-/releases" target="_blank">latest release</a></li>
+                        <li>Double-click to launch the application (no installation needed)</li>
+                        <li>Use the graphical interface to add positions and configure settings</li>
+                        <li>Export directly to Anki with visual progress tracking!</li>
+                    </ol>
+
+                    <div class="requirements">
+                        <h4>Requirements</h4>
+                        <ul>
+                            <li class="required">Anki 2.1.x installed</li>
+                            <li class="required">AnkiConnect addon (code: 2055492159)</li>
+                            <li>Windows 10 or later</li>
+                            <li>GnuBG (optional, for automatic analysis of position IDs)</li>
+                        </ul>
+                        <p class="requirement-note">
+                            <strong>No Python installation needed</strong> - the executable is fully standalone and includes the Python runtime.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- macOS Instructions -->
+                <div id="macos-install" class="install-section">
+                    <h3>macOS <span style="font-size: 0.9rem; color: var(--text-dim); font-weight: 400;">(Advanced Users Only)</span></h3>
+
+                    <p style="padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon is developed for Windows. macOS support is experimental and requires building from source. No pre-built executables available.
+                    </p>
+
+                    <ol>
+                        <li>Install Python 3.8+: <code>brew install python3</code></li>
+                        <li>Clone repository: <code>git clone https://gitlab.com/yourusername/ankigammon.git</code></li>
+                        <li>Install dependencies: <code>cd ankigammon && pip install -r requirements.txt</code></li>
+                        <li>Build: <code>./build_executable.sh</code></li>
+                        <li>Run: <code>./dist/ankigammon</code></li>
+                    </ol>
+
+                    <div class="requirements">
+                        <h4>Requirements</h4>
+                        <ul>
+                            <li class="required">Python 3.8+ with pip and Git</li>
+                            <li class="required">Anki 2.1.x</li>
+                            <li class="required">AnkiConnect addon (2055492159)</li>
+                            <li>GnuBG (optional, for automatic analysis)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Linux Instructions -->
+                <div id="linux-install" class="install-section">
+                    <h3>Linux <span style="font-size: 0.9rem; color: var(--text-dim); font-weight: 400;">(Advanced Users Only)</span></h3>
+
+                    <p style="padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon is developed for Windows. Linux support is experimental and requires building from source. No pre-built executables available.
+                    </p>
+
+                    <ol>
+                        <li>Install Python 3.8+: <code>sudo apt install python3 python3-pip git</code></li>
+                        <li>Clone repository: <code>git clone https://gitlab.com/yourusername/ankigammon.git</code></li>
+                        <li>Install dependencies: <code>cd ankigammon && pip install -r requirements.txt</code></li>
+                        <li>Build: <code>./build_executable.sh</code></li>
+                        <li>Run: <code>./dist/ankigammon</code></li>
+                        <li>If errors occur: <code>sudo apt install libxcb1</code></li>
+                    </ol>
+
+                    <div class="requirements">
+                        <h4>Requirements</h4>
+                        <ul>
+                            <li class="required">Python 3.8+ with pip and Git</li>
+                            <li class="required">Anki 2.1.x</li>
+                            <li class="required">AnkiConnect addon (2055492159)</li>
+                            <li>Ubuntu 20.04+ or equivalent</li>
+                            <li>GnuBG (optional, for automatic analysis)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <p style="color: var(--text-secondary);">
+                    <strong>Installing AnkiConnect:</strong> Open Anki → Tools → Add-ons → Get Add-ons → Enter code: <code>2055492159</code> → Restart Anki
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq section">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Does this upload my positions anywhere?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No. All processing happens 100% locally on your computer. Your XG analysis never leaves your machine. The GUI shows live previews of board positions locally before export, and all card generation happens entirely offline.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Do I need to know Python or command line?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No. AnkiGammon is a GUI desktop application—just double-click to launch. No Python installation, no command line, no technical knowledge required. The graphical interface guides you through everything.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Do I need XG analysis or can I just paste position IDs?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. You can configure the analysis depth (ply) in settings. For cube decisions, it can even generate full score matrices showing equity at different match scores.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Will this mess up my existing Anki decks?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No. AnkiGammon creates a separate deck (default name: "XG Backgammon") with no interference to existing cards. You can customize the deck name, and Anki's duplicate detection prevents accidental card duplication.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Can I recreate cards if I delete them?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes. Every card includes the source XGID on the back. You can always regenerate cards from your original XG export file, or save the XG text for future use.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>What's the difference between AnkiConnect and APKG export?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>AnkiConnect (recommended):</strong> Cards appear instantly in Anki while it's running. No import step needed. Requires AnkiConnect addon.<br><br>
+                            <strong>APKG export:</strong> Creates a file you manually import into Anki. Useful when Anki isn't running or for sharing decks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Can I preview positions before exporting to Anki?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes. The GUI features a live board preview panel that displays the selected position as an SVG board in real-time. You can review all positions in your collection before exporting, ensuring everything looks correct.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>How do I manage multiple positions?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>The GUI includes a position list on the left side that shows all your positions at a glance. You can add positions one by one (paste XG text), remove unwanted positions, and batch export them all to Anki in one click. The smart input dialog automatically detects the format of pasted text (XG, XGID, OGID, GNUID) with visual indicators.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Can I change the board orientation?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes. AnkiGammon supports both clockwise and counter-clockwise board orientation. The default counter-clockwise orientation (point 1 at bottom right) is standard, but you can switch to clockwise (point 1 at bottom left) in the Options menu. Your preference is saved and applied to all generated cards automatically.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a href="https://gitlab.com/yourusername/ankigammon" class="footer-link" target="_blank">GitLab</a>
+                <a href="https://gitlab.com/yourusername/ankigammon/-/blob/main/README.md" class="footer-link" target="_blank">Documentation</a>
+                <a href="https://gitlab.com/yourusername/ankigammon/-/issues" class="footer-link" target="_blank">Issues</a>
+                <a href="https://gitlab.com/yourusername/ankigammon/-/blob/main/LICENSE" class="footer-link" target="_blank">MIT License</a>
+            </div>
+            <div class="footer-credit">
+                Built with ❤ for the backgammon community
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/platform.js"></script>
+    <script src="js/faq.js"></script>
+    <script src="js/navigation.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

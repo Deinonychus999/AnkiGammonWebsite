@@ -1,0 +1,32 @@
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .nav-links {
+        gap: var(--space-md);
+    }
+
+    .nav-link {
+        display: none;
+    }
+
+    .nav-link.nav-cta {
+        display: block;
+    }
+
+    .feature-grid,
+    .workflow-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}

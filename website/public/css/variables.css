@@ -1,0 +1,33 @@
+/* ===== Design System Variables ===== */
+:root {
+    /* Colors */
+    --bg-primary: #121212;
+    --bg-secondary: #1a1f2c;
+    --bg-elevated: #1e2430;
+    --bg-surface: #252a35;
+
+    --text-primary: #e8e6e3;
+    --text-secondary: #a0a0a0;
+    --text-dim: #6b7280;
+
+    --accent-primary: #5b9dd9;
+    --accent-hover: #4a8bc2;
+    --accent-success: #5fb878;
+    --accent-warning: #f4a261;
+
+    --border: #2a2f3a;
+    --code-bg: #1e1e1e;
+
+    /* Typography */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    --font-code: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+}
