@@ -64,8 +64,11 @@
                 </div>
             </div>
 
-            <div class="cta-buttons">
-                <a href="#install" class="btn btn-primary">Download for Windows</a>
+            <div class="cta-buttons" style="align-items: flex-start;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                    <a href="https://gitlab.com/yourusername/ankigammon/-/releases/permalink/latest/downloads/ankigammon.exe" class="btn btn-primary">Download for Windows</a>
+                    <a href="#install" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: underline;">Other platforms</a>
+                </div>
                 <a href="https://gitlab.com/yourusername/ankigammon" class="btn btn-secondary" target="_blank">View on GitLab</a>
             </div>
 
@@ -80,7 +83,7 @@
                     <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                         <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                    GUI Desktop Application
+                    Works Offline
                 </span>
             </div>
         </div>
@@ -89,9 +92,9 @@
     <!-- Features Section -->
     <section id="features" class="features section">
         <div class="container">
-            <h2>Desktop Application Features</h2>
+            <h2>Features</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2.5rem; font-size: 1.05rem;">
-                AnkiGammon combines a graphical interface with automatic analysis. No command line needed.
+                AnkiGammon combines visual board rendering with automatic analysis for effortless learning.
             </p>
             <div class="feature-grid">
                 <div class="feature-card">
@@ -176,7 +179,7 @@
                 <div class="workflow-step">
                     <div class="step-number">1</div>
                     <h3>Launch the App</h3>
-                    <p>Double-click the desktop application—dark theme interface opens instantly</p>
+                    <p>Double-click to open—ready to use instantly</p>
                 </div>
 
                 <div class="workflow-step">
@@ -253,13 +256,13 @@
                     <h3>Windows <span style="font-size: 0.9rem; color: var(--accent-success); font-weight: 400;">(Recommended)</span></h3>
 
                     <p style="padding: 0.75rem; background: rgba(95, 184, 120, 0.1); border-left: 3px solid var(--accent-success); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
-                        <strong style="color: var(--accent-success);">✓ Fully Supported:</strong> Pre-built GUI desktop application, no Python required, automatic builds with every release.
+                        <strong style="color: var(--accent-success);">✓ Fully Supported:</strong> Pre-built application ready to use, automatic builds with every release.
                     </p>
 
                     <ol>
                         <li>Download <code>ankigammon.exe</code> from the <a href="https://gitlab.com/yourusername/ankigammon/-/releases" target="_blank">latest release</a></li>
-                        <li>Double-click to launch the application (no installation needed)</li>
-                        <li>Use the graphical interface to add positions and configure settings</li>
+                        <li>Double-click to launch (no installation needed)</li>
+                        <li>Add positions and configure settings visually</li>
                         <li>Export directly to Anki with visual progress tracking!</li>
                     </ol>
 
@@ -272,7 +275,7 @@
                             <li>GnuBG (optional, for automatic analysis of position IDs)</li>
                         </ul>
                         <p class="requirement-note">
-                            <strong>No Python installation needed</strong> - the executable is fully standalone and includes the Python runtime.
+                            <strong>No installation needed</strong> - just download and run.
                         </p>
                     </div>
                 </div>
@@ -358,14 +361,14 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No. All processing happens 100% locally on your computer. Your XG analysis never leaves your machine. The GUI shows live previews of board positions locally before export, and all card generation happens entirely offline.</p>
+                            <p>No. All processing happens 100% locally on your computer. Your XG analysis never leaves your machine. Live previews and card generation all happen entirely offline.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>Do I need to know Python or command line?</h3>
+                        <h3>Is this difficult to use?</h3>
                         <span class="faq-toggle">
                             <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                 <polyline points="6 9 12 15 18 9"/>
@@ -374,7 +377,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No. AnkiGammon is a GUI desktop application—just double-click to launch. No Python installation, no command line, no technical knowledge required. The graphical interface guides you through everything.</p>
+                            <p>No. Just double-click to launch, paste your analysis, and click export. The interface guides you through each step visually.</p>
                         </div>
                     </div>
                 </div>
@@ -390,7 +393,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. You can configure the analysis depth (ply) in settings. For cube decisions, it can even generate full score matrices showing equity at different match scores.</p>
+                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. You can configure the analysis depth (0-4 ply) in settings. For cube decisions, it can even generate full score matrices showing equity at different match scores.</p>
                         </div>
                     </div>
                 </div>
@@ -455,7 +458,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. The GUI features a live board preview panel that displays the selected position as an SVG board in real-time. You can review all positions in your collection before exporting, ensuring everything looks correct.</p>
+                            <p>Yes. A live board preview displays each position in real-time. You can review all positions in your collection before exporting, ensuring everything looks correct.</p>
                         </div>
                     </div>
                 </div>
@@ -471,7 +474,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The GUI includes a position list on the left side that shows all your positions at a glance. You can add positions one by one (paste XG text), remove unwanted positions, and batch export them all to Anki in one click. The smart input dialog automatically detects the format of pasted text (XG, XGID, OGID, GNUID) with visual indicators.</p>
+                            <p>A position list shows all your positions at a glance. You can add positions one by one (paste XG text), remove unwanted positions, and batch export them all to Anki in one click. The input dialog automatically detects the format of pasted text (XG, XGID, OGID, GNUID) with visual indicators.</p>
                         </div>
                     </div>
                 </div>
