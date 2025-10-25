@@ -44,7 +44,7 @@ cd website/
 git init
 git add .
 git commit -m "Initial commit: AnkiGammon landing page"
-git remote add origin https://github.com/yourusername/ankigammon-website.git
+git remote add origin https://github.com/Deinonychus999/ankigammon-website.git
 git push -u origin main
 ```
 
@@ -53,7 +53,7 @@ Enable GitHub Pages:
 2. Source: Select "GitHub Actions"
 3. The workflow will automatically deploy
 
-The site will be available at: `https://yourusername.github.io/ankigammon-website`
+The site will be available at: `https://Deinonychus999.github.io/ankigammon-website` (or at custom domain: https://AnkiGammon.com)
 
 #### Option 2: Same Repository
 
@@ -69,7 +69,7 @@ git push origin main
 Configure GitHub Pages:
 1. Go to **Settings > Pages** in your GitHub project
 2. Source: Select "GitHub Actions"
-3. The site will be available at: `https://yourusername.github.io/ankigammon`
+3. The site will be available at: `https://Deinonychus999.github.io/AnkiGammon` (or at custom domain: https://AnkiGammon.com)
 
 ### Deployment Process
 
@@ -83,9 +83,9 @@ Deployment is **fully automatic**:
 
 Monitor deployment: **Actions** tab in your GitHub repository
 
-### Custom Domain
+### Custom Domain (AnkiGammon.com)
 
-To use a custom domain (e.g., `ankigammon.com`):
+To configure the custom domain AnkiGammon.com:
 
 1. **In GitHub:**
    - Go to **Settings > Pages**
@@ -93,16 +93,16 @@ To use a custom domain (e.g., `ankigammon.com`):
    - Save the configuration
 
 2. **At your DNS provider:**
-   - Add A records pointing to GitHub Pages:
+   - Add A records for apex domain (ankigammon.com):
      ```
      ankigammon.com A 185.199.108.153
      ankigammon.com A 185.199.109.153
      ankigammon.com A 185.199.110.153
      ankigammon.com A 185.199.111.153
      ```
-   - Or add CNAME record for subdomain:
+   - Add CNAME record for www subdomain:
      ```
-     www.ankigammon.com CNAME yourusername.github.io
+     www.ankigammon.com CNAME Deinonychus999.github.io
      ```
 
 3. **Back in GitHub:**
@@ -165,7 +165,9 @@ Changes deploy automatically within 1-2 minutes.
 
 ### Updating GitHub Links
 
-Find and replace `https://github.com/yourusername/ankigammon` with your actual repository URL in:
+Repository URL: `https://github.com/Deinonychus999/AnkiGammon`
+
+All links in the following sections use this repository:
 - Navigation links
 - Footer links
 - Installation section
@@ -277,7 +279,7 @@ Current optimizations:
 ```bash
 # Use Lighthouse in Chrome DevTools
 # Or run from command line:
-lighthouse https://yourusername.github.io/ankigammon --view
+lighthouse https://Deinonychus999.github.io/AnkiGammon --view
 ```
 
 ## Browser Compatibility
@@ -395,8 +397,8 @@ For better social media sharing, add to `<head>`:
 ```html
 <meta property="og:title" content="AnkiGammon - Turn XG Analysis Into Anki Flashcards">
 <meta property="og:description" content="Automatically convert eXtreme Gammon backgammon analysis into Anki flashcards with beautiful board images and MCQs.">
-<meta property="og:image" content="https://yourusername.github.io/ankigammon/assets/hero-card.webp">
-<meta property="og:url" content="https://yourusername.github.io/ankigammon">
+<meta property="og:image" content="https://Deinonychus999.github.io/AnkiGammon/assets/hero-card.webp">
+<meta property="og:url" content="https://Deinonychus999.github.io/AnkiGammon">
 <meta name="twitter:card" content="summary_large_image">
 ```
 

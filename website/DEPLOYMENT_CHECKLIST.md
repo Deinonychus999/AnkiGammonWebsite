@@ -6,14 +6,9 @@ Use this checklist to prepare and deploy the AnkiGammon landing page to GitHub P
 
 ### 1. Customize Content
 
-- [ ] **Update GitHub username** in all links:
-  - Open [public/index.html](public/index.html)
-  - Find and replace `yourusername` with your actual GitHub username
-  - Links to update:
-    - Navigation GitHub link
-    - Download buttons (installation section)
-    - Footer links
-    - All `https://github.com/yourusername/ankigammon` references
+- [x] **Update GitHub username** in all links: ✓ Already configured
+  - Repository: https://github.com/Deinonychus999/AnkiGammon
+  - All links have been updated to use the correct GitHub repository
 
 - [ ] **Review and customize messaging:**
   - Hero headline (line ~531)
@@ -133,7 +128,7 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
    git init
    git add .
    git commit -m "Initial commit: AnkiGammon landing page"
-   git remote add origin https://github.com/yourusername/ankigammon-website.git
+   git remote add origin https://github.com/Deinonychus999/ankigammon-website.git
    git branch -M main
    git push -u origin main
    ```
@@ -151,7 +146,7 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
 
 5. [ ] **Verify deployment:**
    - Go to **Settings > Pages**
-   - Copy the URL (e.g., `https://yourusername.github.io/ankigammon-website`)
+   - Copy the URL (e.g., `https://Deinonychus999.github.io/ankigammon-website`)
    - Open in browser to verify site is live
 
 ### Option B: Subdirectory of Main Repo
@@ -199,21 +194,26 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
   - Test with: https://www.opengraph.xyz/
   - Preview how links appear on Twitter, Facebook, etc.
 
-### 3. Custom Domain (Optional)
+### 3. Custom Domain Configuration
 
-If you own a domain (e.g., `ankigammon.com`):
+Setting up AnkiGammon.com as the custom domain:
 
 - [ ] **In GitHub** (Settings > Pages):
   - [ ] Add custom domain
   - [ ] Note DNS verification instructions
 
-- [ ] **At DNS provider:**
-  - [ ] Add A records pointing to GitHub Pages IPs:
-    - 185.199.108.153
-    - 185.199.109.153
-    - 185.199.110.153
-    - 185.199.111.153
-  - [ ] OR add CNAME record pointing to `yourusername.github.io`
+- [ ] **At DNS provider (for AnkiGammon.com):**
+  - [ ] Add A records for the apex domain:
+    ```
+    ankigammon.com A 185.199.108.153
+    ankigammon.com A 185.199.109.153
+    ankigammon.com A 185.199.110.153
+    ankigammon.com A 185.199.111.153
+    ```
+  - [ ] Add CNAME record for www subdomain:
+    ```
+    www.ankigammon.com CNAME Deinonychus999.github.io
+    ```
   - [ ] Wait for DNS propagation (up to 24 hours)
 
 - [ ] **Back in GitHub:**
@@ -305,6 +305,6 @@ After successful deployment:
 
 **Questions or issues?** Open an issue in the main AnkiGammon repository or consult [website/README.md](README.md) for detailed documentation.
 
-**Website URL (after deployment):** `https://yourusername.github.io/ankigammon-website`
+**Website URL (after deployment):** `https://AnkiGammon.com` (custom domain configured)
 
 **Last updated:** 2025-10-20
