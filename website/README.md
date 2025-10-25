@@ -1,6 +1,6 @@
 # AnkiGammon Landing Page
 
-This directory contains the promotional website for AnkiGammon, designed to be hosted on GitLab Pages.
+This directory contains the promotional website for AnkiGammon, designed to be hosted on GitHub Pages.
 
 ## Overview
 
@@ -9,15 +9,14 @@ A single-page static website showcasing a **GUI desktop application** (AnkiGammo
 - **Developer-focused UX** - Clear, authentic messaging without marketing fluff
 - **Performance optimized** - Inline CSS/JS, minimal dependencies, <1s load time
 - **Fully responsive** - Works on desktop, tablet, and mobile devices
-- **Automatic deployment** - GitLab CI/CD pipeline deploys on push to main
+- **Automatic deployment** - GitHub Actions workflow deploys on push to main
 
 ## File Structure
 
 ```
 website/
-├── .gitlab-ci.yml          # GitLab Pages deployment config
 ├── README.md               # This file
-└── public/                 # Deployment directory (served by GitLab Pages)
+└── public/                 # Deployment directory (served by GitHub Pages)
     ├── index.html          # Main page (with inline CSS/JS)
     └── assets/             # Static assets
         ├── favicon.ico     # Browser tab icon
@@ -26,12 +25,12 @@ website/
         └── demo.mp4        # Demo video (to be added)
 ```
 
-## Deployment to GitLab Pages
+## Deployment to GitHub Pages
 
 ### Prerequisites
 
-1. GitLab repository with the website code
-2. GitLab Runner enabled (automatic on gitlab.com)
+1. GitHub repository with the website code
+2. GitHub Actions enabled (automatic on github.com)
 
 ### Setup Instructions
 
@@ -40,18 +39,23 @@ website/
 Create a dedicated repository for the website:
 
 ```bash
-# Create new GitLab repository named 'ankigammon-website'
+# Create new GitHub repository named 'ankigammon-website'
 cd website/
 git init
 git add .
 git commit -m "Initial commit: AnkiGammon landing page"
-git remote add origin https://gitlab.com/yourusername/ankigammon-website.git
+git remote add origin https://github.com/yourusername/ankigammon-website.git
 git push -u origin main
 ```
 
-The site will be available at: `https://yourusername.gitlab.io/ankigammon-website`
+Enable GitHub Pages:
+1. Go to **Settings > Pages** in your GitHub repository
+2. Source: Select "GitHub Actions"
+3. The workflow will automatically deploy
 
-#### Option 2: Same Repository, Separate Branch
+The site will be available at: `https://yourusername.github.io/ankigammon-website`
+
+#### Option 2: Same Repository
 
 Keep the website in the main ankigammon repository:
 
@@ -62,50 +66,49 @@ git commit -m "Add promotional website"
 git push origin main
 ```
 
-Configure GitLab Pages:
-1. Go to **Settings > Pages** in your GitLab project
-2. Ensure the CI/CD pipeline runs successfully
-3. The site will be available at: `https://yourusername.gitlab.io/ankigammon`
+Configure GitHub Pages:
+1. Go to **Settings > Pages** in your GitHub project
+2. Source: Select "GitHub Actions"
+3. The site will be available at: `https://yourusername.github.io/ankigammon`
 
 ### Deployment Process
 
 Deployment is **fully automatic**:
 
 1. Push changes to the `main` branch
-2. GitLab CI/CD pipeline runs (defined in `.gitlab-ci.yml`)
+2. GitHub Actions workflow runs (defined in `.github/workflows/pages.yml`)
 3. Validation job checks that required files exist
-4. Deployment job publishes the `public/` directory
+4. Deployment job publishes the `website/public/` directory
 5. Site is live within ~1-2 minutes
 
-Monitor deployment: **CI/CD > Pipelines** in your GitLab project
+Monitor deployment: **Actions** tab in your GitHub repository
 
 ### Custom Domain
 
 To use a custom domain (e.g., `ankigammon.com`):
 
-1. **In GitLab:**
+1. **In GitHub:**
    - Go to **Settings > Pages**
-   - Click **New Domain**
-   - Enter your domain name
-   - Note the verification TXT record and A record values
+   - Enter your custom domain
+   - Save the configuration
 
 2. **At your DNS provider:**
-   - Add TXT record for verification:
+   - Add A records pointing to GitHub Pages:
      ```
-     _gitlab-pages-verification-code.ankigammon.com TXT "gitlab-pages-verification-code=..."
+     ankigammon.com A 185.199.108.153
+     ankigammon.com A 185.199.109.153
+     ankigammon.com A 185.199.110.153
+     ankigammon.com A 185.199.111.153
      ```
-   - Add A record pointing to GitLab Pages:
+   - Or add CNAME record for subdomain:
      ```
-     ankigammon.com A 35.185.44.232
-     ```
-   - Or add CNAME record:
-     ```
-     www.ankigammon.com CNAME yourusername.gitlab.io
+     www.ankigammon.com CNAME yourusername.github.io
      ```
 
-3. **Back in GitLab:**
-   - Click **Verify** to confirm DNS setup
-   - Enable **Force HTTPS** (recommended)
+3. **Back in GitHub:**
+   - DNS check will verify automatically
+   - Enable **Enforce HTTPS** (recommended)
+   - Wait for SSL certificate (~5 minutes)
 
 SSL certificate is automatically provisioned via Let's Encrypt.
 
@@ -160,9 +163,9 @@ Changes deploy automatically within 1-2 minutes.
 
 3. Replace the demo placeholder section
 
-### Updating GitLab/GitHub Links
+### Updating GitHub Links
 
-Find and replace `https://gitlab.com/yourusername/ankigammon` with your actual repository URL in:
+Find and replace `https://github.com/yourusername/ankigammon` with your actual repository URL in:
 - Navigation links
 - Footer links
 - Installation section
@@ -274,7 +277,7 @@ Current optimizations:
 ```bash
 # Use Lighthouse in Chrome DevTools
 # Or run from command line:
-lighthouse https://yourusername.gitlab.io/ankigammon --view
+lighthouse https://yourusername.github.io/ankigammon --view
 ```
 
 ## Browser Compatibility
@@ -392,26 +395,26 @@ For better social media sharing, add to `<head>`:
 ```html
 <meta property="og:title" content="AnkiGammon - Turn XG Analysis Into Anki Flashcards">
 <meta property="og:description" content="Automatically convert eXtreme Gammon backgammon analysis into Anki flashcards with beautiful board images and MCQs.">
-<meta property="og:image" content="https://yourusername.gitlab.io/ankigammon/assets/hero-card.webp">
-<meta property="og:url" content="https://yourusername.gitlab.io/ankigammon">
+<meta property="og:image" content="https://yourusername.github.io/ankigammon/assets/hero-card.webp">
+<meta property="og:url" content="https://yourusername.github.io/ankigammon">
 <meta name="twitter:card" content="summary_large_image">
 ```
 
 ## Troubleshooting
 
-### Pipeline fails with "pages" job error
-- Ensure `.gitlab-ci.yml` is in the repository root
-- Check that `public/` directory exists and contains `index.html`
-- View detailed logs in **CI/CD > Pipelines > Failed job**
+### Workflow fails with "pages" job error
+- Ensure `.github/workflows/pages.yml` is in the repository
+- Check that `website/public/` directory exists and contains `index.html`
+- View detailed logs in **Actions > Failed workflow**
 
 ### Site shows 404 after deployment
 - Wait 1-2 minutes for pages to fully deploy
-- Check **Settings > Pages** shows "Your pages are served under: ..."
+- Check **Settings > Pages** shows the deployment URL
 - Ensure you're visiting the correct URL
 
 ### Changes not appearing
 - Hard refresh browser: Ctrl+Shift+R (Windows) or Cmd+Shift+R (macOS)
-- Check pipeline completed successfully
+- Check workflow completed successfully (Actions tab)
 - Clear browser cache
 
 ### CSS/JavaScript not working
@@ -438,7 +441,7 @@ To suggest improvements to the website:
    git push -u origin feature/improve-hero-section
    ```
 
-5. Create a Merge Request in GitLab
+5. Create a Pull Request in GitHub
 
 ## License
 

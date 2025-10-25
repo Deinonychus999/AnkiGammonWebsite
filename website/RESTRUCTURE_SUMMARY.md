@@ -51,7 +51,7 @@ Based on analysis from parallel agents evaluating the codebase:
   - Simple landing page doesn't justify build tooling
   - Better performance (single HTTP request for HTML)
   - Easier maintenance for solo developer
-  - Perfect for static GitLab Pages hosting
+  - Perfect for static GitHub Pages hosting
 
 ### 2. **Vanilla JavaScript** ✓
 - **Decision**: Stay with vanilla JS (no React/Vue/Svelte)
@@ -135,7 +135,7 @@ The restructuring maintains 100% functional equivalence:
 
 ## Testing Checklist
 
-Before deploying to GitLab Pages, verify:
+Before deploying to GitHub Pages, verify:
 
 - [ ] All CSS loads correctly (no 404s in Network tab)
 - [ ] All JavaScript files load (check Console for errors)
@@ -160,8 +160,8 @@ python -m http.server 8000
 
 ## Deployment
 
-No changes needed for GitLab Pages deployment:
-- Still serves static files from `public/` directory
+No changes needed for GitHub Pages deployment:
+- Still serves static files from `website/public/` directory
 - No build step required
 - All file paths are relative
 

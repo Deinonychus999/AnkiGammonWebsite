@@ -1,19 +1,19 @@
 # AnkiGammon Website - Deployment Checklist
 
-Use this checklist to prepare and deploy the AnkiGammon landing page to GitLab Pages.
+Use this checklist to prepare and deploy the AnkiGammon landing page to GitHub Pages.
 
 ## Pre-Deployment Checklist
 
 ### 1. Customize Content
 
-- [ ] **Update GitLab username** in all links:
+- [ ] **Update GitHub username** in all links:
   - Open [public/index.html](public/index.html)
-  - Find and replace `yourusername` with your actual GitLab username
+  - Find and replace `yourusername` with your actual GitHub username
   - Links to update:
-    - Navigation GitLab link
+    - Navigation GitHub link
     - Download buttons (installation section)
     - Footer links
-    - All `https://gitlab.com/yourusername/ankigammon` references
+    - All `https://github.com/yourusername/ankigammon` references
 
 - [ ] **Review and customize messaging:**
   - Hero headline (line ~531)
@@ -119,10 +119,10 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
 
 ### Option A: Separate Repository (Recommended)
 
-**Best for:** Dedicated landing page at `username.gitlab.io/ankigammon-website`
+**Best for:** Dedicated landing page at `username.github.io/ankigammon-website`
 
-1. [ ] **Create new GitLab repository:**
-   - Go to https://gitlab.com/projects/new
+1. [ ] **Create new GitHub repository:**
+   - Go to https://github.com/new
    - Name: `ankigammon-website`
    - Visibility: Public
    - Don't initialize with README (we have files)
@@ -133,19 +133,25 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
    git init
    git add .
    git commit -m "Initial commit: AnkiGammon landing page"
-   git remote add origin https://gitlab.com/yourusername/ankigammon-website.git
+   git remote add origin https://github.com/yourusername/ankigammon-website.git
    git branch -M main
    git push -u origin main
    ```
 
-3. [ ] **Wait for pipeline:**
-   - Go to **CI/CD > Pipelines** in GitLab
-   - Wait for "pages" job to complete (1-2 minutes)
+3. [ ] **Enable GitHub Pages:**
+   - Go to **Settings > Pages**
+   - Source: Deploy from a branch OR GitHub Actions (recommended)
+   - If using GitHub Actions: The workflow will automatically deploy
+   - If using branch: Select `main` branch and `/ (root)` folder
+
+4. [ ] **Wait for deployment:**
+   - Go to **Actions** tab
+   - Wait for "Deploy to GitHub Pages" workflow to complete (1-2 minutes)
    - Check for green ✓ checkmark
 
-4. [ ] **Verify deployment:**
+5. [ ] **Verify deployment:**
    - Go to **Settings > Pages**
-   - Copy the URL (e.g., `https://yourusername.gitlab.io/ankigammon-website`)
+   - Copy the URL (e.g., `https://yourusername.github.io/ankigammon-website`)
    - Open in browser to verify site is live
 
 ### Option B: Subdirectory of Main Repo
@@ -161,10 +167,11 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
    ```
 
 2. [ ] **Configure Pages:**
-   - Create `.gitlab-ci.yml` in **repo root** (not website/)
-   - Copy config from `website/.gitlab-ci.yml` and adjust paths
+   - The GitHub Actions workflow in `.github/workflows/pages.yml` is already configured
+   - Go to **Settings > Pages**
+   - Source: Select "GitHub Actions"
 
-3. [ ] **Wait for pipeline and verify** (same as Option A)
+3. [ ] **Wait for deployment and verify** (same as Option A)
 
 ## Post-Deployment Checklist
 
@@ -196,19 +203,23 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
 
 If you own a domain (e.g., `ankigammon.com`):
 
-- [ ] **In GitLab** (Settings > Pages):
+- [ ] **In GitHub** (Settings > Pages):
   - [ ] Add custom domain
-  - [ ] Note verification TXT record
+  - [ ] Note DNS verification instructions
 
 - [ ] **At DNS provider:**
-  - [ ] Add TXT record for verification
-  - [ ] Add A record or CNAME pointing to GitLab Pages
+  - [ ] Add A records pointing to GitHub Pages IPs:
+    - 185.199.108.153
+    - 185.199.109.153
+    - 185.199.110.153
+    - 185.199.111.153
+  - [ ] OR add CNAME record pointing to `yourusername.github.io`
   - [ ] Wait for DNS propagation (up to 24 hours)
 
-- [ ] **Back in GitLab:**
-  - [ ] Click "Verify" button
-  - [ ] Enable "Force HTTPS"
-  - [ ] Wait for Let's Encrypt certificate (~5 minutes)
+- [ ] **Back in GitHub:**
+  - [ ] DNS check will verify automatically
+  - [ ] Enable "Enforce HTTPS"
+  - [ ] Wait for SSL certificate (~5 minutes)
 
 ### 4. Promotion
 
@@ -223,7 +234,7 @@ If you own a domain (e.g., `ankigammon.com`):
   - [ ] Backgammon Discord servers
 
 - [ ] **Add website link to:**
-  - [ ] GitLab project description
+  - [ ] GitHub repository description
   - [ ] Release announcements
   - [ ] Documentation
 
@@ -237,7 +248,7 @@ If you own a domain (e.g., `ankigammon.com`):
   - Update version numbers if displayed
 
 - [ ] **Monitor:**
-  - GitLab Issues for website feedback
+  - GitHub Issues for website feedback
   - Analytics (if installed) for traffic patterns
   - Broken links (quarterly check)
 
@@ -260,10 +271,10 @@ git push
 
 ## Troubleshooting
 
-### Pipeline fails
-- **Check:** `.gitlab-ci.yml` syntax
-- **Check:** `public/` directory exists and has index.html
-- **View:** Detailed job logs in CI/CD > Pipelines
+### Workflow fails
+- **Check:** `.github/workflows/pages.yml` syntax
+- **Check:** `website/public/` directory exists and has index.html
+- **View:** Detailed job logs in Actions tab
 
 ### Site shows 404
 - **Wait:** 2-3 minutes after deployment
@@ -277,7 +288,7 @@ git push
 
 ### Changes not appearing
 - **Clear browser cache:** Ctrl+Shift+R (Windows) or Cmd+Shift+R (macOS)
-- **Check pipeline status:** Must complete successfully
+- **Check workflow status:** Must complete successfully (Actions tab)
 - **Try:** Incognito/private browsing window
 
 ## Next Steps
@@ -294,6 +305,6 @@ After successful deployment:
 
 **Questions or issues?** Open an issue in the main AnkiGammon repository or consult [website/README.md](README.md) for detailed documentation.
 
-**Website URL (after deployment):** `https://yourusername.gitlab.io/ankigammon-website`
+**Website URL (after deployment):** `https://yourusername.github.io/ankigammon-website`
 
 **Last updated:** 2025-10-20
