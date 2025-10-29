@@ -3,14 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AnkiGammon - Paste any backgammon position and get smart Anki study cards. Supports XGID, OGID, and GNUID formats with automated analysis, interactive MCQ, and direct Anki integration.">
-    <meta name="keywords" content="backgammon, anki, flashcards, extreme gammon, xg, gnubg, gnu backgammon, opengammon, xgid, ogid, gnuid, spaced repetition, position study">
+    <meta name="description" content="Convert backgammon positions to Anki flashcards. Paste XGID, OGID, or GNUID formats. Auto-analysis, intelligent filtering, one-click export to Anki.">
     <meta name="author" content="AnkiGammon">
-    <title>AnkiGammon - Paste Any Position. Get Smart Study Cards.</title>
-    <link rel="icon" type="image/png" href="assets/images/icon.png">
+    <title>AnkiGammon - Backgammon Training Tool | Auto-Generate Anki Flashcards</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icon.png">
+    <link rel="icon" type="image/webp" sizes="64x64" href="assets/images/icon.webp">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ankigammon.com/">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ankigammon.com/">
+    <meta property="og:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
+    <meta property="og:description" content="Paste any backgammon position (XGID, OGID, GNUID) or drag XG files for automatic blunder filtering. Generate smart Anki flashcards with MCQ, live board preview, and 6 color schemes. Free & open source.">
+    <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+    <meta property="og:image:width" content="100">
+    <meta property="og:image:height" content="100">
+    <meta property="og:image:type" content="image/webp">
+    <meta property="og:image:alt" content="AnkiGammon application icon - backgammon to Anki flashcard converter">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="AnkiGammon">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="https://ankigammon.com/">
+    <meta name="twitter:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
+    <meta name="twitter:description" content="Paste any backgammon position or drag XG files for automatic blunder filtering. Generate smart Anki flashcards. Free & open source.">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+    <meta name="twitter:image:alt" content="AnkiGammon application icon - backgammon to Anki flashcard converter">
+
+    <!-- SEO Meta Tags -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+
     <!-- GitHub repository: https://github.com/Deinonychus999/AnkiGammon -->
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "AnkiGammon",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Windows, macOS, Linux",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Convert backgammon position analysis to Anki flashcards. Supports XGID, OGID, and GNUID formats with automated GnuBG analysis, intelligent blunder filtering, and direct Anki integration.",
+      "url": "https://ankigammon.com/",
+      "downloadUrl": "https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip",
+      "softwareVersion": "latest",
+      "author": {
+        "@type": "Organization",
+        "name": "AnkiGammon",
+        "url": "https://ankigammon.com/"
+      },
+      "screenshot": "https://ankigammon.com/assets/images/icon.webp",
+      "license": "https://github.com/Deinonychus999/AnkiGammon/blob/main/LICENSE"
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Do I need XG analysis or can I just paste position IDs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. You can configure the analysis depth (0-4 ply) in settings."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I filter which positions get imported from game files?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! When importing .xg files, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection (X, O, or both). These settings are remembered between sessions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What customization options are available for the flashcards?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AnkiGammon offers 6 color schemes, board orientation options (clockwise/counter-clockwise), show/hide options toggle, interactive move visualization, score matrix generation, configurable GnuBG analysis depth (0-4 ply), and choice of export methods (AnkiConnect or APKG)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to reconfigure settings every time I open the app?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No! All settings automatically persist to ~/.ankigammon/config.json. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, and all other preferences are saved immediately when changed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will this mess up my existing Anki decks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. AnkiGammon creates a separate deck with no interference to existing cards. You can customize the deck name in settings."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the difference between AnkiConnect and APKG export?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AnkiConnect provides instant export while Anki is running with no import step needed. APKG export creates portable files for manual import, useful when Anki isn't running or for sharing decks."
+          }
+        }
+      ]
+    }
+    </script>
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="css/reset.css">
@@ -25,20 +139,25 @@
     <nav class="nav">
         <div class="container nav-container">
             <a href="#home" class="nav-logo">
-                <img src="assets/images/icon.png" alt="AnkiGammon" style="width: 32px; height: 32px; vertical-align: middle; margin-right: 0.5rem;">
+                <img src="assets/images/icon.webp" alt="AnkiGammon" style="width: 32px; height: 32px; vertical-align: middle; margin-right: 0.5rem;">
                 AnkiGammon
             </a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="nav-links">
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#how-it-works" class="nav-link">How It Works</a>
                 <a href="#install" class="nav-link">Install</a>
                 <a href="#faq" class="nav-link">FAQ</a>
-                <a href="https://discord.gg/U8cmrCsK5x" class="nav-link" target="_blank" title="Join our Discord" style="display: inline-flex; align-items: center; color: inherit; text-decoration: none;">
+                <a href="https://discord.gg/U8cmrCsK5x" class="nav-link" target="_blank" rel="noopener noreferrer" title="Join our Discord" style="display: inline-flex; align-items: center; color: inherit; text-decoration: none;">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126.644 96" style="width: 20px; height: 20px;">
                         <path fill="#e0e3ff" d="M81.15,0c-1.2376,2.1973-2.3489,4.4704-3.3591,6.794-9.5975-1.4396-19.3718-1.4396-28.9945,0-.985-2.3236-2.1216-4.5967-3.3591-6.794-9.0166,1.5407-17.8059,4.2431-26.1405,8.0568C2.779,32.5304-1.6914,56.3725.5312,79.8863c9.6732,7.1476,20.5083,12.603,32.0505,16.0884,2.6014-3.4854,4.8998-7.1981,6.8698-11.0623-3.738-1.3891-7.3497-3.1318-10.8098-5.1523.9092-.6567,1.7932-1.3386,2.6519-1.9953,20.281,9.547,43.7696,9.547,64.0758,0,.8587.7072,1.7427,1.3891,2.6519,1.9953-3.4601,2.0457-7.0718,3.7632-10.835,5.1776,1.97,3.8642,4.2683,7.5769,6.8698,11.0623,11.5419-3.4854,22.3769-8.9156,32.0509-16.0631,2.626-27.2771-4.496-50.9172-18.817-71.8548C98.9811,4.2684,90.1918,1.5659,81.1752.0505l-.0252-.0505ZM42.2802,65.4144c-6.2383,0-11.4159-5.6575-11.4159-12.6535s4.9755-12.6788,11.3907-12.6788,11.5169,5.708,11.4159,12.6788c-.101,6.9708-5.026,12.6535-11.3907,12.6535ZM84.3576,65.4144c-6.2637,0-11.3907-5.6575-11.3907-12.6535s4.9755-12.6788,11.3907-12.6788,11.4917,5.708,11.3906,12.6788c-.101,6.9708-5.026,12.6535-11.3906,12.6535Z"/>
                     </svg>
                 </a>
-                <a href="https://github.com/Deinonychus999/AnkiGammon" class="nav-link" target="_blank" title="View on GitHub" style="display: inline-flex; align-items: center; color: inherit; text-decoration: none;">
+                <a href="https://github.com/Deinonychus999/AnkiGammon" class="nav-link" target="_blank" rel="noopener noreferrer" title="View on GitHub" style="display: inline-flex; align-items: center; color: inherit; text-decoration: none;">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" style="width: 20px; height: 20px;">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="#fff"/>
                     </svg>
@@ -48,10 +167,11 @@
         </div>
     </nav>
 
+    <main>
     <!-- Hero Section -->
     <section id="home" class="hero section">
         <div class="container">
-            <h1>Study Only Your Biggest Mistakes. Automatically Extracted.</h1>
+            <h1>Master Backgammon: Turn Your Mistakes Into Anki Flashcards</h1>
             <p class="hero-subtitle">
                 Tired of manually turning backgammon analysis into flashcards? AnkiGammon does it for you. Import game files to automatically extract significant blunders, paste position IDs for instant GnuBG analysis, or load full XG exports. Add your own notes and explanations to each position. Customize everything, then export to Anki in one click.
             </p>
@@ -61,7 +181,7 @@
                     <a href="https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip" class="btn btn-primary">Download for Windows</a>
                     <a href="#install" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: underline;">Other platforms</a>
                 </div>
-                <a href="https://github.com/Deinonychus999/AnkiGammon" class="btn btn-secondary" target="_blank">View on GitHub</a>
+                <a href="https://github.com/Deinonychus999/AnkiGammon" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
             </div>
 
             <div class="quick-stats">
@@ -84,7 +204,7 @@
     <!-- Features Section -->
     <section id="features" class="features section">
         <div class="container">
-            <h2>Features</h2>
+            <h2>Powerful Backgammon Study Features</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2.5rem; font-size: 1.05rem;">
                 AnkiGammon is designed for flexibility and ease of use. Customize every aspect of your study cards while enjoying seamless workflow automation.
             </p>
@@ -202,7 +322,7 @@
     <!-- How It Works Section -->
     <section id="how-it-works" class="how-it-works section">
         <div class="container">
-            <h2>How It Works</h2>
+            <h2>From Backgammon Analysis to Anki Cards in Seconds</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
                 From import to Anki export in seconds. AnkiGammon automates the tedious parts while giving you complete control over customization.
             </p>
@@ -247,7 +367,7 @@
     <!-- Installation Section -->
     <section id="install" class="installation section">
         <div class="container">
-            <h2>Get Started</h2>
+            <h2>Download AnkiGammon - Free Backgammon Training Software</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
                 AnkiGammon is a desktop application developed for <strong style="color: var(--accent-success);">Windows</strong>. macOS and Linux support is experimental.
             </p>
@@ -291,7 +411,7 @@
                     </p>
 
                     <ol>
-                        <li>Download <code>ankigammon-windows.zip</code> from the <a href="https://github.com/Deinonychus999/AnkiGammon/releases" target="_blank">latest release</a> and extract it</li>
+                        <li>Download <code>ankigammon-windows.zip</code> from the <a href="https://github.com/Deinonychus999/AnkiGammon/releases" target="_blank" rel="noopener noreferrer">latest release</a> and extract it</li>
                         <li>Double-click to launch (no installation needed)</li>
                         <li>Add positions and configure settings visually</li>
                         <li>Export directly to Anki with visual progress tracking!</li>
@@ -475,7 +595,7 @@
 
                             <p style="margin-top: 1rem;"><strong>Installation:</strong></p>
                             <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                                <li><strong>Windows:</strong> Download the installer (version 1.07) from <a href="https://ftp.gnu.org/gnu/gnubg/gnubg-1_07_001-20221114-setup.exe" target="_blank">ftp.gnu.org</a> and run the .exe file.</li>
+                                <li><strong>Windows:</strong> Download the installer (version 1.07) from <a href="https://ftp.gnu.org/gnu/gnubg/gnubg-1_07_001-20221114-setup.exe" target="_blank" rel="noopener noreferrer nofollow">ftp.gnu.org</a> and run the .exe file.</li>
                                 <li><strong>macOS:</strong> Use Homebrew: <code>brew install --cask gnubg</code></li>
                                 <li><strong>Linux:</strong> Install from your package manager: <code>sudo apt install gnubg</code> (Ubuntu/Debian) or <code>sudo dnf install gnubg</code> (Fedora)</li>
                             </ul>
@@ -538,26 +658,27 @@
             </div>
         </div>
     </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-content">
             <div class="footer-links">
-                <a href="https://github.com/Deinonychus999/AnkiGammon" class="footer-link" target="_blank" title="View on GitHub" style="display: inline-flex; align-items: center;">
+                <a href="https://github.com/Deinonychus999/AnkiGammon" class="footer-link" target="_blank" rel="noopener noreferrer" title="View on GitHub" style="display: inline-flex; align-items: center;">
                     <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" style="margin-right: 0.25rem;">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="#fff"/>
                     </svg>
                     GitHub
                 </a>
-                <a href="https://discord.gg/U8cmrCsK5x" class="footer-link" target="_blank" title="Join our Discord" style="display: inline-flex; align-items: center;">
+                <a href="https://discord.gg/U8cmrCsK5x" class="footer-link" target="_blank" rel="noopener noreferrer" title="Join our Discord" style="display: inline-flex; align-items: center;">
                     <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126.644 96" style="margin-right: 0.25rem;">
                         <path fill="#e0e3ff" d="M81.15,0c-1.2376,2.1973-2.3489,4.4704-3.3591,6.794-9.5975-1.4396-19.3718-1.4396-28.9945,0-.985-2.3236-2.1216-4.5967-3.3591-6.794-9.0166,1.5407-17.8059,4.2431-26.1405,8.0568C2.779,32.5304-1.6914,56.3725.5312,79.8863c9.6732,7.1476,20.5083,12.603,32.0505,16.0884,2.6014-3.4854,4.8998-7.1981,6.8698-11.0623-3.738-1.3891-7.3497-3.1318-10.8098-5.1523.9092-.6567,1.7932-1.3386,2.6519-1.9953,20.281,9.547,43.7696,9.547,64.0758,0,.8587.7072,1.7427,1.3891,2.6519,1.9953-3.4601,2.0457-7.0718,3.7632-10.835,5.1776,1.97,3.8642,4.2683,7.5769,6.8698,11.0623,11.5419-3.4854,22.3769-8.9156,32.0509-16.0631,2.626-27.2771-4.496-50.9172-18.817-71.8548C98.9811,4.2684,90.1918,1.5659,81.1752.0505l-.0252-.0505ZM42.2802,65.4144c-6.2383,0-11.4159-5.6575-11.4159-12.6535s4.9755-12.6788,11.3907-12.6788,11.5169,5.708,11.4159,12.6788c-.101,6.9708-5.026,12.6535-11.3907,12.6535ZM84.3576,65.4144c-6.2637,0-11.3907-5.6575-11.3907-12.6535s4.9755-12.6788,11.3907-12.6788,11.4917,5.708,11.3906,12.6788c-.101,6.9708-5.026,12.6535-11.3906,12.6535Z"/>
                     </svg>
                     Discord
                 </a>
-                <a href="https://github.com/Deinonychus999/AnkiGammon/blob/main/README.md" class="footer-link" target="_blank">Documentation</a>
-                <a href="https://github.com/Deinonychus999/AnkiGammon/issues" class="footer-link" target="_blank">Issues</a>
-                <a href="https://github.com/Deinonychus999/AnkiGammon/blob/main/LICENSE" class="footer-link" target="_blank">MIT License</a>
+                <a href="https://github.com/Deinonychus999/AnkiGammon/blob/main/README.md" class="footer-link" target="_blank" rel="noopener noreferrer">Documentation</a>
+                <a href="https://github.com/Deinonychus999/AnkiGammon/issues" class="footer-link" target="_blank" rel="noopener noreferrer">Issues</a>
+                <a href="https://github.com/Deinonychus999/AnkiGammon/blob/main/LICENSE" class="footer-link" target="_blank" rel="noopener noreferrer">MIT License</a>
             </div>
             <div class="footer-credit">
                 Built with ❤ for the backgammon community
@@ -566,9 +687,9 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="js/platform.js"></script>
-    <script src="js/faq.js"></script>
-    <script src="js/navigation.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script defer src="js/platform.js"></script>
+    <script defer src="js/faq.js"></script>
+    <script defer src="js/navigation.js"></script>
+    <script type="module" defer src="js/main.js"></script>
 </body>
 </html>

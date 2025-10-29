@@ -1,0 +1,12 @@
+# AnkiGammon robots.txt
+# https://ankigammon.com/
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://ankigammon.com/sitemap.xml
+
+# Optional: Block assets from indexing (reduces crawl budget usage)
+Disallow: /css/
+Disallow: /js/

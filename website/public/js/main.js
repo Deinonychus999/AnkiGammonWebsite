@@ -8,4 +8,7 @@ window.addEventListener('load', () => {
     if (window.initSmoothScroll) {
         window.initSmoothScroll();
     }
+    if (window.initMobileMenu) {
+        window.initMobileMenu();
+    }
 });
