@@ -1,51 +1,67 @@
 # AnkiGammon Website - Deployment Checklist
 
-Use this checklist to prepare and deploy the AnkiGammon landing page to GitHub Pages.
+**Last Updated:** 2025-10-25
+**Current Status:** 60% Ready - Infrastructure complete, missing assets and validation
+
+## Current State Summary
+
+✅ **Complete:**
+- GitHub Actions workflow configured (`.github/workflows/pages.yml`)
+- HTML/CSS/JavaScript structure complete
+- Repository links updated to Deinonychus999/AnkiGammon
+- Basic screenshots available (main_window.png, anki_front.png, icon.png)
+- Favicon exists and is properly linked (favicon.ico)
+
+⚠️ **In Progress:**
+- Asset optimization (PNG → WebP conversion needed)
+- Demo video placeholder (line 220 in index.html)
+
+❌ **Blocking Production Release:**
+- No local testing performed
+- No performance audit completed
+- Demo placeholder text still visible (line 220)
+- GitHub Pages not enabled
+
+---
 
 ## Pre-Deployment Checklist
 
 ### 1. Customize Content
 
-- [x] **Update GitHub username** in all links: ✓ Already configured
-  - Repository: https://github.com/Deinonychus999/AnkiGammon
-  - All links have been updated to use the correct GitHub repository
-
 - [ ] **Review and customize messaging:**
-  - Hero headline (line ~531)
-  - Hero subtitle (lines ~532-534)
-  - Feature descriptions (lines ~573-609)
-  - FAQ answers (lines ~749-838)
+  - [ ] Hero headline (verify current text is appropriate)
+  - [ ] Hero subtitle (verify current text is appropriate)
+  - [ ] Feature descriptions (ensure accuracy)
+  - [ ] FAQ answers (verify completeness and accuracy)
 
 - [ ] **Add contact/support information** (optional):
-  - Email address for questions
-  - Link to Discord/Slack community
-  - Social media links
+  - [ ] Email address for questions
+  - [ ] Link to Discord/Slack community (if available)
+  - [ ] Social media links (if available)
 
-### 2. Add Visual Assets
+### 2. Visual Assets
 
-**Priority: High**
-- [ ] **Main window screenshot** (`public/assets/main-window.webp`):
-  - Launch AnkiGammon GUI application
-  - Load positions to show position list and live preview
-  - Take screenshot of main window (1200×800px recommended)
-  - Save as WebP format
-  - Place in `public/assets/`
+**Status: Partially Complete - Optimization Needed**
 
-- [ ] **Hero screenshot** (`public/assets/hero-card.webp`):
-  - Generate an Anki card with AnkiGammon
-  - Take screenshot of the card (800×600px recommended)
-  - Save as WebP format
-  - Place in `public/assets/`
+**Priority: CRITICAL (Blocking Production)**
 
-- [ ] **Demo video** (`public/assets/demo.mp4`):
-  - Record 15-20 second GUI workflow demo
-  - Show: Launch app → Load/paste XG text → Preview boards → Export to Anki
-  - Highlight live preview and visual progress tracking
-  - Convert to MP4 (H.264, <5MB)
-  - Place in `public/assets/`
-  - Update HTML to remove placeholder and add video element
+- [ ] **Demo video or screenshot** - CRITICAL:
+  - **Current issue:** Placeholder text at line 220: "📹 Demo video or screenshots coming soon"
+  - **Option A (Quick):** Use existing `main_window.png` or `anki_front.png` as static screenshot
+  - **Option B (Better):** Record 15-20 second GUI workflow video (Launch app → Load/paste XG text → Preview boards → Export to Anki)
+  - **Action:** Replace line 220 placeholder with either `<img>` tag or `<video>` element
 
-**Priority: Medium**
+**Priority: MEDIUM (Optional Enhancement - Recommended)**
+
+- [ ] **Convert screenshots to WebP** (file size optimization):
+  ```bash
+  cd website/public/assets/images/
+  cwebp -q 85 main_window.png -o ../main-window.webp
+  cwebp -q 85 anki_front.png -o ../hero-card.webp
+  ```
+
+**Priority: LOW (Optional Enhancement)**
+
 - [ ] **Input dialog screenshot** (`public/assets/input-dialog.webp`):
   - Screenshot of smart input dialog with format detection
   - Shows XG text being pasted with automatic parsing
@@ -58,63 +74,65 @@ Use this checklist to prepare and deploy the AnkiGammon landing page to GitHub P
   - Screenshot showing different color scheme options
   - Display 2-3 boards with different themes (classic, ocean, midnight, etc.)
 
-- [ ] **Favicon** (`public/assets/favicon.ico`):
-  - Create or generate 32×32 ICO file
-  - Uncomment favicon link in HTML (line ~12)
-
-**Priority: Low**
-- [ ] Additional GUI screenshots (optional feature showcase)
-
-See [public/assets/README.md](public/assets/README.md) for detailed instructions.
-
 ### 3. Test Locally
+
+**Status: NOT STARTED**
 
 - [ ] **Start local web server:**
   ```bash
   cd website/public/
-  python -m http.server 8000
+  python -m http.server 8001
   ```
 
-- [ ] **Open browser:** http://localhost:8000
+- [ ] **Open browser:** http://localhost:8001
 
 - [ ] **Test functionality:**
   - [ ] Navigation links scroll smoothly to sections
-  - [ ] Download buttons link to correct releases (Windows/macOS/Linux executables)
+  - [ ] Download buttons link to correct GitHub releases
   - [ ] Platform switcher works (Windows/macOS/Linux tabs)
   - [ ] FAQ items expand/collapse on click
   - [ ] All links are valid (no 404s)
-  - [ ] GUI screenshots load properly
-  - [ ] Demo video plays correctly (if added)
+  - [ ] Screenshots load properly
+  - [ ] Demo video plays correctly (after adding)
+  - [ ] Icon appears in header
 
 - [ ] **Test responsive design:**
   - [ ] Desktop view (1920×1080)
   - [ ] Tablet view (768×1024)
   - [ ] Mobile view (375×667)
-  - Use browser DevTools to test different screen sizes
+  - Use browser DevTools (F12) to test different screen sizes
 
 - [ ] **Check browser console** (F12):
   - [ ] No JavaScript errors
-  - [ ] No broken resource links
+  - [ ] No broken resource links (404s)
+  - [ ] No CSS loading issues
 
 ### 4. Performance Check
 
-- [ ] **Run Lighthouse audit** (Chrome DevTools):
-  - Target scores: 90+ in all categories
+**Status: NOT STARTED**
+
+- [ ] **Run Lighthouse audit** (Chrome DevTools > Lighthouse):
+  - Target scores: 90+ in all categories (Performance, Accessibility, Best Practices, SEO)
   - Fix any critical issues highlighted
+  - Document score before and after optimizations
 
 - [ ] **Verify page weight:**
-  - [ ] Total size <100KB (before images/video)
-  - [ ] With assets: <2MB total
+  - [ ] HTML/CSS/JS size <100KB (excluding images/video)
+  - [ ] Total with assets: <2MB
+  - Check in DevTools > Network tab
 
 - [ ] **Test load time:**
   - [ ] First Contentful Paint <1.5s
   - [ ] Time to Interactive <3s
+  - Use Lighthouse or WebPageTest.org
+
+---
 
 ## Deployment Steps
 
-### Option A: Separate Repository (Recommended)
+### Option A: Separate Repository (Recommended for Production)
 
-**Best for:** Dedicated landing page at `username.github.io/ankigammon-website`
+**Best for:** Dedicated landing page at `Deinonychus999.github.io/ankigammon-website`
 
 1. [ ] **Create new GitHub repository:**
    - Go to https://github.com/new
@@ -135,9 +153,8 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
 
 3. [ ] **Enable GitHub Pages:**
    - Go to **Settings > Pages**
-   - Source: Deploy from a branch OR GitHub Actions (recommended)
-   - If using GitHub Actions: The workflow will automatically deploy
-   - If using branch: Select `main` branch and `/ (root)` folder
+   - Source: Select "GitHub Actions" (workflow already exists in `.github/workflows/pages.yml`)
+   - Workflow will automatically deploy on push to main
 
 4. [ ] **Wait for deployment:**
    - Go to **Actions** tab
@@ -149,34 +166,35 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
    - Copy the URL (e.g., `https://Deinonychus999.github.io/ankigammon-website`)
    - Open in browser to verify site is live
 
-### Option B: Subdirectory of Main Repo
+### Option B: Subdirectory of Main Repo (Current Setup)
 
-**Best for:** Keeping everything in one repository
+**Best for:** Keeping everything in one repository (current state)
 
-1. [ ] **Commit website to main repo:**
-   ```bash
-   cd /path/to/ankigammon/  # Root of main repo
-   git add website/
-   git commit -m "Add promotional landing page"
-   git push origin main
-   ```
+**Status:** Website files committed to main repo, Pages not enabled
 
-2. [ ] **Configure Pages:**
-   - The GitHub Actions workflow in `.github/workflows/pages.yml` is already configured
-   - Go to **Settings > Pages**
+1. [ ] **Enable GitHub Pages:**
+   - Go to repository **Settings > Pages**
    - Source: Select "GitHub Actions"
+   - The workflow in `.github/workflows/pages.yml` will handle deployment
+   - Deploys from `website/public/` directory
 
-3. [ ] **Wait for deployment and verify** (same as Option A)
+2. [ ] **Wait for deployment and verify:**
+   - Go to **Actions** tab
+   - Wait for "Deploy to GitHub Pages" workflow to complete
+   - Visit the deployed URL (shown in Settings > Pages)
+   - Verify site appears correctly
+
+---
 
 ## Post-Deployment Checklist
 
 ### 1. Verify Live Site
 
 - [ ] **Visit deployed URL**
-- [ ] **Test all functionality** (same as local testing)
+- [ ] **Test all functionality** (same as local testing checklist above)
 - [ ] **Test on real devices:**
-  - [ ] Desktop computer
-  - [ ] Mobile phone
+  - [ ] Desktop computer (Windows/macOS/Linux)
+  - [ ] Mobile phone (iOS/Android)
   - [ ] Tablet (if available)
 
 ### 2. SEO & Analytics (Optional)
@@ -186,24 +204,27 @@ See [public/assets/README.md](public/assets/README.md) for detailed instructions
   - [ ] Bing Webmaster Tools
 
 - [ ] **Add analytics** (optional):
-  - [ ] Google Analytics
-  - [ ] Plausible (privacy-friendly alternative)
+  - [ ] Google Analytics, or
+  - [ ] Plausible (privacy-friendly alternative), or
+  - [ ] Simple Analytics
   - Add tracking code to `<head>` in index.html
 
-- [ ] **Verify Open Graph tags** (optional):
+- [ ] **Verify Open Graph tags:**
   - Test with: https://www.opengraph.xyz/
-  - Preview how links appear on Twitter, Facebook, etc.
+  - Preview how links appear on Twitter, Facebook, Discord, etc.
+  - Add custom OG tags if needed (image, description, title)
 
-### 3. Custom Domain Configuration
+### 3. Custom Domain Configuration (Optional)
 
-Setting up AnkiGammon.com as the custom domain:
+**If using AnkiGammon.com custom domain:**
 
 - [ ] **In GitHub** (Settings > Pages):
-  - [ ] Add custom domain
+  - [ ] Enter custom domain: `ankigammon.com`
   - [ ] Note DNS verification instructions
+  - [ ] Add CNAME file to public/ directory
 
-- [ ] **At DNS provider (for AnkiGammon.com):**
-  - [ ] Add A records for the apex domain:
+- [ ] **At DNS provider:**
+  - [ ] Add A records for apex domain:
     ```
     ankigammon.com A 185.199.108.153
     ankigammon.com A 185.199.109.153
@@ -214,29 +235,33 @@ Setting up AnkiGammon.com as the custom domain:
     ```
     www.ankigammon.com CNAME Deinonychus999.github.io
     ```
-  - [ ] Wait for DNS propagation (up to 24 hours)
+  - [ ] Wait for DNS propagation (up to 24-48 hours)
 
 - [ ] **Back in GitHub:**
-  - [ ] DNS check will verify automatically
+  - [ ] DNS check will verify automatically (green checkmark)
   - [ ] Enable "Enforce HTTPS"
-  - [ ] Wait for SSL certificate (~5 minutes)
+  - [ ] Wait for SSL certificate provisioning (~5 minutes)
 
 ### 4. Promotion
 
 - [ ] **Update main AnkiGammon repository:**
-  - [ ] Add link to website in README
-  - [ ] Update project description
+  - [ ] Add website link to README.md
+  - [ ] Update GitHub repository description to include website link
+  - [ ] Add website badge to README
 
-- [ ] **Share on social media/forums:**
-  - [ ] Reddit (r/backgammon, r/Anki)
-  - [ ] Backgammon forums (bgonline.org, etc.)
-  - [ ] Twitter/X
+- [ ] **Share on communities:**
+  - [ ] Reddit: r/backgammon, r/Anki
+  - [ ] Backgammon forums: bgonline.org, etc.
+  - [ ] Twitter/X (if applicable)
   - [ ] Backgammon Discord servers
+  - [ ] Hacker News (Show HN: if appropriate)
 
 - [ ] **Add website link to:**
-  - [ ] GitHub repository description
+  - [ ] GitHub repository description field
   - [ ] Release announcements
-  - [ ] Documentation
+  - [ ] Documentation files
+
+---
 
 ## Maintenance
 
@@ -244,67 +269,143 @@ Setting up AnkiGammon.com as the custom domain:
 
 - [ ] **After major releases:**
   - Update feature descriptions if new capabilities added
-  - Add new screenshots if UI changed
-  - Update version numbers if displayed
+  - Add new screenshots if UI significantly changed
+  - Update version numbers if displayed anywhere
+  - Add new FAQ items based on common questions
 
 - [ ] **Monitor:**
-  - GitHub Issues for website feedback
-  - Analytics (if installed) for traffic patterns
-  - Broken links (quarterly check)
+  - GitHub Issues for website-specific feedback
+  - Analytics (if installed) for traffic patterns and user behavior
+  - Broken links (quarterly check recommended)
+  - GitHub release links still valid
 
 ### Content Updates
 
 To update content after deployment:
 
 ```bash
-# Edit files
+# Navigate to website directory
 cd website/public/
-# Make changes to index.html or assets/
 
-# Commit and push
-git add .
-git commit -m "Update hero section messaging"
+# Make changes to index.html, CSS, JS, or assets/
+
+# Commit and push (if using Option B: main repo)
+cd ../..  # Back to repo root
+git add website/
+git commit -m "Update website: describe changes"
 git push
 
-# Site redeploys automatically within 1-2 minutes
+# Or push to separate repo (if using Option A)
+git add .
+git commit -m "Update hero section messaging"
+git push origin main
+
+# Site redeploys automatically within 1-2 minutes via GitHub Actions
 ```
+
+---
 
 ## Troubleshooting
 
 ### Workflow fails
-- **Check:** `.github/workflows/pages.yml` syntax
-- **Check:** `website/public/` directory exists and has index.html
-- **View:** Detailed job logs in Actions tab
+
+- **Check:** `.github/workflows/pages.yml` syntax is valid
+- **Check:** `website/public/` directory exists and contains `index.html`
+- **Check:** `assets/` directory exists in `website/public/`
+- **View:** Detailed job logs in Actions tab for specific errors
+- **Common issues:**
+  - Missing `index.html` file
+  - Invalid YAML syntax
+  - Permissions not set correctly (check workflow permissions)
 
 ### Site shows 404
-- **Wait:** 2-3 minutes after deployment
-- **Check:** Settings > Pages shows correct URL
-- **Try:** Hard refresh (Ctrl+Shift+R)
+
+- **Wait:** 2-3 minutes after first deployment
+- **Check:** Settings > Pages shows correct source and URL
+- **Check:** GitHub Pages is enabled (green checkmark in Settings)
+- **Try:** Hard refresh browser (Ctrl+Shift+R or Cmd+Shift+R)
+- **Check:** Workflow completed successfully (Actions tab)
 
 ### Images/assets not loading
-- **Check:** File paths are correct (`assets/` not `/assets/`)
-- **Check:** Files are in `public/assets/` directory
-- **Check:** File names match exactly (case-sensitive on Linux)
+
+- **Check:** File paths are relative: `assets/images/icon.png` not `/assets/`
+- **Check:** Files exist in `public/assets/` or `public/assets/images/`
+- **Check:** File names match exactly (case-sensitive on Linux servers)
+- **Check:** Browser console (F12) for 404 errors
+- **Common issue:** WebP files not supported in older browsers (provide PNG fallbacks)
 
 ### Changes not appearing
+
 - **Clear browser cache:** Ctrl+Shift+R (Windows) or Cmd+Shift+R (macOS)
-- **Check workflow status:** Must complete successfully (Actions tab)
+- **Check workflow status:** Must show green ✓ in Actions tab
 - **Try:** Incognito/private browsing window
+- **Check:** Correct branch deployed (main/master)
+- **Wait:** GitHub Pages can take 1-2 minutes to update
+
+### Demo video not playing
+
+- **Check:** File size <5MB (GitHub Pages has file size limits)
+- **Check:** Video codec is H.264 (widely supported)
+- **Check:** File path correct: `assets/demo.mp4`
+- **Try:** Different browsers (codec support varies)
+- **Alternative:** Link to YouTube/Vimeo instead of self-hosting
+
+---
+
+## Readiness Assessment
+
+**Overall Status: 60% Ready**
+
+| Category | Status | Blockers |
+|----------|--------|----------|
+| Infrastructure | ✅ Complete | None |
+| HTML/CSS/JS | ✅ Complete | None |
+| Assets (Basic) | ⚠️ Partial | PNG→WebP conversion recommended |
+| Assets (Video) | ❌ Missing | Demo placeholder at line 220 |
+| Local Testing | ❌ Not Started | All items unchecked |
+| Performance | ❌ Not Started | Lighthouse audit needed |
+| Deployment | ❌ Not Enabled | GitHub Pages not activated |
+
+**Recommended Path to Production:**
+
+1. **Quick Staging Deploy** (30-60 minutes):
+   - Replace demo placeholder with screenshot or video
+   - Enable GitHub Pages for staging test
+   - Basic functionality test
+   - Optional: Convert existing PNGs to WebP
+
+2. **Production Ready** (+ 2-4 hours):
+   - Create demo video or replace placeholder with static screenshot
+   - Complete local testing checklist
+   - Run Lighthouse audit and fix issues
+   - Full responsive testing
+
+3. **Polish** (+ optional time):
+   - Add optional screenshots
+   - SEO optimization
+   - Custom domain setup
+   - Analytics integration
+
+---
 
 ## Next Steps
 
-After successful deployment:
+**To reach staging deployment:**
+1. ✅ Run asset optimization commands (see section 2) - Optional but recommended
+2. ✅ Replace demo placeholder (either video or fallback screenshot)
+3. ✅ Enable GitHub Pages in Settings
+4. ✅ Basic smoke test on deployed site
 
-1. ✅ Test the live site thoroughly
-2. ✅ Share the URL with beta testers for feedback
-3. ✅ Monitor analytics to see which sections get most attention
-4. ✅ Iterate based on user feedback
-5. ✅ Consider A/B testing different headlines/CTAs
+**To reach production quality:**
+1. ✅ Complete local testing checklist
+2. ✅ Run Lighthouse audit (target: 90+ all categories)
+3. ✅ Test on multiple devices/browsers
+4. ✅ Review and approve all content
+5. ✅ Plan promotion strategy
 
 ---
 
 **Questions or issues?** Open an issue in the main AnkiGammon repository or consult [website/README.md](README.md) for detailed documentation.
 
-**Website URL (after deployment):** `https://AnkiGammon.com` (custom domain configured)
-
-**Last updated:** 2025-10-20
+**Current Repository:** https://github.com/Deinonychus999/AnkiGammon
+**Target Website URL:** `https://Deinonychus999.github.io/AnkiGammon` (Option B) or `https://ankigammon.com` (with custom domain)

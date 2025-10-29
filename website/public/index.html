@@ -51,30 +51,12 @@
     <!-- Hero Section -->
     <section id="home" class="hero section">
         <div class="container">
-            <h1>Paste Any Position. Get Smart Study Cards.</h1>
+            <h1>Study Only Your Biggest Mistakes. Automatically Extracted.</h1>
             <p class="hero-subtitle">
-                Your backgammon analysis tool shows you the best move. AnkiGammon helps you remember it forever.
-                Supports XG, GnuBG, and OpenGammon formats with automatic analysis, score matrices, and instant Anki export.
+                Tired of manually turning backgammon analysis into flashcards? AnkiGammon does it for you. Import game files to automatically extract significant blunders, paste position IDs for instant GnuBG analysis, or load full XG exports. Add your own notes and explanations to each position. Customize everything, then export to Anki in one click.
             </p>
 
-            <div class="terminal-box">
-                <div style="padding: 1.5rem; text-align: left;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-                        <span style="color: var(--accent-success); font-weight: 600; font-size: 1.25rem;">1</span>
-                        <span style="color: var(--text-primary);">Launch the desktop application</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-                        <span style="color: var(--accent-success); font-weight: 600; font-size: 1.25rem;">2</span>
-                        <span style="color: var(--text-primary);">Paste XG analysis or position IDs (XGID/OGID/GNUID)</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <span style="color: var(--accent-success); font-weight: 600; font-size: 1.25rem;">3</span>
-                        <span style="color: var(--text-primary);">Preview positions visually → Export to Anki</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cta-buttons" style="align-items: flex-start;">
+            <div class="cta-buttons" style="align-items: flex-start; margin-top: 2rem;">
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
                     <a href="https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip" class="btn btn-primary">Download for Windows</a>
                     <a href="#install" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: underline;">Other platforms</a>
@@ -104,9 +86,32 @@
         <div class="container">
             <h2>Features</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2.5rem; font-size: 1.05rem;">
-                AnkiGammon combines visual board rendering with automatic analysis for effortless learning.
+                AnkiGammon is designed for flexibility and ease of use. Customize every aspect of your study cards while enjoying seamless workflow automation.
             </p>
             <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </div>
+                    <h3>Intelligent Blunder Filtering</h3>
+                    <p>Drag XG files (.xg) onto the window and AnkiGammon automatically keeps only blunders above your error threshold. Focus on meaningful mistakes, skip trivial decisions. Match file (.mat) support coming soon with automatic GnuBG analysis and filtering!</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <h3>Smart Format Detection</h3>
+                    <p>Paste any format: XGID, OGID, GNUID position IDs, or full XG analysis text. AnkiGammon automatically detects the format and provides helpful warnings if dependencies are needed.</p>
+                </div>
+
                 <div class="feature-card">
                     <div class="feature-icon">
                         <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
@@ -115,8 +120,8 @@
                             <line x1="12" y1="17" x2="12" y2="21"/>
                         </svg>
                     </div>
-                    <h3>Live Board Preview</h3>
-                    <p>See positions rendered as scalable SVG boards in real-time. Choose from 6 color schemes and toggle between clockwise/counter-clockwise board orientation to match your learning style.</p>
+                    <h3>Flexible Board Customization</h3>
+                    <p>Choose from 6 beautiful color schemes (Classic, Forest, Ocean, Desert, Sunset, Midnight) and toggle board orientation (clockwise/counter-clockwise). All settings persist automatically.</p>
                 </div>
 
                 <div class="feature-card">
@@ -128,7 +133,42 @@
                         </svg>
                     </div>
                     <h3>Automatic GnuBG Analysis</h3>
-                    <p>Paste position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. No manual rollout needed.</p>
+                    <p>Paste position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. Configure analysis depth (0-4 ply) to balance speed and accuracy.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <line x1="21" y1="10" x2="3" y2="10"/>
+                            <line x1="21" y1="6" x2="3" y2="6"/>
+                            <line x1="21" y1="14" x2="3" y2="14"/>
+                            <line x1="21" y1="18" x2="3" y2="18"/>
+                        </svg>
+                    </div>
+                    <h3>Smart Import Filtering</h3>
+                    <p>Set your error threshold (default 0.080) to automatically filter game records. Only import positions with significant blunders. Choose specific players to study. Your filter settings persist between sessions.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="6"/>
+                            <circle cx="12" cy="12" r="2"/>
+                        </svg>
+                    </div>
+                    <h3>Interactive Move Visualization</h3>
+                    <p>Click moves on the card back to see animated checker movements with smooth arc paths. Optional feature you can enable/disable to match your learning preference.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <h3>Dual Export Methods</h3>
+                    <p>Choose AnkiConnect for instant one-click export to running Anki, or APKG files for offline/portable decks. Visual progress tracking shows real-time status with cancellation support.</p>
                 </div>
 
                 <div class="feature-card">
@@ -141,29 +181,7 @@
                         </svg>
                     </div>
                     <h3>Score Matrix Generation</h3>
-                    <p>For cube decisions, AnkiGammon generates detailed score matrices showing equity at different match scores. Essential for understanding cube actions in tournament play.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                        </svg>
-                    </div>
-                    <h3>One-Click Export</h3>
-                    <p>Cards appear in Anki instantly via AnkiConnect—no import step, no file management. Visual progress tracking with background workers keeps the interface responsive.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"/>
-                            <circle cx="12" cy="12" r="6"/>
-                            <circle cx="12" cy="12" r="2"/>
-                        </svg>
-                    </div>
-                    <h3>Interactive Move Visualization</h3>
-                    <p>Click moves in the analysis table to see resulting positions with smooth animations. A unique learning aid that brings positions to life.</p>
+                    <p>For cube decisions, optionally generate detailed score matrices showing equity at different match scores. Essential for understanding cube actions in tournament play.</p>
                 </div>
 
                 <div class="feature-card">
@@ -175,7 +193,7 @@
                         </svg>
                     </div>
                     <h3>Complete Analysis</h3>
-                    <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Learn the why, not just the what.</p>
+                    <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Customize whether options appear on the card front for easier or harder study.</p>
                 </div>
             </div>
         </div>
@@ -185,29 +203,32 @@
     <section id="how-it-works" class="how-it-works section">
         <div class="container">
             <h2>How It Works</h2>
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
+                From import to Anki export in seconds. AnkiGammon automates the tedious parts while giving you complete control over customization.
+            </p>
             <div class="workflow-steps">
                 <div class="workflow-step">
                     <div class="step-number">1</div>
                     <h3>Launch the App</h3>
-                    <p>Double-click to open—ready to use instantly</p>
+                    <p>Double-click to open, ready instantly. Your previous settings (color scheme, orientation, deck name) load automatically. No configuration needed.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">2</div>
-                    <h3>Add Positions</h3>
-                    <p>Paste XG analysis or just position IDs (XGID/OGID/GNUID)—GnuBG automatically analyzes unanalyzed positions in the background</p>
+                    <h3>Add Positions Flexibly</h3>
+                    <p>Paste any format (XG analysis, XGID, OGID, GNUID) or drag-and-drop .xg files. Smart format detection warns you if dependencies are missing. Filter by error threshold and player.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">3</div>
-                    <h3>Preview & Manage</h3>
-                    <p>See live board previews with score matrices for cube decisions, manage your position list visually</p>
+                    <h3>Customize & Preview</h3>
+                    <p>See live board previews with your chosen color scheme. Toggle board orientation, configure GnuBG analysis depth, enable/disable interactive moves, and generate score matrices. All optional.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">4</div>
-                    <h3>Export to Anki</h3>
-                    <p>One click exports all positions—watch the progress bar as complete analysis cards are created</p>
+                    <h3>Export with One Click</h3>
+                    <p>Choose AnkiConnect (instant) or APKG export. Watch real-time progress with cancellation support. All your preferences persist for next time.</p>
                 </div>
             </div>
         </div>
@@ -378,6 +399,68 @@
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Can I filter which positions get imported from game files?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes! This is one of AnkiGammon's most powerful features. When importing .xg files, you can filter by:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li><strong>Error threshold:</strong> Set a minimum error threshold (default 0.080) to automatically import only significant blunders. Skip trivial decisions and focus on positions where you made meaningful mistakes.</li>
+                                <li><strong>Player selection:</strong> Choose to import mistakes from Player X (White), Player O (Black), or both. Perfect for studying only your own mistakes from a game record.</li>
+                            </ul>
+                            <p style="margin-top: 1rem;">These settings are remembered between sessions, so you don't need to reconfigure them each time. <strong>Coming soon:</strong> Match file (.mat) support with automatic GnuBG analysis of non-analyzed matches and intelligent blunder filtering. Just drag and drop!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>What customization options are available for the flashcards?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>AnkiGammon offers extensive customization options, all automatically saved:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li><strong>Color schemes:</strong> 6 themes (Classic, Forest, Ocean, Desert, Sunset, Midnight)</li>
+                                <li><strong>Board orientation:</strong> Counter-clockwise (standard) or clockwise numbering</li>
+                                <li><strong>Show options toggle:</strong> Display multiple-choice options on card front (easier) or hide them (harder)</li>
+                                <li><strong>Interactive moves:</strong> Enable/disable animated checker movements when clicking moves on the card back</li>
+                                <li><strong>Score matrix generation:</strong> Optionally generate detailed cube equity matrices for tournament positions</li>
+                                <li><strong>GnuBG analysis depth:</strong> Choose 0-4 ply to balance speed vs. accuracy</li>
+                                <li><strong>Export method:</strong> AnkiConnect (instant) or APKG (portable files)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Do I need to reconfigure settings every time I open the app?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No! All settings automatically persist to <code>~/.ankigammon/config.json</code>. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, import filters, and all other preferences are saved immediately when changed. The next time you open AnkiGammon, everything loads exactly as you left it. Even your window size and position are remembered.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
                         <h3>What is GNU Backgammon (GnuBG) and how do I install it?</h3>
                         <span class="faq-toggle">
                             <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
@@ -415,7 +498,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No. AnkiGammon creates a separate deck (default name: "My AnkiGammon Deck") with no interference to existing cards. You can customize the deck name.</p>
+                            <p>No. AnkiGammon creates a separate deck (default name: "My AnkiGammon Deck") with no interference to existing cards. You can customize the deck name in settings or by clicking the edit button next to the deck name.</p>
                         </div>
                     </div>
                 </div>
@@ -431,8 +514,8 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>AnkiConnect (recommended):</strong> Cards appear instantly in Anki while it's running. No import step needed. Requires AnkiConnect addon.<br><br>
-                            <strong>APKG export:</strong> Creates a file you manually import into Anki. Useful when Anki isn't running or for sharing decks.</p>
+                            <p><strong>AnkiConnect (recommended):</strong> Cards appear instantly in Anki while it's running. No import step needed. Requires AnkiConnect addon. Best for daily workflow.<br><br>
+                            <strong>APKG export:</strong> Creates a portable .apkg file you manually import into Anki. Useful when Anki isn't running or for sharing decks with others. Your export method preference is saved.</p>
                         </div>
                     </div>
                 </div>
@@ -448,23 +531,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. AnkiGammon offers 6 color schemes to match your preference: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). Your color scheme selection is saved and applied to all generated cards. You can change themes anytime in the settings.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>Can I change the board orientation?</h3>
-                        <span class="faq-toggle">
-                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes. AnkiGammon supports both clockwise and counter-clockwise board orientation. The default counter-clockwise orientation (point 1 at bottom right) is standard, but you can switch to clockwise (point 1 at bottom left) in the Options menu. Your preference is saved and applied to all generated cards automatically.</p>
+                            <p>Yes. AnkiGammon offers 6 color schemes to match your preference: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). You can also toggle board orientation between counter-clockwise (point 1 at bottom right, standard) and clockwise (point 1 at bottom left). All preferences are saved automatically and applied to all generated cards.</p>
                         </div>
                     </div>
                 </div>
