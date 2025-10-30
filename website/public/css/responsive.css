@@ -131,6 +131,33 @@
         flex-direction: column;
         text-align: center;
     }
+
+    /* Carousel Mobile Styles */
+    .embla {
+        padding: 0 var(--space-md);
+    }
+
+    .embla__button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .embla__button--prev {
+        left: var(--space-xs);
+    }
+
+    .embla__button--next {
+        right: var(--space-xs);
+    }
+
+    .embla__slide img {
+        max-height: 400px;
+    }
+
+    .slide-caption {
+        padding: var(--space-md);
+        font-size: 0.85rem;
+    }
 }
 
 /* Extra small mobile devices */
@@ -165,5 +192,29 @@
 
     .cta-buttons .btn {
         width: 100%;
+    }
+
+    /* Carousel Extra Small Mobile Styles */
+    .embla {
+        padding: 0 var(--space-sm);
+    }
+
+    .embla__button {
+        width: 36px;
+        height: 36px;
+    }
+
+    .embla__button .icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .embla__slide img {
+        max-height: 300px;
+    }
+
+    .embla__dot {
+        width: 10px;
+        height: 10px;
     }
 }

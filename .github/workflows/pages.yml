@@ -1,14 +1,22 @@
-name: Deploy to GitHub Pages
+name: Deploy Website to GitHub Pages
 
+# Runs on every commit to main/master (for website updates only)
+# This does NOT build the application executable - see release.yml for that
 on:
   push:
     branches:
       - main
       - master
+    paths:
+      - 'website/**'
+      - '.github/workflows/pages.yml'
   pull_request:
     branches:
       - main
       - master
+    paths:
+      - 'website/**'
+      - '.github/workflows/pages.yml'
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:

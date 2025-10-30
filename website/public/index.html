@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Convert backgammon positions to Anki flashcards. Paste XGID, OGID, or GNUID formats. Auto-analysis, intelligent filtering, one-click export to Anki.">
+    <meta name="description" content="Backgammon Anki flashcard generator. Convert backgammon positions to Anki cards automatically. Paste XGID, OGID, or GNUID formats. Auto-analysis, intelligent filtering, one-click export.">
     <meta name="author" content="AnkiGammon">
     <title>AnkiGammon - Backgammon Training Tool | Auto-Generate Anki Flashcards</title>
 
@@ -76,6 +76,14 @@
       "mainEntity": [
         {
           "@type": "Question",
+          "name": "Why use Anki for backgammon training?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Anki backgammon training is incredibly effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once—but without spaced repetition, you'll forget them. AnkiGammon bridges this gap by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "Do I need XG analysis or can I just paste position IDs?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -126,6 +134,128 @@
     }
     </script>
 
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://ankigammon.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Features",
+          "item": "https://ankigammon.com/#features"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Installation",
+          "item": "https://ankigammon.com/#install"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "FAQ",
+          "item": "https://ankigammon.com/#faq"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Enhanced Organization Schema (Knowledge Graph) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "AnkiGammon",
+      "url": "https://ankigammon.com/",
+      "logo": "https://ankigammon.com/assets/images/icon.webp",
+      "description": "Free, open-source Anki backgammon training software that converts game analysis into Anki flashcards automatically.",
+      "sameAs": [
+        "https://github.com/Deinonychus999/AnkiGammon",
+        "https://discord.gg/U8cmrCsK5x"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Support",
+        "url": "https://github.com/Deinonychus999/AnkiGammon/issues"
+      }
+    }
+    </script>
+
+    <!-- WebSite Schema with Search Action -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "AnkiGammon",
+      "url": "https://ankigammon.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://ankigammon.com/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- HowTo Schema - Installation Guide -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Install AnkiGammon on Windows",
+      "description": "Step-by-step guide to downloading and installing AnkiGammon backgammon training software on Windows",
+      "image": "https://ankigammon.com/assets/images/icon.webp",
+      "totalTime": "PT5M",
+      "tool": [
+        {
+          "@type": "HowToTool",
+          "name": "Anki 2.1.x"
+        },
+        {
+          "@type": "HowToTool",
+          "name": "AnkiConnect addon"
+        }
+      ],
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Download AnkiGammon",
+          "text": "Download ankigammon-windows.zip from the latest GitHub release",
+          "url": "https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Extract the Archive",
+          "text": "Extract the ZIP file to your preferred location on your computer"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Launch the Application",
+          "text": "Double-click ankigammon.exe to start the application (no installation required)"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Install AnkiConnect Addon",
+          "text": "Open Anki → Tools → Add-ons → Get Add-ons → Enter code: 2055492159 → Restart Anki"
+        }
+      ]
+    }
+    </script>
+
     <!-- CSS Files -->
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/variables.css">
@@ -139,7 +269,7 @@
     <nav class="nav">
         <div class="container nav-container">
             <a href="#home" class="nav-logo">
-                <img src="assets/images/icon.webp" alt="AnkiGammon" style="width: 32px; height: 32px; vertical-align: middle; margin-right: 0.5rem;">
+                <img src="assets/images/icon.webp" alt="AnkiGammon - Backgammon to Anki flashcard converter" width="32" height="32" style="vertical-align: middle; margin-right: 0.5rem;">
                 AnkiGammon
             </a>
             <button class="mobile-menu-toggle" aria-label="Toggle menu">
@@ -173,7 +303,7 @@
         <div class="container">
             <h1>Master Backgammon: Turn Your Mistakes Into Anki Flashcards</h1>
             <p class="hero-subtitle">
-                Tired of manually turning backgammon analysis into flashcards? AnkiGammon does it for you. Import game files to automatically extract significant blunders, paste position IDs for instant GnuBG analysis, or load full XG exports. Add your own notes and explanations to each position. Customize everything, then export to Anki in one click.
+                The best Anki backgammon tool for serious players. Stop manually converting backgammon analysis into flashcards—AnkiGammon does it automatically. Import game files to extract blunders, paste position IDs for instant analysis, or load full XG exports. Export to Anki in one click.
             </p>
 
             <div class="cta-buttons" style="align-items: flex-start; margin-top: 2rem;">
@@ -206,7 +336,7 @@
         <div class="container">
             <h2>Powerful Backgammon Study Features</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2.5rem; font-size: 1.05rem;">
-                AnkiGammon is designed for flexibility and ease of use. Customize every aspect of your study cards while enjoying seamless workflow automation.
+                The most powerful backgammon Anki integration available. Customize every aspect of your study cards while enjoying seamless workflow automation.
             </p>
             <div class="feature-grid">
                 <div class="feature-card">
@@ -223,9 +353,10 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
                         </svg>
                     </div>
                     <h3>Smart Format Detection</h3>
@@ -234,10 +365,12 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                            <line x1="8" y1="21" x2="16" y2="21"/>
-                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="13.5" cy="6.5" r=".5"/>
+                            <circle cx="17.5" cy="10.5" r=".5"/>
+                            <circle cx="8.5" cy="7.5" r=".5"/>
+                            <circle cx="6.5" cy="12.5" r=".5"/>
+                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
                         </svg>
                     </div>
                     <h3>Flexible Board Customization</h3>
@@ -246,10 +379,9 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
                         </svg>
                     </div>
                     <h3>Automatic GnuBG Analysis</h3>
@@ -258,11 +390,8 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <line x1="21" y1="10" x2="3" y2="10"/>
-                            <line x1="21" y1="6" x2="3" y2="6"/>
-                            <line x1="21" y1="14" x2="3" y2="14"/>
-                            <line x1="21" y1="18" x2="3" y2="18"/>
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                         </svg>
                     </div>
                     <h3>Smart Import Filtering</h3>
@@ -271,10 +400,9 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"/>
-                            <circle cx="12" cy="12" r="6"/>
-                            <circle cx="12" cy="12" r="2"/>
+                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                            <path d="M13 8l7-4v16l-7-4"/>
                         </svg>
                     </div>
                     <h3>Interactive Move Visualization</h3>
@@ -358,8 +486,59 @@
     <section id="demo" class="demo section">
         <div class="container">
             <h2>See It In Action</h2>
-            <div class="demo-placeholder">
-                <p>📹 Demo video or screenshots coming soon</p>
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
+                Explore AnkiGammon's intuitive interface and powerful features through these screenshots.
+            </p>
+
+            <!-- Carousel -->
+            <div class="embla">
+                <div class="embla__viewport">
+                    <div class="embla__container">
+                        <div class="embla__slide">
+                            <img src="assets/images/main-window.png" alt="AnkiGammon main window with position list and controls" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Main Window - Manage your positions with drag-and-drop support</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/add-positions.png" alt="Add positions dialog with format detection" width="1152" height="932" loading="lazy">
+                            <p class="slide-caption">Add Positions - Smart format detection for XGID, OGID, and GNUID</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/drag-and-drop.png" alt="Drag and drop XG files into AnkiGammon" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Drag & Drop - Import XG files with automatic blunder filtering</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/post-import.png" alt="Post-import view with imported positions" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Post-Import - Review and edit imported positions</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/add-note.png" alt="Add custom notes and explanations to positions" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Add Notes - Include your own explanations for each position</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/settings.png" alt="Settings dialog with color schemes and customization options" width="502" height="659" loading="lazy">
+                            <p class="slide-caption">Settings - Customize board appearance, export method, and analysis depth</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/anki-front.png" alt="Anki flashcard with backgammon position and multiple choice options" width="947" height="1133" loading="lazy">
+                            <p class="slide-caption">Anki Flashcard - Study with interactive cards featuring board visualization</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <button class="embla__button embla__button--prev" type="button" aria-label="Previous slide">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </button>
+                <button class="embla__button embla__button--next" type="button" aria-label="Next slide">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </button>
+
+                <!-- Pagination Dots -->
+                <div class="embla__dots"></div>
             </div>
         </div>
     </section>
@@ -367,7 +546,7 @@
     <!-- Installation Section -->
     <section id="install" class="installation section">
         <div class="container">
-            <h2>Download AnkiGammon - Free Backgammon Training Software</h2>
+            <h2>Download AnkiGammon - Free Backgammon Anki Training Software</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
                 AnkiGammon is a desktop application developed for <strong style="color: var(--accent-success);">Windows</strong>. macOS and Linux support is experimental.
             </p>
@@ -501,6 +680,22 @@
         <div class="container">
             <h2>Frequently Asked Questions</h2>
             <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Why use Anki for backgammon training?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Anki backgammon training is incredibly effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once—but without spaced repetition, you'll forget them. AnkiGammon bridges this gap by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
                         <h3>Do I need XG analysis or can I just paste position IDs?</h3>
@@ -690,6 +885,11 @@
     <script defer src="js/platform.js"></script>
     <script defer src="js/faq.js"></script>
     <script defer src="js/navigation.js"></script>
+
+    <!-- Embla Carousel - Load without defer to ensure availability -->
+    <script src="https://unpkg.com/embla-carousel@8.3.0/embla-carousel.umd.js"></script>
+    <script src="js/carousel.js"></script>
+
     <script type="module" defer src="js/main.js"></script>
 </body>
 </html>
