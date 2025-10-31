@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Backgammon Anki flashcard generator. Convert backgammon positions to Anki cards automatically. Paste XGID, OGID, or GNUID formats. Auto-analysis, intelligent filtering, one-click export.">
+    <meta name="description" content="Backgammon Anki flashcard generator. Convert backgammon positions to Anki cards automatically. Paste XGID, OGID, or GNUID formats. Auto-analysis, filter by error threshold, one-click export.">
     <meta name="author" content="AnkiGammon">
     <title>AnkiGammon - Backgammon Training Tool | Auto-Generate Anki Flashcards</title>
 
@@ -19,7 +19,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/">
     <meta property="og:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta property="og:description" content="Paste any backgammon position (XGID, OGID, GNUID) or drag XG files for automatic blunder filtering. Generate smart Anki flashcards with MCQ, live board preview, and 6 color schemes. Free & open source.">
+    <meta property="og:description" content="Paste any backgammon position (XGID, OGID, GNUID) or drag XG files for automatic blunder filtering. Generate Anki flashcards with MCQ, live board preview, and 6 color schemes. Free & open source.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:image:width" content="100">
     <meta property="og:image:height" content="100">
@@ -55,7 +55,7 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "Convert backgammon position analysis to Anki flashcards. Supports XGID, OGID, and GNUID formats with automated GnuBG analysis, intelligent blunder filtering, and direct Anki integration.",
+      "description": "Convert backgammon position analysis to Anki flashcards. Supports XGID, OGID, and GNUID formats with automated GnuBG analysis, blunder filtering by error threshold, and direct Anki integration.",
       "url": "https://ankigammon.com/",
       "downloadUrl": "https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip",
       "softwareVersion": "latest",
@@ -79,7 +79,7 @@
           "name": "Why use Anki for backgammon training?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Anki backgammon training is incredibly effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once—but without spaced repetition, you'll forget them. AnkiGammon bridges this gap by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game."
+            "text": "Anki backgammon training is effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once, but without spaced repetition, you'll forget them. AnkiGammon solves this problem by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game."
           }
         },
         {
@@ -303,7 +303,7 @@
         <div class="container">
             <h1>Master Backgammon: Turn Your Mistakes Into Anki Flashcards</h1>
             <p class="hero-subtitle">
-                The best Anki backgammon tool for serious players. Stop manually converting backgammon analysis into flashcards—AnkiGammon does it automatically. Import game files to extract blunders, paste position IDs for instant analysis, or load full XG exports. Export to Anki in one click.
+                Converts backgammon analysis into flashcards automatically, so you don't have to do it by hand. Import game files to extract blunders, paste position IDs for instant analysis, or load full XG exports. Export to Anki in one click.
             </p>
 
             <div class="cta-buttons" style="align-items: flex-start; margin-top: 2rem;">
@@ -334,9 +334,9 @@
     <!-- Features Section -->
     <section id="features" class="features section">
         <div class="container">
-            <h2>Powerful Backgammon Study Features</h2>
+            <h2>Backgammon Study Features</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2.5rem; font-size: 1.05rem;">
-                The most powerful backgammon Anki integration available. Customize every aspect of your study cards while enjoying seamless workflow automation.
+                Full control over your backgammon study cards. Customize everything while the app handles the boring stuff automatically.
             </p>
             <div class="feature-grid">
                 <div class="feature-card">
@@ -347,8 +347,8 @@
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
                     </div>
-                    <h3>Intelligent Blunder Filtering</h3>
-                    <p>Drag XG files (.xg) onto the window and AnkiGammon automatically keeps only blunders above your error threshold. Focus on meaningful mistakes, skip trivial decisions. Match file (.mat) support coming soon with automatic GnuBG analysis and filtering!</p>
+                    <h3>Filter by Error Size</h3>
+                    <p>Drag XG files (.xg) onto the window and AnkiGammon automatically keeps only blunders above your error threshold. Study big mistakes, ignore small ones. Match file (.mat) support coming soon with automatic GnuBG analysis and filtering!</p>
                 </div>
 
                 <div class="feature-card">
@@ -359,8 +359,8 @@
                             <path d="M2 12l10 5 10-5"/>
                         </svg>
                     </div>
-                    <h3>Smart Format Detection</h3>
-                    <p>Paste any format: XGID, OGID, GNUID position IDs, or full XG analysis text. AnkiGammon automatically detects the format and provides helpful warnings if dependencies are needed.</p>
+                    <h3>Automatic Format Detection</h3>
+                    <p>Paste any format: XGID, OGID, GNUID position IDs, or full XG analysis text. AnkiGammon automatically detects the format and tells you if you need to install GnuBG.</p>
                 </div>
 
                 <div class="feature-card">
@@ -373,8 +373,8 @@
                             <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
                         </svg>
                     </div>
-                    <h3>Flexible Board Customization</h3>
-                    <p>Choose from 6 beautiful color schemes (Classic, Forest, Ocean, Desert, Sunset, Midnight) and toggle board orientation (clockwise/counter-clockwise). All settings persist automatically.</p>
+                    <h3>Customize Board Appearance</h3>
+                    <p>Choose from 6 color schemes (Classic, Forest, Ocean, Desert, Sunset, Midnight) and toggle board orientation (clockwise/counter-clockwise). All settings save automatically.</p>
                 </div>
 
                 <div class="feature-card">
@@ -385,7 +385,7 @@
                         </svg>
                     </div>
                     <h3>Automatic GnuBG Analysis</h3>
-                    <p>Paste position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. Configure analysis depth (0-4 ply) to balance speed and accuracy.</p>
+                    <p>Paste position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. Pick how deep to analyze (0-4 ply). Deeper is more accurate but slower.</p>
                 </div>
 
                 <div class="feature-card">
@@ -394,8 +394,8 @@
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                         </svg>
                     </div>
-                    <h3>Smart Import Filtering</h3>
-                    <p>Set your error threshold (default 0.080) to automatically filter game records. Only import positions with significant blunders. Choose specific players to study. Your filter settings persist between sessions.</p>
+                    <h3>Filter Positions on Import</h3>
+                    <p>Set your error threshold (default 0.080) to automatically filter game records. Only import positions with significant blunders. Choose specific players to study. Your filter settings save automatically.</p>
                 </div>
 
                 <div class="feature-card">
@@ -415,8 +415,8 @@
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                         </svg>
                     </div>
-                    <h3>Dual Export Methods</h3>
-                    <p>Choose AnkiConnect for instant one-click export to running Anki, or APKG files for offline/portable decks. Visual progress tracking shows real-time status with cancellation support.</p>
+                    <h3>Two Ways to Export</h3>
+                    <p>Choose AnkiConnect for instant one-click export to running Anki, or APKG files for offline/portable decks. Shows progress as it exports.</p>
                 </div>
 
                 <div class="feature-card">
@@ -429,7 +429,7 @@
                         </svg>
                     </div>
                     <h3>Score Matrix Generation</h3>
-                    <p>For cube decisions, optionally generate detailed score matrices showing equity at different match scores. Essential for understanding cube actions in tournament play.</p>
+                    <p>For cube decisions, optionally generate detailed score matrices showing equity at different match scores. Helps you understand cube decisions in match play.</p>
                 </div>
 
                 <div class="feature-card">
@@ -440,8 +440,8 @@
                             <line x1="6" y1="20" x2="6" y2="16"/>
                         </svg>
                     </div>
-                    <h3>Complete Analysis</h3>
-                    <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Customize whether options appear on the card front for easier or harder study.</p>
+                    <h3>Full Move Analysis</h3>
+                    <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Show options on the front (easier) or hide them (harder).</p>
                 </div>
             </div>
         </div>
@@ -452,7 +452,7 @@
         <div class="container">
             <h2>From Backgammon Analysis to Anki Cards in Seconds</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
-                From import to Anki export in seconds. AnkiGammon automates the tedious parts while giving you complete control over customization.
+                From import to Anki export in seconds. AnkiGammon handles the boring stuff while you control how your cards look.
             </p>
             <div class="workflow-steps">
                 <div class="workflow-step">
@@ -463,20 +463,20 @@
 
                 <div class="workflow-step">
                     <div class="step-number">2</div>
-                    <h3>Add Positions Flexibly</h3>
-                    <p>Paste any format (XG analysis, XGID, OGID, GNUID) or drag-and-drop .xg files. Smart format detection warns you if dependencies are missing. Filter by error threshold and player.</p>
+                    <h3>Add Positions Any Way You Want</h3>
+                    <p>Paste any format (XG analysis, XGID, OGID, GNUID) or drag-and-drop .xg files. The app detects your format automatically and tells you if you're missing something. Filter by error threshold and player.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">3</div>
                     <h3>Customize & Preview</h3>
-                    <p>See live board previews with your chosen color scheme. Toggle board orientation, configure GnuBG analysis depth, enable/disable interactive moves, and generate score matrices. All optional.</p>
+                    <p>Preview your boards as you pick colors. Toggle board orientation, configure GnuBG analysis depth, enable/disable interactive moves, and generate score matrices. All optional.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">4</div>
                     <h3>Export with One Click</h3>
-                    <p>Choose AnkiConnect (instant) or APKG export. Watch real-time progress with cancellation support. All your preferences persist for next time.</p>
+                    <p>Choose AnkiConnect (instant) or APKG export. All your preferences save for next time.</p>
                 </div>
             </div>
         </div>
@@ -487,7 +487,7 @@
         <div class="container">
             <h2>See It In Action</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
-                Explore AnkiGammon's intuitive interface and powerful features through these screenshots.
+                Here's what the app looks like and what it can do.
             </p>
 
             <!-- Carousel -->
@@ -496,7 +496,7 @@
                     <div class="embla__container">
                         <div class="embla__slide">
                             <img src="assets/images/main-window.webp" alt="AnkiGammon main window with imported positions" width="1302" height="752" loading="lazy">
-                            <p class="slide-caption">Main Window - Manage positions with live board previews and drag-and-drop</p>
+                            <p class="slide-caption">Main Window - Your positions with board previews and drag-and-drop</p>
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/add-positions.webp" alt="Add positions dialog with smart format detection" width="1152" height="932" loading="lazy">
@@ -516,7 +516,7 @@
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/anki-front.webp" alt="Anki flashcard front with backgammon position and multiple choice" width="947" height="1133" loading="lazy">
-                            <p class="slide-caption">Card Front - Multiple-choice questions with beautiful board rendering</p>
+                            <p class="slide-caption">Card Front - Multiple-choice questions with clean board graphics</p>
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/anki-back.webp" alt="Anki flashcard back with move analysis" width="947" height="1133" loading="lazy">
@@ -556,7 +556,7 @@
         <div class="container">
             <h2>Download AnkiGammon - Free Backgammon Anki Training Software</h2>
             <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; font-size: 1.05rem;">
-                AnkiGammon is a desktop application developed for <strong style="color: var(--accent-success);">Windows</strong>. macOS and Linux support is experimental.
+                AnkiGammon works best on <strong style="color: var(--accent-success);">Windows</strong>. macOS and Linux support is experimental.
             </p>
 
             <div class="platform-buttons">
@@ -594,14 +594,14 @@
                     <h3>Windows <span style="font-size: 0.9rem; color: var(--accent-success); font-weight: 400;">(Recommended)</span></h3>
 
                     <p style="padding: 0.75rem; background: rgba(95, 184, 120, 0.1); border-left: 3px solid var(--accent-success); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
-                        <strong style="color: var(--accent-success);">✓ Fully Supported:</strong> Pre-built application ready to use, automatic builds with every release.
+                        <strong style="color: var(--accent-success);">✓ Fully Supported:</strong> Download and run, no building required. We update it with every release.
                     </p>
 
                     <ol>
                         <li>Download <code>ankigammon-windows.zip</code> from the <a href="https://github.com/Deinonychus999/AnkiGammon/releases" target="_blank" rel="noopener noreferrer">latest release</a> and extract it</li>
                         <li>Double-click to launch (no installation needed)</li>
                         <li>Add positions and configure settings visually</li>
-                        <li>Export directly to Anki with visual progress tracking!</li>
+                        <li>Export to Anki</li>
                     </ol>
 
                     <div class="requirements">
@@ -623,7 +623,7 @@
                     <h3>macOS <span style="font-size: 0.9rem; color: var(--text-dim); font-weight: 400;">(Advanced Users Only)</span></h3>
 
                     <p style="padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
-                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon is developed for Windows. macOS support is experimental and requires building from source. No pre-built executables available.
+                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon works best on Windows. macOS support is experimental and requires building from source. You'll need to build it yourself.
                     </p>
 
                     <ol>
@@ -650,7 +650,7 @@
                     <h3>Linux <span style="font-size: 0.9rem; color: var(--text-dim); font-weight: 400;">(Advanced Users Only)</span></h3>
 
                     <p style="padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
-                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon is developed for Windows. Linux support is experimental and requires building from source. No pre-built executables available.
+                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon works best on Windows. Linux support is experimental and requires building from source. You'll need to build it yourself.
                     </p>
 
                     <ol>
@@ -699,7 +699,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Anki backgammon training is incredibly effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once—but without spaced repetition, you'll forget them. AnkiGammon bridges this gap by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game.</p>
+                            <p>Anki backgammon training is effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once, but without spaced repetition, you'll forget them. AnkiGammon solves this problem by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game.</p>
                         </div>
                     </div>
                 </div>
@@ -777,7 +777,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No! All settings automatically persist to <code>~/.ankigammon/config.json</code>. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, import filters, and all other preferences are saved immediately when changed. The next time you open AnkiGammon, everything loads exactly as you left it. Even your window size and position are remembered.</p>
+                            <p>No! All settings save automatically to <code>~/.ankigammon/config.json</code>. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, import filters, and all other preferences are saved immediately when changed. The next time you open AnkiGammon, everything loads exactly as you left it. Even your window size and position are remembered.</p>
                         </div>
                     </div>
                 </div>
