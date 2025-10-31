@@ -13,77 +13,73 @@ function initSmoothScroll() {
                     behavior: 'smooth',
                     block: 'start'
                 });
-
-                // Close mobile menu after clicking a link
-                const navLinks = document.querySelector('.nav-links');
-                const menuToggle = document.querySelector('.mobile-menu-toggle');
-                if (navLinks && menuToggle) {
-                    navLinks.classList.remove('active');
-                    menuToggle.classList.remove('active');
-                }
             }
         });
     });
 }
 
 /**
- * Initialize mobile menu toggle
+ * Initialize scroll-hide navigation
+ * Hides nav on scroll down, shows on scroll up (mobile only)
  */
-function initMobileMenu() {
-    const menuToggle = document.querySelector('.mobile-menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
+function initScrollHideNav() {
+    const nav = document.querySelector('.nav');
+    if (!nav) return;
 
-    if (!menuToggle || !navLinks) return;
+    let lastScrollTop = 0;
+    let ticking = false;
 
-    // Toggle menu on button click
-    menuToggle.addEventListener('click', function(e) {
-        e.stopPropagation();
-        this.classList.toggle('active');
-        navLinks.classList.toggle('active');
-    });
+    function updateNavVisibility() {
+        // Only hide nav on mobile screens
+        if (window.innerWidth > 768) {
+            nav.classList.remove('nav-hidden');
+            return;
+        }
 
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
-            navLinks.classList.remove('active');
-            menuToggle.classList.remove('active');
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        // Show nav at top of page
+        if (scrollTop < 100) {
+            nav.classList.remove('nav-hidden');
+        }
+        // Hide when scrolling down, show when scrolling up
+        else if (scrollTop > lastScrollTop) {
+            nav.classList.add('nav-hidden');
+        } else {
+            nav.classList.remove('nav-hidden');
+        }
+
+        lastScrollTop = scrollTop;
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(updateNavVisibility);
+            ticking = true;
         }
     });
 
-    // Prevent menu from closing when clicking inside it
-    navLinks.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-
-    // Close menu on escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && navLinks.classList.contains('active')) {
-            navLinks.classList.remove('active');
-            menuToggle.classList.remove('active');
-        }
-    });
-
-    // Close menu when resizing to desktop
+    // Also check on resize
     window.addEventListener('resize', function() {
         if (window.innerWidth > 768) {
-            navLinks.classList.remove('active');
-            menuToggle.classList.remove('active');
+            nav.classList.remove('nav-hidden');
         }
     });
 }
 
 // Make functions globally available
 window.initSmoothScroll = initSmoothScroll;
-window.initMobileMenu = initMobileMenu;
+window.initScrollHideNav = initScrollHideNav;
 
 // Auto-initialize when DOM is ready (since script is deferred)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         initSmoothScroll();
-        initMobileMenu();
+        initScrollHideNav();
     });
 } else {
     // DOM already loaded
     initSmoothScroll();
-    initMobileMenu();
+    initScrollHideNav();
 }

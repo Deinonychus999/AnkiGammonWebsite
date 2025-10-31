@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Backgammon Anki flashcard generator. Convert backgammon positions to Anki cards automatically. Paste XGID, OGID, or GNUID formats. Auto-analysis, filter by error threshold, one-click export.">
+    <meta name="description" content="Backgammon Anki flashcard generator. Drag & drop .xg files with auto-blunder filtering, paste position IDs for GnuBG analysis (0-4 ply), add custom notes, generate score matrices. Interactive moves, 6 color schemes, settings persistence. Export via AnkiConnect or APKG.">
     <meta name="author" content="AnkiGammon">
     <title>AnkiGammon - Backgammon Training Tool | Auto-Generate Anki Flashcards</title>
 
@@ -19,7 +19,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/">
     <meta property="og:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta property="og:description" content="Paste any backgammon position (XGID, OGID, GNUID) or drag XG files for automatic blunder filtering. Generate Anki flashcards with MCQ, live board preview, and 6 color schemes. Free & open source.">
+    <meta property="og:description" content="Paste backgammon positions (XGID, OGID, GNUID) or drag .xg files with auto-blunder filtering. Add custom notes, configure GnuBG analysis depth (0-4 ply), generate score matrices. Interactive moves, 6 color schemes, settings persistence. Export via AnkiConnect or APKG. Free & open source.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:image:width" content="100">
     <meta property="og:image:height" content="100">
@@ -32,7 +32,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:url" content="https://ankigammon.com/">
     <meta name="twitter:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta name="twitter:description" content="Paste any backgammon position or drag XG files for automatic blunder filtering. Generate smart Anki flashcards. Free & open source.">
+    <meta name="twitter:description" content="Drag .xg files with auto-blunder filtering, paste position IDs for GnuBG analysis, add custom notes. Interactive moves, score matrices, 6 color schemes, settings persistence. Export via AnkiConnect or APKG. Free & open source.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta name="twitter:image:alt" content="AnkiGammon application icon - backgammon to Anki flashcard converter">
 
@@ -55,7 +55,7 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "Convert backgammon position analysis to Anki flashcards. Supports XGID, OGID, and GNUID formats with automated GnuBG analysis, blunder filtering by error threshold, and direct Anki integration.",
+      "description": "Convert backgammon position analysis to Anki flashcards with drag-and-drop XG file import, automatic blunder filtering, and GnuBG analysis. Supports XGID, OGID, and GNUID formats. Features include custom position notes, score matrix generation, interactive move visualization, and dual export options (AnkiConnect or APKG). All settings auto-save.",
       "url": "https://ankigammon.com/",
       "downloadUrl": "https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip",
       "softwareVersion": "latest",
@@ -92,10 +92,10 @@
         },
         {
           "@type": "Question",
-          "name": "Can I filter which positions get imported from game files?",
+          "name": "Can I import game files directly?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes! When importing .xg files, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection (X, O, or both). These settings are remembered between sessions."
+            "text": "Yes! You can drag-and-drop .xg files or use File > Import. When importing, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection (X, O, or both). These settings are remembered between sessions."
           }
         },
         {
@@ -103,7 +103,7 @@
           "name": "What customization options are available for the flashcards?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiGammon offers 6 color schemes, board orientation options (clockwise/counter-clockwise), show/hide options toggle, interactive move visualization, score matrix generation, configurable GnuBG analysis depth (0-4 ply), and choice of export methods (AnkiConnect or APKG)."
+            "text": "AnkiGammon offers 6 color schemes, board orientation options (clockwise/counter-clockwise), show/hide options toggle, interactive move visualization, custom notes for positions, score matrix generation for cube decisions, configurable GnuBG analysis depth (0-4 ply), and choice of export methods (AnkiConnect or APKG)."
           }
         },
         {
@@ -111,7 +111,7 @@
           "name": "Do I need to reconfigure settings every time I open the app?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No! All settings automatically persist to ~/.ankigammon/config.json. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, and all other preferences are saved immediately when changed."
+            "text": "No! All settings automatically persist to ~/.ankigammon/config.json. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, import filters, and all other preferences are saved immediately when changed."
           }
         },
         {
@@ -219,11 +219,11 @@
       "tool": [
         {
           "@type": "HowToTool",
-          "name": "Anki 2.1.x"
+          "name": "Anki"
         },
         {
           "@type": "HowToTool",
-          "name": "AnkiConnect addon"
+          "name": "AnkiConnect addon (optional, for direct export to desktop Anki)"
         }
       ],
       "step": [
@@ -244,13 +244,13 @@
           "@type": "HowToStep",
           "position": 3,
           "name": "Launch the Application",
-          "text": "Double-click ankigammon.exe to start the application (no installation required)"
+          "text": "Double-click ankigammon.exe to start the application (no Python installation required)"
         },
         {
           "@type": "HowToStep",
           "position": 4,
-          "name": "Install AnkiConnect Addon",
-          "text": "Open Anki → Tools → Add-ons → Get Add-ons → Enter code: 2055492159 → Restart Anki"
+          "name": "Choose Export Method",
+          "text": "For direct card export (recommended): Install AnkiConnect addon in Anki (Tools → Add-ons → Get Add-ons → Enter code: 2055492159 → Restart Anki). For manual import: Use APKG export method in AnkiGammon settings (no addon required)"
         }
       ]
     }
@@ -272,11 +272,6 @@
                 <img src="assets/images/icon.webp" alt="AnkiGammon - Backgammon to Anki flashcard converter" width="32" height="32" style="vertical-align: middle; margin-right: 0.5rem;">
                 AnkiGammon
             </a>
-            <button class="mobile-menu-toggle" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
             <div class="nav-links">
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#how-it-works" class="nav-link">How It Works</a>
@@ -347,8 +342,8 @@
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
                     </div>
-                    <h3>Filter by Error Size</h3>
-                    <p>Drag XG files (.xg) onto the window and AnkiGammon automatically keeps only blunders above your error threshold. Study big mistakes, ignore small ones. Match file (.mat) support coming soon with automatic GnuBG analysis and filtering!</p>
+                    <h3>Drag & Drop Import with Filtering</h3>
+                    <p>Drag XG files (.xg) directly onto the window to instantly import positions. AnkiGammon automatically extracts only the blunders that matter based on your error threshold. Match file (.mat) support coming soon with automatic GnuBG analysis!</p>
                 </div>
 
                 <div class="feature-card">
@@ -404,11 +399,15 @@
                 <div class="feature-card">
                     <div class="feature-icon">
                         <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
                         </svg>
                     </div>
-                    <h3>Filter Positions on Import</h3>
-                    <p>Set your error threshold (default 0.080) to automatically filter game records. Only import positions with significant blunders. Choose specific players to study. Your filter settings save automatically.</p>
+                    <h3>Add Custom Notes to Positions</h3>
+                    <p>Add your own explanations, insights, and reminders to any position. Your notes appear on the flashcard back, making it easy to capture key lessons and strategic patterns while building your deck.</p>
                 </div>
 
                 <div class="feature-card">
@@ -623,6 +622,10 @@
                         <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon works best on Windows. macOS support is experimental and requires building from source. You'll need to build it yourself.
                     </p>
 
+                    <p style="padding: 0.75rem; background: rgba(100, 150, 255, 0.1); border-left: 3px solid var(--accent-primary); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <strong>📦 Coming Soon:</strong> Pre-built DMG executable for easy installation.
+                    </p>
+
                     <ol>
                         <li>Install Python 3.8+: <code>brew install python3</code></li>
                         <li>Clone repository: <code>git clone https://github.com/Deinonychus999/AnkiGammon.git</code></li>
@@ -648,6 +651,10 @@
 
                     <p style="padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
                         <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon works best on Windows. Linux support is experimental and requires building from source. You'll need to build it yourself.
+                    </p>
+
+                    <p style="padding: 0.75rem; background: rgba(100, 150, 255, 0.1); border-left: 3px solid var(--accent-primary); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <strong>📦 Coming Soon:</strong> Pre-built tar.gz executable for easy installation.
                     </p>
 
                     <ol>
@@ -902,7 +909,7 @@
     <!-- Ko-fi Widget -->
     <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
     <script>
-      kofiWidgetOverlay.draw('deinonychus', {
+      kofiWidgetOverlay.draw('AnkiGammon', {
         'type': 'floating-chat',
         'floating-chat.donateButton.text': 'Support me',
         'floating-chat.donateButton.background-color': '#323842',
