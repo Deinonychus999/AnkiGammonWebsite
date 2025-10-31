@@ -53,9 +53,34 @@
         font-size: 1.1rem;
     }
 
+    /* Hero CTA Buttons - Center on mobile */
+    .hero .cta-buttons {
+        align-items: center !important;
+    }
+
     /* Mobile Navigation */
     .nav {
         padding: var(--space-sm) 0;
+    }
+
+    /* Platform Buttons - Keep in row on mobile */
+    .platform-buttons {
+        gap: var(--space-sm);
+    }
+
+    .platform-btn {
+        min-width: 120px;
+        padding: var(--space-md) var(--space-sm);
+        flex: 1;
+    }
+
+    .platform-icon {
+        font-size: 1.5rem;
+        margin-bottom: var(--space-xs);
+    }
+
+    .platform-name {
+        font-size: 0.9rem;
     }
 
     .nav-container {
@@ -192,6 +217,20 @@
 
     .cta-buttons .btn {
         width: 100%;
+    }
+
+    /* Platform Buttons - Even more compact on small screens */
+    .platform-btn {
+        min-width: 100px;
+        padding: var(--space-sm) var(--space-xs);
+    }
+
+    .platform-icon {
+        font-size: 1.25rem;
+    }
+
+    .platform-name {
+        font-size: 0.85rem;
     }
 
     /* Carousel Extra Small Mobile Styles */
