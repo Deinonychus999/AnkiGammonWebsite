@@ -495,32 +495,40 @@
                 <div class="embla__viewport">
                     <div class="embla__container">
                         <div class="embla__slide">
-                            <img src="assets/images/main-window.png" alt="AnkiGammon main window with position list and controls" width="1302" height="752" loading="lazy">
-                            <p class="slide-caption">Main Window - Manage your positions with drag-and-drop support</p>
+                            <img src="assets/images/main-window.webp" alt="AnkiGammon main window with imported positions" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Main Window - Manage positions with live board previews and drag-and-drop</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/add-positions.png" alt="Add positions dialog with format detection" width="1152" height="932" loading="lazy">
-                            <p class="slide-caption">Add Positions - Smart format detection for XGID, OGID, and GNUID</p>
+                            <img src="assets/images/add-positions.webp" alt="Add positions dialog with smart format detection" width="1152" height="932" loading="lazy">
+                            <p class="slide-caption">Add Positions - Paste XGID, OGID, GNUID, or full XG analysis text</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/drag-and-drop.png" alt="Drag and drop XG files into AnkiGammon" width="1302" height="752" loading="lazy">
-                            <p class="slide-caption">Drag & Drop - Import XG files with automatic blunder filtering</p>
+                            <img src="assets/images/drag-and-drop.webp" alt="Drag and drop XG files into AnkiGammon" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Drag & Drop - Import .xg files with automatic blunder filtering</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/post-import.png" alt="Post-import view with imported positions" width="1302" height="752" loading="lazy">
-                            <p class="slide-caption">Post-Import - Review and edit imported positions</p>
+                            <img src="assets/images/edit-note.webp" alt="Edit position and add custom notes" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Edit Notes - Add your own explanations and insights to each position</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/add-note.png" alt="Add custom notes and explanations to positions" width="1302" height="752" loading="lazy">
-                            <p class="slide-caption">Add Notes - Include your own explanations for each position</p>
+                            <img src="assets/images/settings.webp" alt="Settings dialog with color schemes and customization" width="502" height="659" loading="lazy">
+                            <p class="slide-caption">Settings - 6 color schemes, board orientation, GnuBG analysis, and more</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/settings.png" alt="Settings dialog with color schemes and customization options" width="502" height="659" loading="lazy">
-                            <p class="slide-caption">Settings - Customize board appearance, export method, and analysis depth</p>
+                            <img src="assets/images/anki-front.webp" alt="Anki flashcard front with backgammon position and multiple choice" width="947" height="1133" loading="lazy">
+                            <p class="slide-caption">Card Front - Multiple-choice questions with beautiful board rendering</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/anki-front.png" alt="Anki flashcard with backgammon position and multiple choice options" width="947" height="1133" loading="lazy">
-                            <p class="slide-caption">Anki Flashcard - Study with interactive cards featuring board visualization</p>
+                            <img src="assets/images/anki-back.webp" alt="Anki flashcard back with move analysis" width="947" height="1133" loading="lazy">
+                            <p class="slide-caption">Card Back - Detailed analysis with equities and interactive move visualization</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/anki-note.webp" alt="Position note in Anki before studying" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Anki Note - Your positions appear in Anki ready to study</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/score-matrix.webp" alt="Score matrix for cube decisions" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Score Matrix - Advanced cube analysis for tournament play (optional)</p>
                         </div>
                     </div>
                 </div>
@@ -747,7 +755,7 @@
                             <p>AnkiGammon offers extensive customization options, all automatically saved:</p>
                             <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
                                 <li><strong>Color schemes:</strong> 6 themes (Classic, Forest, Ocean, Desert, Sunset, Midnight)</li>
-                                <li><strong>Board orientation:</strong> Counter-clockwise (standard) or clockwise numbering</li>
+                                <li><strong>Board orientation:</strong> Counter-clockwise or clockwise numbering</li>
                                 <li><strong>Show options toggle:</strong> Display multiple-choice options on card front (easier) or hide them (harder)</li>
                                 <li><strong>Interactive moves:</strong> Enable/disable animated checker movements when clicking moves on the card back</li>
                                 <li><strong>Score matrix generation:</strong> Optionally generate detailed cube equity matrices for tournament positions</li>
@@ -889,6 +897,7 @@
     <!-- Embla Carousel - Load without defer to ensure availability -->
     <script src="https://unpkg.com/embla-carousel@8.3.0/embla-carousel.umd.js"></script>
     <script src="js/carousel.js"></script>
+    <script defer src="js/lightbox.js"></script>
 
     <script type="module" defer src="js/main.js"></script>
 </body>
