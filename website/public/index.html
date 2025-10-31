@@ -604,7 +604,7 @@
                         <h4>Requirements</h4>
                         <ul>
                             <li class="required">Anki 2.1.x installed</li>
-                            <li class="required">AnkiConnect addon (code: 2055492159)</li>
+                            <li>AnkiConnect addon (code: 2055492159, optional for direct export)</li>
                             <li>Windows 10 or later</li>
                             <li>GnuBG (optional, for automatic analysis of position IDs)</li>
                         </ul>
@@ -616,10 +616,14 @@
 
                 <!-- macOS Instructions -->
                 <div id="macos-install" class="install-section">
-                    <h3>macOS <span style="font-size: 0.9rem; color: var(--text-dim); font-weight: 400;">(Advanced Users Only)</span></h3>
+                    <h3>macOS <span style="font-size: 0.9rem; color: var(--accent-success); font-weight: 400;">(Use PyPI)</span></h3>
 
-                    <p style="padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
-                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon works best on Windows. macOS support is experimental and requires building from source. You'll need to build it yourself.
+                    <p style="padding: 0.75rem; background: rgba(95, 184, 120, 0.1); border-left: 3px solid var(--accent-success); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong style="color: var(--accent-success);">✓ Recommended:</strong> Install via PyPI (<code>pip install ankigammon</code>) for the easiest setup on macOS.
+                    </p>
+
+                    <p style="padding: 0.75rem; background: rgba(100, 150, 255, 0.1); border-left: 3px solid var(--accent-primary); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong>📦 Available on PyPI:</strong> <a href="https://pypi.org/project/ankigammon/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary);">pypi.org/project/ankigammon</a>
                     </p>
 
                     <p style="padding: 0.75rem; background: rgba(100, 150, 255, 0.1); border-left: 3px solid var(--accent-primary); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
@@ -628,18 +632,16 @@
 
                     <ol>
                         <li>Install Python 3.8+: <code>brew install python3</code></li>
-                        <li>Clone repository: <code>git clone https://github.com/Deinonychus999/AnkiGammon.git</code></li>
-                        <li>Install dependencies: <code>cd ankigammon && pip install -r requirements.txt</code></li>
-                        <li>Build: <code>./build_executable.sh</code></li>
-                        <li>Run: <code>./dist/ankigammon</code></li>
+                        <li>Install AnkiGammon: <code>pip install ankigammon</code></li>
+                        <li>Launch: <code>ankigammon</code></li>
                     </ol>
 
                     <div class="requirements">
                         <h4>Requirements</h4>
                         <ul>
-                            <li class="required">Python 3.8+ with pip and Git</li>
+                            <li class="required">Python 3.8+ with pip</li>
                             <li class="required">Anki 2.1.x</li>
-                            <li class="required">AnkiConnect addon (2055492159)</li>
+                            <li>AnkiConnect addon (2055492159, optional for direct export)</li>
                             <li>GnuBG (optional, for automatic analysis)</li>
                         </ul>
                     </div>
@@ -647,10 +649,14 @@
 
                 <!-- Linux Instructions -->
                 <div id="linux-install" class="install-section">
-                    <h3>Linux <span style="font-size: 0.9rem; color: var(--text-dim); font-weight: 400;">(Advanced Users Only)</span></h3>
+                    <h3>Linux <span style="font-size: 0.9rem; color: var(--accent-success); font-weight: 400;">(Use PyPI)</span></h3>
 
-                    <p style="padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
-                        <strong style="color: var(--accent-warning);">⚠️ Experimental:</strong> AnkiGammon works best on Windows. Linux support is experimental and requires building from source. You'll need to build it yourself.
+                    <p style="padding: 0.75rem; background: rgba(95, 184, 120, 0.1); border-left: 3px solid var(--accent-success); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong style="color: var(--accent-success);">✓ Recommended:</strong> Install via PyPI (<code>pip install ankigammon</code>) for the easiest setup on Linux.
+                    </p>
+
+                    <p style="padding: 0.75rem; background: rgba(100, 150, 255, 0.1); border-left: 3px solid var(--accent-primary); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong>📦 Available on PyPI:</strong> <a href="https://pypi.org/project/ankigammon/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary);">pypi.org/project/ankigammon</a>
                     </p>
 
                     <p style="padding: 0.75rem; background: rgba(100, 150, 255, 0.1); border-left: 3px solid var(--accent-primary); margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
@@ -658,20 +664,18 @@
                     </p>
 
                     <ol>
-                        <li>Install Python 3.8+: <code>sudo apt install python3 python3-pip git</code></li>
-                        <li>Clone repository: <code>git clone https://github.com/Deinonychus999/AnkiGammon.git</code></li>
-                        <li>Install dependencies: <code>cd ankigammon && pip install -r requirements.txt</code></li>
-                        <li>Build: <code>./build_executable.sh</code></li>
-                        <li>Run: <code>./dist/ankigammon</code></li>
+                        <li>Install Python 3.8+: <code>sudo apt install python3 python3-pip</code></li>
+                        <li>Install AnkiGammon: <code>pip install ankigammon</code></li>
+                        <li>Launch: <code>ankigammon</code></li>
                         <li>If errors occur: <code>sudo apt install libxcb1</code></li>
                     </ol>
 
                     <div class="requirements">
                         <h4>Requirements</h4>
                         <ul>
-                            <li class="required">Python 3.8+ with pip and Git</li>
+                            <li class="required">Python 3.8+ with pip</li>
                             <li class="required">Anki 2.1.x</li>
-                            <li class="required">AnkiConnect addon (2055492159)</li>
+                            <li>AnkiConnect addon (2055492159, optional for direct export)</li>
                             <li>Ubuntu 20.04+ or equivalent</li>
                             <li>GnuBG (optional, for automatic analysis)</li>
                         </ul>
