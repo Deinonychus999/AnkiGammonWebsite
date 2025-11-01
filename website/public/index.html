@@ -76,10 +76,18 @@
       "mainEntity": [
         {
           "@type": "Question",
+          "name": "Will this mess up my existing Anki decks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. AnkiGammon creates a separate deck with no interference to existing cards. You can customize the deck name in settings. If you export to a deck that already exists with the same name, it will append new cards to it rather than deleting or overwriting existing cards."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "Why use Anki for backgammon training?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Anki backgammon training is effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once, but without spaced repetition, you'll forget them. AnkiGammon solves this problem by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game."
+            "text": "Spaced repetition actually works. Anki schedules reviews at the right intervals to build long-term retention. AnkiGammon converts your analysis into Anki flashcards automatically, so you can use spaced repetition for mistakes and reference positions instead of making cards by hand."
           }
         },
         {
@@ -92,6 +100,14 @@
         },
         {
           "@type": "Question",
+          "name": "What's the difference between AnkiConnect and APKG export?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AnkiConnect provides instant export while Anki is running with no import step needed. APKG export creates portable files for manual import, useful when Anki isn't running or for sharing decks."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "Can I import game files directly?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -100,34 +116,18 @@
         },
         {
           "@type": "Question",
-          "name": "What customization options are available for the flashcards?",
+          "name": "Can I customize the board appearance?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiGammon offers 6 color schemes, board orientation options (clockwise/counter-clockwise), show/hide options toggle, interactive move visualization, custom notes for positions, score matrix generation for cube decisions, configurable GnuBG analysis depth (0-4 ply), and choice of export methods (AnkiConnect or APKG)."
+            "text": "Yes. AnkiGammon offers 6 color schemes: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). You can also toggle board orientation between bearing off on the right and bearing off on the left. All preferences are saved automatically and applied to all generated cards. The theme system is easy to extend - you can submit theme requests on GitHub or share ideas in the Discord community."
           }
         },
         {
           "@type": "Question",
-          "name": "Do I need to reconfigure settings every time I open the app?",
+          "name": "What other customization options are available?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No! All settings automatically persist to ~/.ankigammon/config.json. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, import filters, and all other preferences are saved immediately when changed."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Will this mess up my existing Anki decks?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. AnkiGammon creates a separate deck with no interference to existing cards. You can customize the deck name in settings. If you export to a deck that already exists with the same name, it will append new cards to it rather than deleting or overwriting existing cards."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What's the difference between AnkiConnect and APKG export?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "AnkiConnect provides instant export while Anki is running with no import step needed. APKG export creates portable files for manual import, useful when Anki isn't running or for sharing decks."
+            "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), configurable GnuBG analysis depth (0-4 ply to balance speed vs. accuracy), and export method choice (AnkiConnect for instant export or APKG for portable files)."
           }
         }
       ]
@@ -274,7 +274,7 @@
             </a>
             <div class="nav-links">
                 <a href="#features" class="nav-link">Features</a>
-                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#demo" class="nav-link">Screenshots</a>
                 <a href="#install" class="nav-link">Install</a>
                 <a href="#faq" class="nav-link">FAQ</a>
                 <a href="https://discord.gg/U8cmrCsK5x" class="nav-link nav-link--icon" target="_blank" rel="noopener noreferrer" title="Join our Discord">
@@ -454,25 +454,25 @@
                 <div class="workflow-step">
                     <div class="step-number">1</div>
                     <h3>Launch the App</h3>
-                    <p>Double-click to open, ready instantly. Your previous settings (color scheme, orientation, deck name) load automatically. No configuration needed.</p>
+                    <p>Your settings from last time load automatically.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">2</div>
-                    <h3>Add Positions Any Way You Want</h3>
-                    <p>Paste any format (XG analysis, XGID, OGID, GNUID) or drag-and-drop .xg files. The app detects your format automatically and tells you if you're missing something. Filter by error threshold and player.</p>
+                    <h3>Import Positions</h3>
+                    <p>Drag .xg files to filter blunders by error threshold and player. Paste position IDs (XGID/OGID/GNUID) for automatic GnuBG analysis. Or paste full XG analysis text. Format detection is automatic.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">3</div>
-                    <h3>Customize & Preview</h3>
-                    <p>Preview your boards as you pick colors. Toggle board orientation, configure GnuBG analysis depth, enable/disable interactive moves, and generate score matrices. All optional.</p>
+                    <h3>Customize & Add Notes</h3>
+                    <p>Add notes to positions. Pick colors and orientation. Show or hide answer options to adjust difficulty. Enable move animations, configure GnuBG depth, generate score matrices. Everything auto-saves.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">4</div>
-                    <h3>Export with One Click</h3>
-                    <p>Choose AnkiConnect (instant) or APKG export. All your preferences save for next time.</p>
+                    <h3>Export to Anki</h3>
+                    <p>AnkiConnect sends cards instantly while Anki runs. APKG creates files you import manually. Pick whichever you prefer.</p>
                 </div>
             </div>
         </div>
@@ -709,6 +709,23 @@
             <div class="faq-list">
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Will this mess up my existing Anki decks?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No. AnkiGammon creates a separate deck (default name: "My AnkiGammon Deck") with no interference to existing cards. You can customize the deck name in settings or by clicking the edit button next to the deck name.</p>
+                            <p><strong>Note:</strong> If you export to a deck that already exists with the same name, AnkiGammon will append new cards to it rather than deleting or overwriting existing cards.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
                         <h3>Why use Anki for backgammon training?</h3>
                         <span class="faq-toggle">
                             <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
@@ -718,7 +735,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Anki backgammon training is effective because it uses spaced repetition to ensure you review your actual mistakes at optimal intervals. Traditional backgammon study tools show you positions once, but without spaced repetition, you'll forget them. AnkiGammon solves this problem by converting your backgammon analysis into Anki flashcards automatically. This backgammon Anki integration means you study efficiently: you see positions right before you'd forget them, building long-term pattern recognition that directly improves your game.</p>
+                            <p>Spaced repetition actually works. Anki schedules reviews at the right intervals to build long-term retention. AnkiGammon converts your analysis into Anki flashcards automatically, so you can use spaced repetition for mistakes and reference positions instead of making cards by hand.</p>
                         </div>
                     </div>
                 </div>
@@ -735,113 +752,6 @@
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. You can configure the analysis depth (0-4 ply) in settings. For cube decisions, it can even generate full score matrices showing equity at different match scores.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>Can I filter which positions get imported from game files?</h3>
-                        <span class="faq-toggle">
-                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes! This is one of AnkiGammon's most powerful features. When importing .xg files, you can filter by:</p>
-                            <ul>
-                                <li><strong>Error threshold:</strong> Set a minimum error threshold (default 0.080) to automatically import only significant blunders. Skip trivial decisions and focus on positions where you made meaningful mistakes.</li>
-                                <li><strong>Player selection:</strong> Choose to import mistakes from Player X (White), Player O (Black), or both. Perfect for studying only your own mistakes from a game record.</li>
-                            </ul>
-                            <p>These settings are remembered between sessions, so you don't need to reconfigure them each time. <strong>Coming soon:</strong> Match file (.mat) support with automatic GnuBG analysis of non-analyzed matches and intelligent blunder filtering. Just drag and drop!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>What customization options are available for the flashcards?</h3>
-                        <span class="faq-toggle">
-                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>AnkiGammon offers extensive customization options, all automatically saved:</p>
-                            <ul>
-                                <li><strong>Color schemes:</strong> 6 themes (Classic, Forest, Ocean, Desert, Sunset, Midnight)</li>
-                                <li><strong>Board orientation:</strong> Counter-clockwise or clockwise numbering</li>
-                                <li><strong>Show options toggle:</strong> Display multiple-choice options on card front (easier) or hide them (harder)</li>
-                                <li><strong>Interactive moves:</strong> Enable/disable animated checker movements when clicking moves on the card back</li>
-                                <li><strong>Score matrix generation:</strong> Optionally generate detailed cube equity matrices for tournament positions</li>
-                                <li><strong>GnuBG analysis depth:</strong> Choose 0-4 ply to balance speed vs. accuracy</li>
-                                <li><strong>Export method:</strong> AnkiConnect (instant) or APKG (portable files)</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>Do I need to reconfigure settings every time I open the app?</h3>
-                        <span class="faq-toggle">
-                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>No! All settings save automatically to <code>~/.ankigammon/config.json</code>. Your color scheme, board orientation, deck name, export method, GnuBG path, analysis depth, import filters, and all other preferences are saved immediately when changed. The next time you open AnkiGammon, everything loads exactly as you left it. Even your window size and position are remembered.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>What is GNU Backgammon (GnuBG) and how do I install it?</h3>
-                        <span class="faq-toggle">
-                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p><strong>What is GnuBG?</strong><br>
-                            GNU Backgammon is a free, world-class backgammon engine that plays and analyzes at expert level. AnkiGammon uses it to automatically analyze positions when you paste just position IDs without analysis. It's completely optional but enables the automatic analysis feature.</p>
-
-                            <p><strong>Installation:</strong></p>
-                            <ul>
-                                <li><strong>Windows:</strong> Download the installer (version 1.07) from <a href="https://ftp.gnu.org/gnu/gnubg/gnubg-1_07_001-20221114-setup.exe" target="_blank" rel="noopener noreferrer nofollow">ftp.gnu.org</a> and run the .exe file.</li>
-                                <li><strong>macOS:</strong> Use Homebrew: <code>brew install --cask gnubg</code></li>
-                                <li><strong>Linux:</strong> Install from your package manager: <code>sudo apt install gnubg</code> (Ubuntu/Debian) or <code>sudo dnf install gnubg</code> (Fedora)</li>
-                            </ul>
-
-                            <p class="note">Note: macOS and Linux package managers may install a different version than the Windows installer.</p>
-
-                            <p>Once installed, AnkiGammon will automatically detect and use GnuBG for position analysis. You can configure the analysis depth (0-4 ply) in the settings.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>Will this mess up my existing Anki decks?</h3>
-                        <span class="faq-toggle">
-                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>No. AnkiGammon creates a separate deck (default name: "My AnkiGammon Deck") with no interference to existing cards. You can customize the deck name in settings or by clicking the edit button next to the deck name.</p>
-                            <p><strong>Note:</strong> If you export to a deck that already exists with the same name, AnkiGammon will append new cards to it rather than deleting or overwriting existing cards.</p>
                         </div>
                     </div>
                 </div>
@@ -865,6 +775,27 @@
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Can I filter which positions get imported from game files?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes! This is one of AnkiGammon's most powerful features. When importing .xg files, you can filter by:</p>
+                            <ul>
+                                <li><strong>Error threshold:</strong> Set a minimum error threshold (default 0.080) to automatically import only significant blunders. Skip trivial decisions and focus on positions where you made meaningful mistakes.</li>
+                                <li><strong>Player selection:</strong> Choose which player's mistakes to import, or import both. Perfect for studying only your own mistakes from a game record.</li>
+                            </ul>
+                            <p>These settings are remembered between sessions, so you don't need to reconfigure them each time. <strong>Coming soon:</strong> Match file (.mat) support with automatic GnuBG analysis of non-analyzed matches and intelligent blunder filtering. Just drag and drop!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
                         <h3>Can I customize the board appearance?</h3>
                         <span class="faq-toggle">
                             <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
@@ -874,7 +805,59 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. AnkiGammon offers 6 color schemes to match your preference: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). You can also toggle board orientation between counter-clockwise (point 1 at bottom right, standard) and clockwise (point 1 at bottom left). All preferences are saved automatically and applied to all generated cards.</p>
+                            <p>Yes. AnkiGammon offers 6 color schemes to match your preference: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). You can also toggle board orientation between bearing off on the right and bearing off on the left. All preferences are saved automatically and applied to all generated cards.</p>
+                            <p>We would love hearing theme ideas from the community! You can <a href="https://github.com/Deinonychus999/AnkiGammon/issues/new?template=theme-request.md" target="_blank" rel="noopener noreferrer">submit a theme request on GitHub</a> with your color preferences or visual inspiration, or share mockups and brainstorm ideas in our <a href="https://discord.gg/U8cmrCsK5x" target="_blank" rel="noopener noreferrer">Discord community</a>. The theme system is easy to extend, so well-described requests can be implemented quickly!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>What other customization options are available?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved:</p>
+                            <ul>
+                                <li><strong>Show options toggle:</strong> Display multiple-choice options on card front or hide them. Number of choices is customizable.</li>
+                                <li><strong>Interactive moves:</strong> Enable/disable animated checker movements when clicking moves on the card back</li>
+                                <li><strong>Score matrix generation:</strong> Optionally generate detailed cube equity matrices for match play</li>
+                                <li><strong>GnuBG analysis depth:</strong> Choose 0-4 ply to balance speed vs. accuracy</li>
+                                <li><strong>Export method:</strong> AnkiConnect (instant) or APKG (portable files)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>What is GNU Backgammon (GnuBG) and how do I install it?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>What is GnuBG?</strong><br>
+                            GNU Backgammon is a free, world-class backgammon engine that plays and analyzes at expert level. AnkiGammon uses it to automatically analyze positions when you paste just position IDs without analysis. It's completely optional but enables the automatic analysis feature.</p>
+
+                            <p><strong>Installation:</strong></p>
+                            <ul>
+                                <li><strong>Windows:</strong> Download the installer from <a href="https://www.gnu.org/software/gnubg/#TOCdownloading" target="_blank" rel="noopener noreferrer nofollow">gnu.org</a> and run the .exe file.</li>
+                                <li><strong>macOS:</strong> Use Homebrew: <code>brew install --cask gnubg</code> or MacPorts: <code>sudo port install gnubg</code></li>
+                                <li><strong>Linux:</strong> Install from your package manager: <code>sudo apt install gnubg</code> (Ubuntu/Debian) or <code>sudo dnf install gnubg</code> (Fedora)</li>
+                            </ul>
+
+                            <p class="note">Note: macOS and Linux package managers may install a different version than the Windows installer.</p>
+
+                            <p>Once installed, AnkiGammon will automatically detect and use GnuBG for position analysis. You can configure the analysis depth (0-4 ply) in the settings.</p>
                         </div>
                     </div>
                 </div>
