@@ -28,6 +28,11 @@
     text-decoration: none;
 }
 
+.nav-logo img {
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
 .nav-links {
     display: flex;
     gap: var(--space-xl);
@@ -44,12 +49,24 @@
     color: var(--text-primary);
 }
 
+.nav-link--icon {
+    display: inline-flex;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+}
+
+.nav-link--icon .icon {
+    width: 20px;
+    height: 20px;
+}
+
 .nav-cta {
     background: var(--accent-primary);
     color: var(--bg-primary);
     padding: 10px 24px;
     border-radius: 6px;
-    font-weight: 500;
+    font-weight: 600;
     transition: background 0.2s;
 }
 
@@ -92,6 +109,7 @@
     display: flex;
     gap: var(--space-md);
     justify-content: center;
+    margin-top: 2rem;
     margin-bottom: var(--space-2xl);
     flex-wrap: wrap;
 }
@@ -446,6 +464,53 @@
     display: block;
 }
 
+.install-section .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.install-section .btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.install-downloads {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.install-pypi-note {
+    color: var(--text-secondary);
+    align-self: center;
+}
+
+.install-section ol {
+    list-style-position: inside;
+}
+
+.install-section ul {
+    margin-left: 1.5rem;
+    list-style-position: inside;
+}
+
+.install-section .faq-answer ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.install-section p.intro {
+    margin-bottom: 1rem;
+}
+
+.install-anki-note {
+    text-align: center;
+    margin-top: 2rem;
+}
+
 .requirements {
     background: var(--code-bg);
     border: 1px solid var(--border);
@@ -567,6 +632,22 @@
     color: var(--text-secondary);
 }
 
+.faq-answer-content ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.faq-answer-content p + p,
+.faq-answer-content ul + p {
+    margin-top: 1rem;
+}
+
+.faq-answer-content .note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
 /* ===== Footer ===== */
 .footer {
     background: var(--bg-primary);
@@ -595,6 +676,15 @@
 
 .footer-link:hover {
     color: var(--accent-primary);
+}
+
+.footer-link--icon {
+    display: inline-flex;
+    align-items: center;
+}
+
+.footer-link--icon .icon {
+    margin-right: 0.25rem;
 }
 
 .footer-credit {

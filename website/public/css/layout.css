@@ -9,3 +9,16 @@
     padding: var(--space-3xl) 0;
     scroll-margin-top: 50px;
 }
+
+/* ===== Section Intro ===== */
+.section-intro {
+    text-align: center;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+    font-size: 1.05rem;
+}
+
+.section-intro--reduced-margin {
+    margin-bottom: 2rem;
+}
