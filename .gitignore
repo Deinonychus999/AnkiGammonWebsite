@@ -1,0 +1,42 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Temporary Files
+*.log
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# Node (if you ever add build tools)
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Python (if you ever use local server)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+
+# Backups
+*.backup
+*-backup/
