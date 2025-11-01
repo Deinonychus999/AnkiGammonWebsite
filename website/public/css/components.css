@@ -404,16 +404,19 @@
     transition: all 0.2s;
     min-width: 180px;
     text-align: center;
+    color: var(--text-secondary);
 }
 
 .platform-btn:hover {
     border-color: var(--accent-primary);
     background: var(--bg-surface);
+    color: var(--text-primary);
 }
 
 .platform-btn.active {
     border-color: var(--accent-primary);
     background: rgba(91, 157, 217, 0.1);
+    color: var(--accent-primary);
 }
 
 .platform-icon {
