@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Backgammon Anki flashcard generator. Drag & drop .xg files with auto-blunder filtering, paste position IDs for GnuBG analysis (0-4 ply), add custom notes, generate score matrices. Interactive moves, 6 color schemes, settings persistence. Export via AnkiConnect or APKG.">
+    <meta name="description" content="Backgammon Anki flashcard generator. Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis or pre-analyzed .xg files. Blunder filtering, position IDs, custom notes, score matrices. Interactive moves, 6 color schemes. Export via AnkiConnect or APKG.">
     <meta name="author" content="AnkiGammon">
     <title>AnkiGammon - Backgammon Training Tool | Auto-Generate Anki Flashcards</title>
 
@@ -19,7 +19,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/">
     <meta property="og:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta property="og:description" content="Paste backgammon positions (XGID, OGID, GNUID) or drag .xg files with auto-blunder filtering. Add custom notes, configure GnuBG analysis depth (0-4 ply), generate score matrices. Interactive moves, 6 color schemes, settings persistence. Export via AnkiConnect or APKG. Free & open source.">
+    <meta property="og:description" content="Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis or pre-analyzed .xg files. Paste positions (XGID, OGID, GNUID), add custom notes, configure analysis depth (0-4 ply), generate score matrices. Interactive moves, 6 color schemes. Export via AnkiConnect or APKG. Free & open source.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:image:width" content="100">
     <meta property="og:image:height" content="100">
@@ -32,7 +32,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:url" content="https://ankigammon.com/">
     <meta name="twitter:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta name="twitter:description" content="Drag .xg files with auto-blunder filtering, paste position IDs for GnuBG analysis, add custom notes. Interactive moves, score matrices, 6 color schemes, settings persistence. Export via AnkiConnect or APKG. Free & open source.">
+    <meta name="twitter:description" content="Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis or pre-analyzed .xg files. Paste position IDs, add custom notes. Interactive moves, score matrices, 6 color schemes. Export via AnkiConnect or APKG. Free & open source.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta name="twitter:image:alt" content="AnkiGammon application icon - backgammon to Anki flashcard converter">
 
@@ -55,7 +55,7 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "Convert backgammon position analysis to Anki flashcards with drag-and-drop XG file import, automatic blunder filtering, and GnuBG analysis. Supports XGID, OGID, and GNUID formats. Features include custom position notes, score matrix generation, interactive move visualization, and dual export options (AnkiConnect or APKG). All settings auto-save.",
+      "description": "Convert backgammon matches to Anki flashcards with drag-and-drop import for raw match files (.mat, .txt, .sgf) that get auto-analyzed with GnuBG or pre-analyzed .xg files. Automatic blunder filtering. Supports XGID, OGID, and GNUID formats. Features include custom position notes, score matrix generation, interactive move visualization, and dual export options (AnkiConnect or APKG). All settings auto-save.",
       "url": "https://ankigammon.com/",
       "downloadUrl": "https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip",
       "softwareVersion": "latest",
@@ -108,10 +108,10 @@
         },
         {
           "@type": "Question",
-          "name": "Can I import game files directly?",
+          "name": "Can I import non-analyzed match files?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes! You can drag-and-drop .xg files or use File > Import. When importing, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection (X, O, or both). These settings are remembered between sessions."
+            "text": "Yes! Drag raw match files like .mat, .txt, .sgf, etc. for automatic GnuBG analysis, or pre-analyzed .xg files (from eXtreme Gammon). When importing, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection. These settings are remembered between sessions."
           }
         },
         {
@@ -179,7 +179,7 @@
       "description": "Free, open-source Anki backgammon training software that converts game analysis into Anki flashcards automatically.",
       "sameAs": [
         "https://github.com/Deinonychus999/AnkiGammon",
-        "https://discord.gg/U8cmrCsK5x"
+        "https://discord.gg/vyFSgtWXSr"
       ],
       "contactPoint": {
         "@type": "ContactPoint",
@@ -277,7 +277,7 @@
                 <a href="#demo" class="nav-link">Screenshots</a>
                 <a href="#install" class="nav-link">Install</a>
                 <a href="#faq" class="nav-link">FAQ</a>
-                <a href="https://discord.gg/U8cmrCsK5x" class="nav-link nav-link--icon" target="_blank" rel="noopener noreferrer" title="Join our Discord">
+                <a href="https://discord.gg/vyFSgtWXSr" class="nav-link nav-link--icon" target="_blank" rel="noopener noreferrer" title="Join our Discord">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126.644 96">
                         <path fill="#e0e3ff" d="M81.15,0c-1.2376,2.1973-2.3489,4.4704-3.3591,6.794-9.5975-1.4396-19.3718-1.4396-28.9945,0-.985-2.3236-2.1216-4.5967-3.3591-6.794-9.0166,1.5407-17.8059,4.2431-26.1405,8.0568C2.779,32.5304-1.6914,56.3725.5312,79.8863c9.6732,7.1476,20.5083,12.603,32.0505,16.0884,2.6014-3.4854,4.8998-7.1981,6.8698-11.0623-3.738-1.3891-7.3497-3.1318-10.8098-5.1523.9092-.6567,1.7932-1.3386,2.6519-1.9953,20.281,9.547,43.7696,9.547,64.0758,0,.8587.7072,1.7427,1.3891,2.6519,1.9953-3.4601,2.0457-7.0718,3.7632-10.835,5.1776,1.97,3.8642,4.2683,7.5769,6.8698,11.0623,11.5419-3.4854,22.3769-8.9156,32.0509-16.0631,2.626-27.2771-4.496-50.9172-18.817-71.8548C98.9811,4.2684,90.1918,1.5659,81.1752.0505l-.0252-.0505ZM42.2802,65.4144c-6.2383,0-11.4159-5.6575-11.4159-12.6535s4.9755-12.6788,11.3907-12.6788,11.5169,5.708,11.4159,12.6788c-.101,6.9708-5.026,12.6535-11.3907,12.6535ZM84.3576,65.4144c-6.2637,0-11.3907-5.6575-11.3907-12.6535s4.9755-12.6788,11.3907-12.6788,11.4917,5.708,11.3906,12.6788c-.101,6.9708-5.026,12.6535-11.3906,12.6535Z"/>
                     </svg>
@@ -298,7 +298,7 @@
         <div class="container">
             <h1>Master Backgammon: Turn Your Mistakes Into Anki Flashcards</h1>
             <p class="hero-subtitle">
-                Converts backgammon analysis into flashcards automatically, so you don't have to do it by hand. Import game files to extract blunders, paste position IDs for instant analysis, or load full XG exports. Export to Anki in one click.
+                Converts backgammon matches into flashcards automatically. Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis, or pre-analyzed .xg files. Filter blunders, paste position IDs, export to Anki in one click.
             </p>
 
             <div class="cta-buttons">
@@ -339,8 +339,8 @@
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
                     </div>
-                    <h3>Drag & Drop Import with Filtering</h3>
-                    <p>Drag XG files (.xg) directly onto the window to instantly import positions. AnkiGammon automatically extracts only the blunders that matter based on your error threshold. Match file (.mat) support coming soon with automatic GnuBG analysis!</p>
+                    <h3>Drag & Drop Any Match File</h3>
+                    <p>Drag raw match files (.mat, .txt, .sgf, etc.) directly onto the window for automatic GnuBG analysis, or pre-analyzed .xg files. Filter by error threshold to extract only significant blunders. Filter by player to study only your own mistakes.</p>
                 </div>
 
                 <div class="feature-card">
@@ -390,7 +390,7 @@
                         </svg>
                     </div>
                     <h3>Automatic GnuBG Analysis</h3>
-                    <p>Paste position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. Pick how deep to analyze (0-4 ply). Deeper is more accurate but slower.</p>
+                    <p>Drag raw match files or enter position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. Pick how deep to analyze (0-4 ply). Deeper is more accurate but slower.</p>
                 </div>
 
                 <div class="feature-card">
@@ -437,7 +437,7 @@
                         </svg>
                     </div>
                     <h3>Full Move Analysis</h3>
-                    <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Show options on the front (easier) or hide them (harder).</p>
+                    <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Show options on the front or hide them.</p>
                 </div>
             </div>
         </div>
@@ -454,13 +454,13 @@
                 <div class="workflow-step">
                     <div class="step-number">1</div>
                     <h3>Launch the App</h3>
-                    <p>Your settings from last time load automatically.</p>
+                    <p>No installation necessary. Just download and run.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">2</div>
                     <h3>Import Positions</h3>
-                    <p>Drag .xg files to filter blunders by error threshold and player. Paste position IDs (XGID/OGID/GNUID) for automatic GnuBG analysis. Or paste full XG analysis text. Format detection is automatic.</p>
+                    <p>Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis, or pre-analyzed .xg files. Filter blunders by error threshold and player. Paste position IDs (XGID/OGID/GNUID) for automatic analysis. Format detection is automatic.</p>
                 </div>
 
                 <div class="workflow-step">
@@ -775,7 +775,7 @@
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>Can I filter which positions get imported from game files?</h3>
+                        <h3>Can I import non-analyzed match files?</h3>
                         <span class="faq-toggle">
                             <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                 <polyline points="6 9 12 15 18 9"/>
@@ -784,12 +784,13 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes! This is one of AnkiGammon's most powerful features. When importing .xg files, you can filter by:</p>
+                            <p>Yes! Drag raw match files like .mat, .txt, .sgf, etc. for automatic GnuBG analysis, or pre-analyzed .xg files (from eXtreme Gammon).</p>
+                            <p>When importing, you can filter by:</p>
                             <ul>
                                 <li><strong>Error threshold:</strong> Set a minimum error threshold (default 0.080) to automatically import only significant blunders. Skip trivial decisions and focus on positions where you made meaningful mistakes.</li>
-                                <li><strong>Player selection:</strong> Choose which player's mistakes to import, or import both. Perfect for studying only your own mistakes from a game record.</li>
+                                <li><strong>Player selection:</strong> Choose which player's mistakes to import. Perfect for studying only your own mistakes from a game record.</li>
                             </ul>
-                            <p>These settings are remembered between sessions, so you don't need to reconfigure them each time. <strong>Coming soon:</strong> Match file (.mat) support with automatic GnuBG analysis of non-analyzed matches and intelligent blunder filtering. Just drag and drop!</p>
+                            <p>These settings are remembered between sessions, so you don't need to reconfigure them each time.</p>
                         </div>
                     </div>
                 </div>
@@ -806,7 +807,7 @@
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes. AnkiGammon offers 6 color schemes to match your preference: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). You can also toggle board orientation between bearing off on the right and bearing off on the left. All preferences are saved automatically and applied to all generated cards.</p>
-                            <p>We would love hearing theme ideas from the community! You can <a href="https://github.com/Deinonychus999/AnkiGammon/issues/new?template=theme-request.md" target="_blank" rel="noopener noreferrer">submit a theme request on GitHub</a> with your color preferences or visual inspiration, or share mockups and brainstorm ideas in our <a href="https://discord.gg/U8cmrCsK5x" target="_blank" rel="noopener noreferrer">Discord community</a>. The theme system is easy to extend, so well-described requests can be implemented quickly!</p>
+                            <p>We would love hearing theme ideas from the community! You can <a href="https://github.com/Deinonychus999/AnkiGammon/issues/new?template=theme-request.md" target="_blank" rel="noopener noreferrer">submit a theme request on GitHub</a> with your color preferences or visual inspiration, or share mockups and brainstorm ideas in our <a href="https://discord.gg/vyFSgtWXSr" target="_blank" rel="noopener noreferrer">Discord community</a>. The theme system is easy to extend, so well-described requests can be implemented quickly!</p>
                         </div>
                     </div>
                 </div>
@@ -876,7 +877,7 @@
                     </svg>
                     GitHub
                 </a>
-                <a href="https://discord.gg/U8cmrCsK5x" class="footer-link footer-link--icon" target="_blank" rel="noopener noreferrer" title="Join our Discord">
+                <a href="https://discord.gg/vyFSgtWXSr" class="footer-link footer-link--icon" target="_blank" rel="noopener noreferrer" title="Join our Discord">
                     <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126.644 96">
                         <path fill="#e0e3ff" d="M81.15,0c-1.2376,2.1973-2.3489,4.4704-3.3591,6.794-9.5975-1.4396-19.3718-1.4396-28.9945,0-.985-2.3236-2.1216-4.5967-3.3591-6.794-9.0166,1.5407-17.8059,4.2431-26.1405,8.0568C2.779,32.5304-1.6914,56.3725.5312,79.8863c9.6732,7.1476,20.5083,12.603,32.0505,16.0884,2.6014-3.4854,4.8998-7.1981,6.8698-11.0623-3.738-1.3891-7.3497-3.1318-10.8098-5.1523.9092-.6567,1.7932-1.3386,2.6519-1.9953,20.281,9.547,43.7696,9.547,64.0758,0,.8587.7072,1.7427,1.3891,2.6519,1.9953-3.4601,2.0457-7.0718,3.7632-10.835,5.1776,1.97,3.8642,4.2683,7.5769,6.8698,11.0623,11.5419-3.4854,22.3769-8.9156,32.0509-16.0631,2.626-27.2771-4.496-50.9172-18.817-71.8548C98.9811,4.2684,90.1918,1.5659,81.1752.0505l-.0252-.0505ZM42.2802,65.4144c-6.2383,0-11.4159-5.6575-11.4159-12.6535s4.9755-12.6788,11.3907-12.6788,11.5169,5.708,11.4159,12.6788c-.101,6.9708-5.026,12.6535-11.3907,12.6535ZM84.3576,65.4144c-6.2637,0-11.3907-5.6575-11.3907-12.6535s4.9755-12.6788,11.3907-12.6788,11.4917,5.708,11.3906,12.6788c-.101,6.9708-5.026,12.6535-11.3906,12.6535Z"/>
                     </svg>
