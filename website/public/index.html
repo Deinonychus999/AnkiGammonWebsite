@@ -20,7 +20,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/">
     <meta property="og:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta property="og:description" content="Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis or pre-analyzed .xg files. Paste positions (XGID, OGID, GNUID), add custom notes, configure analysis depth (0-4 ply), generate score matrices. Interactive moves, 6 color schemes. Export via AnkiConnect or APKG. Free & open source.">
+    <meta property="og:description" content="Turn backgammon analysis into Anki flashcards. Drag match files or paste positions for automatic analysis. Filter blunders, add notes, customize appearance. Export instantly to Anki. Free & open source.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:image:width" content="100">
     <meta property="og:image:height" content="100">
@@ -33,7 +33,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:url" content="https://ankigammon.com/">
     <meta name="twitter:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta name="twitter:description" content="Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis or pre-analyzed .xg files. Paste position IDs, add custom notes. Interactive moves, score matrices, 6 color schemes. Export via AnkiConnect or APKG. Free & open source.">
+    <meta name="twitter:description" content="Turn backgammon analysis into Anki flashcards. Drag match files or paste positions for automatic analysis. Filter blunders, add notes, customize appearance. Export instantly to Anki. Free & open source.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta name="twitter:image:alt" content="AnkiGammon application icon - backgammon to Anki flashcard converter">
 
@@ -56,7 +56,7 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "Convert backgammon matches to Anki flashcards with drag-and-drop import for raw match files (.mat, .txt, .sgf) that get auto-analyzed with GnuBG or pre-analyzed .xg files. Automatic blunder filtering. Supports XGID, OGID, and GNUID formats. Features include custom position notes, score matrix generation, interactive move visualization, and dual export options (AnkiConnect or APKG). All settings auto-save.",
+      "description": "Convert backgammon analysis into Anki flashcards for spaced repetition learning. Import match files or paste positions for automatic analysis. Automatic blunder filtering, custom notes, score matrices, interactive moves. Export via AnkiConnect or APKG files. Free and open source.",
       "url": "https://ankigammon.com/",
       "downloadUrl": "https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip",
       "softwareVersion": "latest",
@@ -96,7 +96,7 @@
           "name": "Do I need XG analysis or can I just paste position IDs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. You can configure the analysis depth (0-4 ply) in settings."
+            "text": "You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. GnuBG needs to be installed separately and configured in AnkiGammon settings. You can configure the analysis depth (0-4 ply) in settings."
           }
         },
         {
@@ -104,15 +104,23 @@
           "name": "What's the difference between AnkiConnect and APKG export?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiConnect provides instant export while Anki is running with no import step needed. APKG export creates portable files for manual import, useful when Anki isn't running or for sharing decks."
+            "text": "AnkiConnect (recommended): Cards appear instantly in Anki while it's running. No import step needed. Install via: Tools → Add-ons → Get Add-ons → Enter code: 2055492159 → Restart Anki. APKG export creates a portable .apkg file you manually import into Anki, useful when Anki isn't running or for sharing decks."
           }
         },
         {
           "@type": "Question",
-          "name": "Can I import non-analyzed match files?",
+          "name": "Can I filter which positions get imported?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes! Drag raw match files like .mat, .txt, .sgf, etc. for automatic GnuBG analysis, or pre-analyzed .xg files (from eXtreme Gammon). When importing, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection. These settings are remembered between sessions."
+            "text": "Yes! When importing files, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection to choose which player's mistakes to import. These settings are remembered between sessions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What file formats are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AnkiGammon supports all common backgammon file formats: .xg and .xgp (eXtreme Gammon files that can include pre-existing analysis), .sgf (Smart Game Format), .mat (match files), .txt (text-based match files), and DailyGammon match files (no file extension). Files with existing analysis are used directly. Files without analysis are automatically analyzed by GnuBG if installed and configured."
           }
         },
         {
@@ -129,6 +137,14 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), configurable GnuBG analysis depth (0-4 ply to balance speed vs. accuracy), and export method choice (AnkiConnect for instant export or APKG for portable files)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What information is in the score matrix?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The score matrix shows optimal cube actions across all score combinations in a match. Each cell contains the best action (D/T, D/P, N/T, TG/T, or TG/P) and error values for the two alternative actions. For example, if the best action is D/T and it shows 15/412, then N/T costs 0.015 equity and D/P costs 0.412 equity. Yellow borders highlight the current match score, and darker highlighting indicates close decisions with error less than 20 (0.020 equity). The matrix is generated by GnuBG at your configured ply level and only includes scores where the cube is still live."
           }
         }
       ]
@@ -299,7 +315,7 @@
         <div class="container">
             <h1>Master Backgammon: Turn Your Mistakes Into Anki Flashcards</h1>
             <p class="hero-subtitle">
-                A backgammon Anki flashcard generator that converts matches into cards automatically. Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis, or pre-analyzed .xg files. Filter blunders, paste position IDs, export in one click.
+                Drag match files or paste position IDs. Filter blunders, export in one click.
             </p>
 
             <div class="cta-buttons">
@@ -340,8 +356,8 @@
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
                     </div>
-                    <h3>Drag & Drop Any Match File</h3>
-                    <p>Drag raw match files (.mat, .txt, .sgf, etc.) directly onto the window for automatic GnuBG analysis, or pre-analyzed .xg files. Filter by error threshold to extract only significant blunders. Filter by player to study only your own mistakes.</p>
+                    <h3>Drag & Drop Any Backgammon File</h3>
+                    <p>Import match or position files. Pre-analyzed files are used directly; others are analyzed automatically by GnuBG. Filter by error threshold and player.</p>
                 </div>
 
                 <div class="feature-card">
@@ -461,19 +477,19 @@
                 <div class="workflow-step">
                     <div class="step-number">2</div>
                     <h3>Import Positions</h3>
-                    <p>Drag raw match files (.mat, .txt, .sgf) for automatic GnuBG analysis, or pre-analyzed .xg files. Filter blunders by error threshold and player. Paste position IDs (XGID/OGID/GNUID) for automatic analysis. Format detection is automatic.</p>
+                    <p>Drag files or paste position IDs. Filter by error threshold and player.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">3</div>
                     <h3>Customize & Add Notes</h3>
-                    <p>Add notes to positions. Pick colors and orientation. Show or hide answer options to adjust difficulty. Enable move animations, configure GnuBG depth, generate score matrices. Everything auto-saves.</p>
+                    <p>Add notes, pick colors, toggle options visibility. Settings auto-save.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">4</div>
                     <h3>Export to Anki</h3>
-                    <p>AnkiConnect sends cards instantly while Anki runs. APKG creates files you import manually. Pick whichever you prefer.</p>
+                    <p>One-click export via AnkiConnect or APKG files.</p>
                 </div>
             </div>
         </div>
@@ -497,8 +513,8 @@
                             <p class="slide-caption">Add Positions - Paste XGID, OGID, GNUID, or full XG analysis text</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/drag-and-drop.webp" alt="Drag and drop XG files into AnkiGammon" width="1302" height="752" loading="lazy">
-                            <p class="slide-caption">Drag & Drop - Import .xg files with automatic blunder filtering</p>
+                            <img src="assets/images/drag-and-drop.webp" alt="Drag and drop XG/XGP files into AnkiGammon" width="1302" height="752" loading="lazy">
+                            <p class="slide-caption">Drag & Drop - Import .xg/.xgp files with automatic blunder filtering</p>
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/edit-note.webp" alt="Edit position and add custom notes" width="1302" height="752" loading="lazy">
@@ -752,7 +768,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. You can configure the analysis depth (0-4 ply) in settings. For cube decisions, it can even generate full score matrices showing equity at different match scores.</p>
+                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. GnuBG needs to be installed separately and configured in AnkiGammon settings. You can configure the analysis depth (0-4 ply) in settings. For cube decisions, it can even generate full score matrices showing equity at different match scores.</p>
                         </div>
                     </div>
                 </div>
@@ -768,7 +784,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>AnkiConnect (recommended):</strong> Cards appear instantly in Anki while it's running. No import step needed. Requires AnkiConnect addon. Best for daily workflow.<br><br>
+                            <p><strong>AnkiConnect (recommended):</strong> Cards appear instantly in Anki while it's running. No import step needed. Install via: Tools → Add-ons → Get Add-ons → Enter code: 2055492159 → Restart Anki.<br><br>
                             <strong>APKG export:</strong> Creates a portable .apkg file you manually import into Anki. Useful when Anki isn't running or for sharing decks with others. Your export method preference is saved.</p>
                         </div>
                     </div>
@@ -776,7 +792,7 @@
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
-                        <h3>Can I import non-analyzed match files?</h3>
+                        <h3>Can I filter which positions get imported?</h3>
                         <span class="faq-toggle">
                             <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                 <polyline points="6 9 12 15 18 9"/>
@@ -785,8 +801,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes! Drag raw match files like .mat, .txt, .sgf, etc. for automatic GnuBG analysis, or pre-analyzed .xg files (from eXtreme Gammon).</p>
-                            <p>When importing, you can filter by:</p>
+                            <p>Yes! When importing files, you can filter by:</p>
                             <ul>
                                 <li><strong>Error threshold:</strong> Set a minimum error threshold (default 0.080) to automatically import only significant blunders. Skip trivial decisions and focus on positions where you made meaningful mistakes.</li>
                                 <li><strong>Player selection:</strong> Choose which player's mistakes to import. Perfect for studying only your own mistakes from a game record.</li>
@@ -832,6 +847,61 @@
                                 <li><strong>GnuBG analysis depth:</strong> Choose 0-4 ply to balance speed vs. accuracy</li>
                                 <li><strong>Export method:</strong> AnkiConnect (instant) or APKG (portable files)</li>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>What file formats are supported?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>AnkiGammon supports all common backgammon file formats:</p>
+                            <ul>
+                                <li><strong>.xg</strong> - eXtreme Gammon match files</li>
+                                <li><strong>.xgp</strong> - eXtreme Gammon position files</li>
+                                <li><strong>.sgf</strong> - Smart Game Format</li>
+                                <li><strong>.mat</strong> - Match files</li>
+                                <li><strong>.txt</strong> - Text-based match files</li>
+                                <li><strong>DailyGammon</strong> - DailyGammon match files (no file extension)</li>
+                            </ul>
+                            <p>Files with existing analysis (.xg and .xgp can include this) are used directly. Files without analysis are automatically analyzed by GnuBG if installed and configured.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>What information is in the score matrix?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>The score matrix shows optimal cube actions across all score combinations in a match. For example, in a 7-point match, it displays the best cube decision for every score from 2-away/2-away through 7-away/7-away.</p>
+
+                            <p><strong>Each cell contains:</strong></p>
+                            <ul>
+                                <li><strong>Best action:</strong> D/T (Double/Take), D/P (Double/Pass), N/T (No Double/Take), TG/T (Too Good/Take), or TG/P (Too Good/Pass)</li>
+                                <li><strong>Error values:</strong> Shows equity loss (scaled by 1000) for the two alternative actions. For example, if the best action is D/T and it shows "15/412", then N/T costs 0.015 equity and D/P costs 0.412 equity</li>
+                            </ul>
+
+                            <p><strong>Special indicators:</strong></p>
+                            <ul>
+                                <li><strong>Yellow border:</strong> Highlights the current match score</li>
+                                <li><strong>Low error cells:</strong> Darker highlighting when error &lt; 20 (0.020 equity), indicating a close decision worth studying</li>
+                            </ul>
+
+                            <p>The matrix is generated by GnuBG at your configured ply level and only includes scores where the cube is still live (can be legally doubled).</p>
                         </div>
                     </div>
                 </div>
