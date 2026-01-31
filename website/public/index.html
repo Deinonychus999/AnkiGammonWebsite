@@ -112,7 +112,7 @@
           "name": "Can I filter which positions get imported?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes! When importing files, you can filter by error threshold (default 0.080) to automatically import only significant blunders, and by player selection to choose which player's mistakes to import. These settings are remembered between sessions."
+            "text": "Yes! When importing files, you can filter by error threshold separately for checker plays and cube decisions (default 0.080) to automatically import only significant blunders, and by player selection to choose which player's mistakes to import. These settings are remembered between sessions."
           }
         },
         {
@@ -128,7 +128,7 @@
           "name": "Can I customize the board appearance?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. AnkiGammon offers 6 color schemes: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). You can also toggle board orientation between bearing off on the right and bearing off on the left. All preferences are saved automatically and applied to all generated cards. The theme system is easy to extend - you can submit theme requests on GitHub or share ideas in the Discord community."
+            "text": "Yes. AnkiGammon offers 7 color schemes: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), Midnight (dark blue/purple), and Monochrome (black/white). You can also toggle board orientation between bearing off on the right and bearing off on the left, or use random orientation. All preferences are saved automatically and applied to all generated cards. The theme system is easy to extend - you can submit theme requests on GitHub or share ideas in the Discord community."
           }
         },
         {
@@ -136,7 +136,7 @@
           "name": "What other customization options are available?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), configurable GnuBG analysis depth (0-4 ply to balance speed vs. accuracy), and export method choice (AnkiConnect for instant export or APKG for portable files)."
+            "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), move score matrix (see best moves across different match scores), split subdecks (separate checker and cube decisions into different subdecks), configurable GnuBG analysis depth (0-4 ply to balance speed vs. accuracy), pip count display toggle, and export method choice (AnkiConnect for instant export or APKG for portable files)."
           }
         },
         {
@@ -382,7 +382,7 @@
                         </svg>
                     </div>
                     <h3>Score Matrix Generation</h3>
-                    <p>For cube decisions, optionally generate detailed score matrices showing equity at different match scores. Helps you understand cube decisions in match play.</p>
+                    <p>Optionally generate detailed score matrices showing optimal cube actions and best moves at different match scores. Helps you understand how match score affects decisions.</p>
                 </div>
 
                 <div class="feature-card">
@@ -396,7 +396,7 @@
                         </svg>
                     </div>
                     <h3>Customize Board Appearance</h3>
-                    <p>Choose from 6 color schemes (Classic, Forest, Ocean, Desert, Sunset, Midnight) and toggle board orientation (clockwise/counter-clockwise). All settings save automatically.</p>
+                    <p>Choose from 7 color schemes (Classic, Forest, Ocean, Desert, Sunset, Midnight, Monochrome) and toggle board orientation (clockwise/counter-clockwise). All settings save automatically.</p>
                 </div>
 
                 <div class="feature-card">
@@ -522,7 +522,7 @@
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/settings.webp" alt="Settings dialog with color schemes and customization" width="502" height="659" loading="lazy">
-                            <p class="slide-caption">Settings - 6 color schemes, board orientation, GnuBG analysis, and more</p>
+                            <p class="slide-caption">Settings - 7 color schemes, board orientation, GnuBG analysis, and more</p>
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/anki-front.webp" alt="Anki flashcard front with backgammon position and multiple choice" width="947" height="1133" loading="lazy">
@@ -803,7 +803,7 @@
                         <div class="faq-answer-content">
                             <p>Yes! When importing files, you can filter by:</p>
                             <ul>
-                                <li><strong>Error threshold:</strong> Set a minimum error threshold (default 0.080) to automatically import only significant blunders. Skip trivial decisions and focus on positions where you made meaningful mistakes.</li>
+                                <li><strong>Error threshold:</strong> Set minimum error thresholds separately for checker plays and cube decisions (default 0.080). Skip trivial decisions and focus on positions where you made meaningful mistakes.</li>
                                 <li><strong>Player selection:</strong> Choose which player's mistakes to import. Perfect for studying only your own mistakes from a game record.</li>
                             </ul>
                             <p>These settings are remembered between sessions, so you don't need to reconfigure them each time.</p>
@@ -822,7 +822,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. AnkiGammon offers 6 color schemes to match your preference: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), and Midnight (dark blue/purple). You can also toggle board orientation between bearing off on the right and bearing off on the left. All preferences are saved automatically and applied to all generated cards.</p>
+                            <p>Yes. AnkiGammon offers 7 color schemes to match your preference: Classic (traditional brown/beige), Forest (green/brown), Ocean (blue/teal), Desert (tan/orange), Sunset (purple/orange), Midnight (dark blue/purple), and Monochrome (black/white). You can also toggle board orientation between bearing off on the right, bearing off on the left, or random orientation. All preferences are saved automatically and applied to all generated cards.</p>
                             <p>We would love hearing theme ideas from the community! You can <a href="https://github.com/Deinonychus999/AnkiGammon/issues/new?template=theme-request.md" target="_blank" rel="noopener noreferrer">submit a theme request on GitHub</a> with your color preferences or visual inspiration, or share mockups and brainstorm ideas in our <a href="https://discord.gg/vyFSgtWXSr" target="_blank" rel="noopener noreferrer">Discord community</a>. The theme system is easy to extend, so well-described requests can be implemented quickly!</p>
                         </div>
                     </div>
@@ -844,7 +844,10 @@
                                 <li><strong>Show options toggle:</strong> Display multiple-choice options on card front or hide them. Number of choices is customizable.</li>
                                 <li><strong>Interactive moves:</strong> Enable/disable animated checker movements when clicking moves on the card back</li>
                                 <li><strong>Score matrix generation:</strong> Optionally generate detailed cube equity matrices for match play</li>
+                                <li><strong>Move score matrix:</strong> See how the best moves change across different match scores</li>
+                                <li><strong>Split subdecks:</strong> Separate checker and cube decisions into different subdecks</li>
                                 <li><strong>GnuBG analysis depth:</strong> Choose 0-4 ply to balance speed vs. accuracy</li>
+                                <li><strong>Pip count display:</strong> Toggle pip counts on/off</li>
                                 <li><strong>Export method:</strong> AnkiConnect (instant) or APKG (portable files)</li>
                             </ul>
                         </div>
