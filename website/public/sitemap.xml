@@ -10,4 +10,12 @@
     <priority>1.0</priority>
   </url>
 
+  <!-- Tools -->
+  <url>
+    <loc>https://ankigammon.com/tools/xg-to-mat</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
