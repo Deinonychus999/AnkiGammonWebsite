@@ -117,11 +117,19 @@
         }
         calcBorneOff(pos);
 
+        // For turn=-1 the position was reversed, so negate cubePos and swap scores
+        // to keep the internal model consistent (same physical player = same X/O)
+        if (turn === -1) {
+            cubePos = -cubePos;
+            var tmpScore = scoreX; scoreX = scoreO; scoreO = tmpScore;
+        }
+
         // Metadata
         var meta = {
             cubeValue:   cubeLog >= 0 ? Math.pow(2, cubeLog) : 1,
             cubeOwner:   cubePos === 0 ? 'centered' : (cubePos === -1 ? 'x_owns' : 'o_owns'),
-            onRoll:      turn === 1 ? 'O' : 'X',
+            onRoll:      'O',
+            _xgidTurn:   turn,
             dice:        null,
             scoreX:      scoreX,
             scoreO:      scoreO,
@@ -144,7 +152,7 @@
     }
 
     function encodeXGID(pos, meta) {
-        var turn = meta.onRoll === 'O' ? 1 : -1;
+        var turn = meta._xgidTurn !== undefined ? meta._xgidTurn : (meta.onRoll === 'O' ? 1 : -1);
         var chars = new Array(26);
 
         if (turn === 1) {
@@ -165,9 +173,17 @@
         var diceStr = meta.dice ? '' + meta.dice[0] + meta.dice[1] : '00';
         var cj = meta.crawford ? 1 : 0;
 
+        // For turn=-1, reverse the normalization done in parseXGID
+        var scoreOOut = meta.scoreO || 0;
+        var scoreXOut = meta.scoreX || 0;
+        if (turn === -1) {
+            cubePos = -cubePos;
+            var tmp = scoreOOut; scoreOOut = scoreXOut; scoreXOut = tmp;
+        }
+
         return 'XGID=' + chars.join('') + ':' +
             cubeLog + ':' + cubePos + ':' + turn + ':' + diceStr + ':' +
-            (meta.scoreO || 0) + ':' + (meta.scoreX || 0) + ':' +
+            scoreOOut + ':' + scoreXOut + ':' +
             cj + ':' + (meta.matchLength || 0) + ':' + log2(256);
     }
 

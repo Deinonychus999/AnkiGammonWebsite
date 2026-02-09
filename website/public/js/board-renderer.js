@@ -2,11 +2,10 @@
  * SVG Backgammon Board Renderer
  *
  * Renders backgammon positions as SVG markup with 7 color schemes.
- * Counter-clockwise orientation only (standard layout).
+ * Supports counter-clockwise (default) and clockwise orientation.
  *
  * Usage:
- *   var renderer = new BoardRenderer();
- *   var svg = renderer.render(position, metadata, 'classic');
+ *   var svg = BoardRenderer.render(position, metadata, 'classic', false, 'ccw');
  */
 (function () {
     'use strict';
@@ -100,19 +99,45 @@
     var POINT_W = HALF_W / 6;
     var POINT_H = BOARD_H * 0.45;
     var CR = Math.min(POINT_W * 0.45, 25); // checker radius
-
-    // Board x (counter-clockwise: cube on left, bearoff on right)
-    var BX = MARGIN + CUBE_AREA;
     var BY = MARGIN;
+    var BEAROFF_W = BEAROFF_AREA - 20;
 
-    function render(position, metadata, schemeName, swapped) {
+    // Orientation-dependent layout (set per render call)
+    var boardX, bearoffX, cubeCX, isCW;
+
+    function setLayout(clockwise) {
+        isCW = clockwise;
+        if (clockwise) {
+            // Clockwise: bearoff on left, cube on right
+            boardX = MARGIN + BEAROFF_AREA;
+            bearoffX = MARGIN + 10;
+            cubeCX = MARGIN + BEAROFF_AREA + PLAYING_W + CUBE_AREA / 2;
+        } else {
+            // Counter-clockwise: cube on left, bearoff on right
+            boardX = MARGIN + CUBE_AREA;
+            bearoffX = boardX + PLAYING_W + 10;
+            cubeCX = (MARGIN + CUBE_AREA) / 2;
+        }
+    }
+
+    // Mirror point-to-visual-position mapping (matches xg2anki Python renderer)
+    function getVisualIndex(pn) {
+        if (isCW) return (pn <= 12) ? (12 - pn) : (36 - pn);
+        return pn - 1;
+    }
+
+    function render(position, metadata, schemeName, swapped, orientation) {
         var s = SCHEMES[schemeName] || SCHEMES.classic;
         if (swapped) {
+            var origCheckerX = s.checkerX;
+            var origDiceColor = s.diceColor;
             s = Object.assign({}, s);
-            var tmp = s.checkerX;
             s.checkerX = s.checkerO;
-            s.checkerO = tmp;
+            s.checkerO = origCheckerX;
+            s.diceColor = origCheckerX;
+            s.dicePipColor = origDiceColor;
         }
+        setLayout(orientation === 'cw');
         var meta = metadata || {};
         var onRoll = meta.onRoll || 'O';
         var flipped = (onRoll === 'X');
@@ -123,10 +148,10 @@
 
         // Backgrounds
         parts.push('<rect x="0" y="0" width="' + WIDTH + '" height="' + HEIGHT + '" fill="' + s.boardLight + '"/>');
-        parts.push('<rect x="' + BX + '" y="' + BY + '" width="' + PLAYING_W + '" height="' + BOARD_H + '" fill="' + s.boardLight + '" stroke="' + s.boardDark + '" stroke-width="3"/>');
+        parts.push('<rect x="' + boardX + '" y="' + BY + '" width="' + PLAYING_W + '" height="' + BOARD_H + '" fill="' + s.boardLight + '" stroke="' + s.boardDark + '" stroke-width="3"/>');
 
         // Bar
-        var barX = BX + HALF_W;
+        var barX = boardX + HALF_W;
         parts.push('<rect x="' + barX + '" y="' + BY + '" width="' + BAR_W + '" height="' + BOARD_H + '" fill="' + s.bar + '" stroke="' + s.boardDark + '" stroke-width="2"/>');
 
         // Points
@@ -188,27 +213,27 @@
     function drawPoints(s) {
         var out = ['<g class="points">'];
         for (var pn = 1; pn <= 24; pn++) {
-            var vi = pn - 1; // visual index (counter-clockwise)
+            var vi = getVisualIndex(pn);
             var x, yBase, yTip, color, labelY;
 
             if (vi < 6) {
                 // Bottom right
-                x = BX + HALF_W + BAR_W + (5 - vi) * POINT_W;
+                x = boardX + HALF_W + BAR_W + (5 - vi) * POINT_W;
                 yBase = BY + BOARD_H; yTip = yBase - POINT_H;
                 labelY = yBase + 13;
             } else if (vi < 12) {
                 // Bottom left
-                x = BX + (11 - vi) * POINT_W;
+                x = boardX + (11 - vi) * POINT_W;
                 yBase = BY + BOARD_H; yTip = yBase - POINT_H;
                 labelY = yBase + 13;
             } else if (vi < 18) {
                 // Top left
-                x = BX + (vi - 12) * POINT_W;
+                x = boardX + (vi - 12) * POINT_W;
                 yBase = BY; yTip = yBase + POINT_H;
                 labelY = yBase - 5;
             } else {
                 // Top right
-                x = BX + HALF_W + BAR_W + (vi - 18) * POINT_W;
+                x = boardX + HALF_W + BAR_W + (vi - 18) * POINT_W;
                 yBase = BY; yTip = yBase + POINT_H;
                 labelY = yBase - 5;
             }
@@ -226,19 +251,19 @@
     // ── Checkers ────────────────────────────────────────────────────────
 
     function getPointPosition(pointIdx) {
-        var vi = pointIdx - 1;
+        var vi = getVisualIndex(pointIdx);
         var x, yBase, isTop;
         if (vi < 6) {
-            x = BX + HALF_W + BAR_W + (5 - vi) * POINT_W;
+            x = boardX + HALF_W + BAR_W + (5 - vi) * POINT_W;
             yBase = BY + BOARD_H; isTop = false;
         } else if (vi < 12) {
-            x = BX + (11 - vi) * POINT_W;
+            x = boardX + (11 - vi) * POINT_W;
             yBase = BY + BOARD_H; isTop = false;
         } else if (vi < 18) {
-            x = BX + (vi - 12) * POINT_W;
+            x = boardX + (vi - 12) * POINT_W;
             yBase = BY; isTop = true;
         } else {
-            x = BX + HALF_W + BAR_W + (vi - 18) * POINT_W;
+            x = boardX + HALF_W + BAR_W + (vi - 18) * POINT_W;
             yBase = BY; isTop = true;
         }
         return { x: x, yBase: yBase, isTop: isTop };
@@ -283,7 +308,7 @@
         }
 
         // Bar checkers
-        var barCX = BX + HALF_W + BAR_W / 2;
+        var barCX = boardX + HALF_W + BAR_W / 2;
         var boardCenterY = BY + BOARD_H / 2;
         var sepOff = CR * 2 + 10;
 
@@ -323,8 +348,8 @@
 
     function drawBearoff(pos, s) {
         var out = ['<g class="bearoff">'];
-        var boX = BX + PLAYING_W + 10;
-        var boW = BEAROFF_AREA - 20;
+        var boX = bearoffX;
+        var boW = BEAROFF_W;
         var cw = 10, ch = 50, csx = 3, csy = 4, cpr = 5;
 
         // Top tray (X)
@@ -387,8 +412,14 @@
     function drawDice(dice, s) {
         var sz = 50, sp = 15;
         var total = 2 * sz + sp;
-        var rhStart = BX + HALF_W + BAR_W;
-        var dx = rhStart + (HALF_W - total) / 2;
+        var dx;
+        if (isCW) {
+            // Clockwise: home board is bottom-left, dice in left half
+            dx = boardX + (HALF_W - total) / 2;
+        } else {
+            // Counter-clockwise: home board is bottom-right, dice in right half
+            dx = boardX + HALF_W + BAR_W + (HALF_W - total) / 2;
+        }
         var dy = BY + (BOARD_H - sz) / 2;
 
         return '<g class="dice">' +
@@ -401,8 +432,7 @@
 
     function drawCube(cubeValue, cubeOwner, s, flipped) {
         var sz = 50;
-        var areaCenter = (MARGIN + CUBE_AREA) / 2;
-        var cx = areaCenter - sz / 2;
+        var cx = cubeCX - sz / 2;
         var cy;
 
         if (cubeOwner === 'centered') {
@@ -425,7 +455,7 @@
 
     function drawPipCounts(pos, s) {
         var pips = window.PositionParser.calculatePipCounts(pos);
-        var tx = BX + PLAYING_W + 15;
+        var tx = bearoffX + 5;
         var topY = BY + 10 + 21;
         var botY = BY + BOARD_H / 2 + 70 + 21;
 
@@ -438,9 +468,7 @@
     // ── Scores ──────────────────────────────────────────────────────────
 
     function drawScores(topScore, bottomScore, matchLength, s) {
-        var boX = BX + PLAYING_W + 10;
-        var boW = BEAROFF_AREA - 20;
-        var centerX = boX + boW / 2;
+        var centerX = bearoffX + BEAROFF_W / 2;
         var centerY = BY + BOARD_H / 2;
         var bw = 60, bh = 35, bsp = 5;
         var totalH = 3 * bh + 2 * bsp;

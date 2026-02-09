@@ -25,12 +25,14 @@
     var errorRetry   = document.getElementById('error-retry');
 
     var swapColorsBtn = document.getElementById('swap-colors-btn');
+    var swapDirectionBtn = document.getElementById('swap-direction-btn');
     var copyImageBtn  = document.getElementById('copy-image-btn');
 
     var currentPosition = null;
     var currentMetadata = null;
     var currentFormat = null;
     var colorsSwapped = false;
+    var boardDirection = 'ccw';
 
     // ── State management ───────────────────────────────────────────────
 
@@ -82,18 +84,14 @@
 
     function renderBoard() {
         var scheme = schemeSelect.value;
-        var svg = window.BoardRenderer.render(currentPosition, currentMetadata, scheme, colorsSwapped);
+        var svg = window.BoardRenderer.render(currentPosition, currentMetadata, scheme, colorsSwapped, boardDirection);
         boardContainer.innerHTML = svg;
     }
 
     function updateOnRoll() {
         if (!currentMetadata) { onRollIndicator.innerHTML = ''; return; }
         var scheme = window.BoardRenderer.SCHEMES[schemeSelect.value] || window.BoardRenderer.SCHEMES.classic;
-        // XGID/GNUID: on-roll player's checkers always map to positive (X)
-        // OGID: mapping is absolute, so use the onRoll flag
-        var useX = (currentFormat === 'ogid')
-            ? currentMetadata.onRoll === 'X'
-            : currentMetadata.onRoll !== 'X';
+        var useX = currentMetadata.onRoll === 'X';
         if (colorsSwapped) useX = !useX;
         var fill = useX ? scheme.checkerX : scheme.checkerO;
         var border = scheme.checkerBorder;
@@ -196,6 +194,15 @@
         }
     });
 
+    // Swap board direction
+    swapDirectionBtn.addEventListener('click', function () {
+        boardDirection = (boardDirection === 'ccw') ? 'cw' : 'ccw';
+        try { localStorage.setItem('bg-direction', boardDirection); } catch (e) {}
+        if (currentPosition) {
+            renderBoard();
+        }
+    });
+
     // Copy board as image
     copyImageBtn.addEventListener('click', function () {
         var btn = copyImageBtn;
@@ -263,6 +270,8 @@
             schemeSelect.value = saved;
         }
         colorsSwapped = localStorage.getItem('bg-swap') === '1';
+        var savedDir = localStorage.getItem('bg-direction');
+        if (savedDir === 'cw' || savedDir === 'ccw') boardDirection = savedDir;
     } catch (e) {}
 
     setState('idle');

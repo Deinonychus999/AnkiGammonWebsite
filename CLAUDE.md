@@ -31,20 +31,34 @@ Alternative: Use any static server (VS Code Live Server extension, Node's `http-
 ```
 website/public/
 ├── index.html           # Single-page marketing site
-├── css/                 # Modular stylesheets (6 files)
+├── css/                 # Modular stylesheets (7 files)
 │   ├── reset.css        # Browser normalization
 │   ├── variables.css    # Design system (colors, spacing, fonts)
 │   ├── base.css         # Typography foundations
 │   ├── layout.css       # Container/grid utilities
 │   ├── components.css   # 14 UI components
-│   └── responsive.css   # Mobile breakpoints (768px, 480px)
-├── js/                  # Modular JavaScript (6 files)
+│   ├── responsive.css   # Mobile breakpoints (768px, 480px)
+│   └── tool.css         # Styles for tool pages
+├── js/                  # Modular JavaScript (14 files)
 │   ├── main.js          # Initialization entry point
 │   ├── carousel.js      # Embla carousel integration
 │   ├── navigation.js    # Smooth scrolling, sticky nav
 │   ├── platform.js      # OS detection & install tabs
 │   ├── faq.js           # FAQ accordion
-│   └── lightbox.js      # Image zoom modal
+│   ├── lightbox.js      # Image zoom modal
+│   ├── xg-parser.js     # XG binary file parser
+│   ├── mat-writer.js    # MAT format writer
+│   ├── xg-to-mat-app.js # XG to MAT converter UI
+│   ├── board-renderer.js        # SVG backgammon board renderer (7 color schemes)
+│   ├── position-parser.js       # Position ID parser (XGID/GNUID/OGID)
+│   ├── position-converter-app.js # Position converter UI
+│   ├── met-data.js              # Kazaross XG2 match equity table data
+│   └── met-calculator-app.js    # MET calculator UI
+├── tools/               # Tool pages
+│   ├── index.html              # Tools landing page
+│   ├── xg-to-mat.html          # XG to MAT converter tool
+│   ├── position-converter.html # Position ID converter & visualizer
+│   └── met-calculator.html     # Match equity table calculator
 └── assets/
     └── images/          # WebP screenshots (13 files)
 ```
@@ -73,6 +87,16 @@ Each JS file is self-contained and handles one feature. When adding new interact
 2. **Embla Carousel** - 9-slide screenshot gallery with lightbox zoom
 3. **Platform Switcher** - Auto-detects OS (Windows/macOS/Linux) and shows appropriate install instructions
 4. **FAQ Accordion** - 9 collapsible Q&A items with Schema.org structured data
+
+### Tools Section
+
+Browser-based backgammon utilities at [/tools/](website/public/tools/). Each tool runs entirely client-side with no server uploads.
+
+- **XG to MAT Converter** - Parses XG binary match files and converts to Jellyfish .mat text format via drag-and-drop
+- **Position ID Converter** - Converts between XGID, GNUID, and OGID position formats with interactive SVG board visualization
+- **Match Equity Table Calculator** - Looks up match winning chances (MWC) at any score using the Kazaross XG2 table, with interactive color-coded 25x25 grid and equity swing calculator
+
+Tool pages share the site's core CSS and add [tool.css](website/public/css/tool.css) for tool-specific styles. Each tool has a parser module and an app/UI module in `js/`.
 
 ### SEO & Structured Data
 
@@ -113,8 +137,10 @@ This context is important when updating copy, screenshots, or install instructio
 ## Important Files
 
 - **Main HTML**: [website/public/index.html](website/public/index.html)
+- **Tools index**: [website/public/tools/index.html](website/public/tools/index.html)
 - **Design tokens**: [website/public/css/variables.css](website/public/css/variables.css)
 - **Components**: [website/public/css/components.css](website/public/css/components.css)
+- **Tool styles**: [website/public/css/tool.css](website/public/css/tool.css)
 - **Deployment**: [.github/workflows/pages.yml](.github/workflows/pages.yml)
 
 ## Common Tasks
@@ -134,6 +160,14 @@ Platform-specific install tabs are in `index.html` under `id="install"`. The [pl
 
 1. Edit HTML in `index.html` under `id="faq"`
 2. **Also update** the Schema.org FAQPage JSON-LD structured data in `<head>` to match
+
+### Adding a New Tool
+
+1. Create a parser module in `js/` (e.g., `js/my-parser.js`) following the IIFE pattern
+2. Create an app/UI module in `js/` (e.g., `js/my-tool-app.js`)
+3. Create the tool page in `tools/` (e.g., `tools/my-tool.html`) — include core CSS plus `tool.css`
+4. Add a card linking to it in [tools/index.html](website/public/tools/index.html)
+5. Update the Schema.org `hasPart` array in `tools/index.html` `<head>`
 
 ### Changing Colors/Spacing
 

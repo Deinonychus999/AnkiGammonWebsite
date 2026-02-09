@@ -10,6 +10,11 @@ website/
 │   ├── index.html      # Main landing page
 │   ├── css/            # Stylesheets
 │   ├── js/             # Client-side JavaScript
+│   ├── tools/          # Browser-based backgammon tools
+│   │   ├── index.html              # Tools landing page
+│   │   ├── xg-to-mat.html          # XG to MAT converter
+│   │   ├── position-converter.html # Position ID converter & visualizer
+│   │   └── met-calculator.html     # Match equity table calculator
 │   └── assets/         # Images, fonts, etc.
 └── README.md           # This file
 ```

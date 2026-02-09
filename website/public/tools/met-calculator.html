@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free online backgammon tools. Convert XG files to MAT format, convert position IDs, visualize positions, and look up match equity. All browser-based, no upload needed.">
+    <meta name="description" content="Look up match winning chances (MWC) at any backgammon match score using the Kazaross XG2 match equity table. Interactive color-coded grid and equity swing calculator.">
     <meta name="author" content="AnkiGammon">
-    <title>Backgammon Tools - AnkiGammon</title>
+    <title>Match Equity Table Calculator - AnkiGammon Tools</title>
 
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.png">
@@ -14,20 +14,20 @@
     <link rel="apple-touch-icon" href="../assets/images/icon.webp">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://ankigammon.com/tools/">
+    <link rel="canonical" href="https://ankigammon.com/tools/met-calculator">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ankigammon.com/tools/">
-    <meta property="og:title" content="Backgammon Tools - AnkiGammon">
-    <meta property="og:description" content="Free online backgammon tools. Convert XG to MAT, convert position IDs, and visualize boards. All browser-based.">
+    <meta property="og:url" content="https://ankigammon.com/tools/met-calculator">
+    <meta property="og:title" content="Match Equity Table Calculator - AnkiGammon Tools">
+    <meta property="og:description" content="Look up match winning chances at any backgammon match score. Interactive Kazaross XG2 table with equity swings.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:site_name" content="AnkiGammon">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Backgammon Tools - AnkiGammon">
-    <meta name="twitter:description" content="Free online backgammon tools. Convert XG to MAT, convert position IDs, and visualize boards. All browser-based.">
+    <meta name="twitter:title" content="Match Equity Table Calculator - AnkiGammon Tools">
+    <meta name="twitter:description" content="Look up match winning chances at any backgammon match score. Interactive Kazaross XG2 table with equity swings.">
 
     <!-- SEO -->
     <meta name="robots" content="index, follow">
@@ -36,32 +36,22 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": "Backgammon Tools",
-      "description": "Free online backgammon utilities: file format converters, position ID converters, and board visualization tools.",
-      "url": "https://ankigammon.com/tools/",
+      "@type": "WebApplication",
+      "name": "Match Equity Table Calculator",
+      "description": "Look up match winning chances (MWC) at any backgammon match score using the Kazaross XG2 match equity table. Features an interactive color-coded grid and equity swing calculator.",
+      "url": "https://ankigammon.com/tools/met-calculator",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any (browser-based)",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
       "isPartOf": {
         "@type": "WebSite",
         "name": "AnkiGammon",
         "url": "https://ankigammon.com/"
-      },
-      "hasPart": [
-        {
-          "@type": "WebApplication",
-          "name": "XG to MAT Converter",
-          "url": "https://ankigammon.com/tools/xg-to-mat"
-        },
-        {
-          "@type": "WebApplication",
-          "name": "Position ID Converter & Visualizer",
-          "url": "https://ankigammon.com/tools/position-converter"
-        },
-        {
-          "@type": "WebApplication",
-          "name": "Match Equity Table Calculator",
-          "url": "https://ankigammon.com/tools/met-calculator"
-        }
-      ]
+      }
     }
     </script>
 
@@ -104,68 +94,124 @@
     </nav>
 
     <main>
-    <!-- Hero -->
+    <!-- Tool Hero -->
     <section class="tool-hero section">
         <div class="container">
-            <h1>Backgammon Tools</h1>
+            <h1>Match Equity Table Calculator</h1>
             <p class="hero-subtitle">
-                Free online utilities for backgammon players. All tools run entirely in your browser &mdash; nothing is uploaded to any server.
+                Look up match winning chances at any score using the Kazaross XG2 table.
+                See equity swings for every game outcome. Runs entirely in your browser.
             </p>
         </div>
     </section>
 
-    <!-- Tool Cards -->
-    <section class="section" style="padding-top: 0;">
+    <!-- Score Lookup + Interactive Table (side by side) -->
+    <section class="tool-workspace section" style="padding-top: 0;">
         <div class="container">
-            <div class="tool-cards">
+            <div class="met-layout">
 
-                <a href="xg-to-mat.html" class="tool-card">
-                    <div class="tool-card__icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <path d="M8 13h2l2 3 2-3h2"/>
-                        </svg>
+                <div class="met-lookup">
+                    <div class="met-inputs">
+                        <div class="met-input-group">
+                            <label for="match-length">Match Length</label>
+                            <input type="number" id="match-length" min="1" max="25" value="7">
+                        </div>
+                        <div class="met-input-group">
+                            <label for="your-score">Your Score</label>
+                            <input type="number" id="your-score" min="0" max="24" value="0">
+                        </div>
+                        <div class="met-input-group">
+                            <label for="opp-score">Opponent Score</label>
+                            <input type="number" id="opp-score" min="0" max="24" value="0">
+                        </div>
                     </div>
-                    <h2 class="tool-card__title">XG to MAT Converter</h2>
-                    <p class="tool-card__desc">Convert eXtreme Gammon .xg match files to Jellyfish .mat text format. Drag and drop your file for instant conversion.</p>
-                    <span class="tool-card__cta">Open tool &rarr;</span>
-                </a>
 
-                <a href="position-converter.html" class="tool-card">
-                    <div class="tool-card__icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="16 3 21 3 21 8"/>
-                            <line x1="4" y1="20" x2="21" y2="3"/>
-                            <polyline points="21 16 21 21 16 21"/>
-                            <line x1="15" y1="15" x2="21" y2="21"/>
-                            <line x1="4" y1="4" x2="9" y2="9"/>
-                        </svg>
-                    </div>
-                    <h2 class="tool-card__title">Position ID Converter & Visualizer</h2>
-                    <p class="tool-card__desc">Visualize any XGID, GNUID, or OGID position on an interactive board. Instantly convert between all three formats.</p>
-                    <span class="tool-card__cta">Open tool &rarr;</span>
-                </a>
+                    <!-- Result -->
+                    <div class="met-result" id="lookup-result" hidden>
+                        <div class="met-result__header">
+                            <span class="met-result__away" id="away-display"></span>
+                            <span class="met-result__badge" id="crawford-badge" hidden></span>
+                            <label class="met-result__post-crawford" id="post-crawford-group" hidden>
+                                <input type="checkbox" id="post-crawford-check"> Post-Crawford
+                            </label>
+                        </div>
+                        <div class="met-result__mwc">
+                            <span class="met-result__label">Your Match Winning Chance</span>
+                            <span class="met-result__value" id="mwc-value"></span>
+                        </div>
 
-                <a href="met-calculator.html" class="tool-card">
-                    <div class="tool-card__icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <line x1="3" y1="9" x2="21" y2="9"/>
-                            <line x1="3" y1="15" x2="21" y2="15"/>
-                            <line x1="9" y1="3" x2="9" y2="21"/>
-                            <line x1="15" y1="3" x2="15" y2="21"/>
-                        </svg>
+                        <!-- Swings -->
+                        <div class="met-swings">
+                            <h3>Equity Swings</h3>
+                            <div class="met-swings__scroll">
+                                <table class="swings-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Result</th>
+                                            <th>New Score</th>
+                                            <th>New MWC</th>
+                                            <th>Change</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="swings-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <h2 class="tool-card__title">Match Equity Table</h2>
-                    <p class="tool-card__desc">Look up match winning chances at any score using the Kazaross XG2 table. Interactive color-coded grid with equity swings.</p>
-                    <span class="tool-card__cta">Open tool &rarr;</span>
-                </a>
+                </div>
+
+                <div class="met-table-section">
+                    <div class="met-table-header">
+                        <h2>Full Match Equity Table</h2>
+                        <div class="met-table-controls">
+                            <div class="met-table-tabs">
+                                <button class="met-table-tab met-table-tab--active" id="pre-crawford-tab" type="button">Pre-Crawford</button>
+                                <button class="met-table-tab" id="post-crawford-tab" type="button">Post-Crawford</button>
+                            </div>
+                            <div id="grid-filter-group">
+                                <label for="grid-filter" class="met-filter-label">Match length:</label>
+                                <select id="grid-filter" class="scheme-select">
+                                    <option value="25">All (25)</option>
+                                    <option value="3">3-pt</option>
+                                    <option value="5">5-pt</option>
+                                    <option value="7" selected>7-pt</option>
+                                    <option value="9">9-pt</option>
+                                    <option value="11">11-pt</option>
+                                    <option value="13">13-pt</option>
+                                    <option value="15">15-pt</option>
+                                    <option value="21">21-pt</option>
+                                    <option value="25">25-pt</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="met-table-hint">Rows = your points away &middot; Columns = opponent points away &middot; Click any cell for details</p>
+                    <div class="met-grid-wrapper" id="met-grid"></div>
+                    <div class="met-grid-wrapper" id="post-crawford-table" hidden></div>
+                    <div class="met-cell-info" id="selected-cell-info" hidden></div>
+                </div>
 
             </div>
+        </div>
+    </section>
 
-            <div class="tool-suggest">
-                <p class="tool-suggest__text">Have an idea for a tool? Let us know on <a href="https://discord.gg/vyFSgtWXSr" target="_blank" rel="noopener noreferrer">Discord</a>.</p>
+    <!-- About Section -->
+    <section class="tool-info section">
+        <div class="container">
+            <h2>About This Tool</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>What is MWC?</h3>
+                    <p>Match Winning Chance (MWC) is the probability of winning a match from a given score. It depends on how many points each player still needs and whether the Crawford rule applies.</p>
+                </div>
+                <div class="info-card">
+                    <h3>Crawford Rule</h3>
+                    <p>When a player reaches 1 point away from winning, the next game is the "Crawford game" where the doubling cube cannot be used. After that, the cube is available again (post-Crawford).</p>
+                </div>
+                <div class="info-card">
+                    <h3>Kazaross XG2</h3>
+                    <p>The Kazaross XG2 table is the industry-standard match equity table, rolled up to 9-point matches and extrapolated to 25. It is used by eXtreme Gammon and most competitive players.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -196,5 +242,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Tool scripts -->
+    <script src="../js/met-data.js"></script>
+    <script src="../js/met-calculator-app.js"></script>
 </body>
 </html>
