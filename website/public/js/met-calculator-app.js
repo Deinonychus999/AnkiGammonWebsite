@@ -117,12 +117,11 @@
 
     showSwings(yourAway, oppAway, mwc);
 
-    // Sync grid filter to best fit for current away values
-    var maxAway = Math.max(yourAway, oppAway);
+    // Sync grid filter to match length
     var best = 25;
     for (var k = 0; k < gridFilterEl.options.length; k++) {
       var val = parseInt(gridFilterEl.options[k].value);
-      if (val >= maxAway && val < best) best = val;
+      if (val >= ml && val < best) best = val;
     }
     if (parseInt(gridFilterEl.value) !== best) {
       gridFilterEl.value = best;
