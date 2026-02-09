@@ -17,6 +17,61 @@
     margin: 0 auto;
 }
 
+/* ===== Tool Cards (landing page) ===== */
+.tool-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-xl);
+}
+
+.tool-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    text-decoration: none;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.tool-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    color: inherit;
+}
+
+.tool-card__icon {
+    color: var(--accent-primary);
+    margin-bottom: var(--space-lg);
+}
+
+.tool-card__title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.tool-card__desc {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-lg);
+    flex: 1;
+}
+
+.tool-card__cta {
+    color: var(--accent-primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.tool-card:hover .tool-card__cta {
+    color: var(--accent-hover);
+}
+
 /* ===== Drop Zone ===== */
 .drop-zone {
     border: 2px dashed var(--border);
@@ -237,6 +292,150 @@
     line-height: 1.6;
 }
 
+/* ===== Input Area (text-based tool input) ===== */
+.input-area {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-lg);
+}
+
+.input-area__label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: var(--space-sm);
+}
+
+.input-area__textarea {
+    width: 100%;
+    min-height: 80px;
+    background: var(--code-bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-code);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    padding: var(--space-md);
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.input-area__textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px rgba(91, 157, 217, 0.1);
+}
+
+.input-area__textarea::placeholder {
+    color: var(--text-dim);
+}
+
+.input-area__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.input-area__hint {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+/* ===== Board Section ===== */
+.board-section {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: var(--space-lg);
+}
+
+.board-section__toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+}
+
+.board-container {
+    padding: var(--space-md);
+    text-align: center;
+}
+
+.board-container svg {
+    display: block;
+    width: min(100%, calc((100vh - 160px) * 880 / 600));
+    width: min(100%, calc((100dvh - 160px) * 880 / 600));
+    height: auto;
+    margin: 0 auto;
+}
+
+/* ===== Board Toolbar ===== */
+.board-section__info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.on-roll-indicator {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.board-section__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* ===== Scheme Selector ===== */
+.scheme-select {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-xs) var(--space-sm);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.scheme-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* ===== Format Outputs ===== */
+.format-outputs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.format-output {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.format-output__text {
+    max-height: none;
+    padding: var(--space-sm) var(--space-md);
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .tool-hero h1 {
@@ -262,6 +461,21 @@
     .results__output {
         max-height: 350px;
         font-size: 0.75rem;
+    }
+
+    .board-section__toolbar {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+    }
+
+    .board-section__actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .input-area__actions {
+        flex-direction: column;
     }
 }
 
