@@ -28,6 +28,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Position ID Converter & Visualizer - AnkiGammon Tools">
     <meta name="twitter:description" content="Convert between XGID, GNUID, and OGID backgammon position formats. Visualize any position with an interactive board.">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
 
     <!-- SEO -->
     <meta name="robots" content="index, follow">
@@ -42,6 +43,13 @@
       "url": "https://ankigammon.com/tools/position-converter",
       "applicationCategory": "UtilityApplication",
       "operatingSystem": "Any (browser-based)",
+      "featureList": [
+        "Converts between XGID, GNUID, and OGID formats",
+        "Interactive SVG board visualization",
+        "7 color schemes",
+        "Auto-detects input format",
+        "Browser-based, no server upload"
+      ],
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -52,6 +60,18 @@
         "name": "AnkiGammon",
         "url": "https://ankigammon.com/"
       }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ankigammon.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://ankigammon.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "Position ID Converter & Visualizer" }
+      ]
     }
     </script>
 
@@ -94,6 +114,15 @@
     </nav>
 
     <main>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb container" aria-label="Breadcrumb">
+        <ol class="breadcrumb__list">
+            <li class="breadcrumb__item"><a href="../" class="breadcrumb__link">Home</a></li>
+            <li class="breadcrumb__item"><a href="./" class="breadcrumb__link">Tools</a></li>
+            <li class="breadcrumb__item"><span class="breadcrumb__current">Position Converter</span></li>
+        </ol>
+    </nav>
+
     <!-- Tool Hero -->
     <section class="tool-hero section">
         <div class="container">
@@ -193,8 +222,8 @@
             <h2>About This Tool</h2>
             <div class="info-grid">
                 <div class="info-card">
-                    <h3>Browser-Based</h3>
-                    <p>Everything runs in your browser using JavaScript. No data is sent to any server. Your positions stay on your machine.</p>
+                    <h3>Instant Results</h3>
+                    <p>Conversions and board rendering happen instantly in your browser. No server round-trips, no waiting.</p>
                 </div>
                 <div class="info-card">
                     <h3>Three Formats</h3>
@@ -204,6 +233,22 @@
                     <h3>7 Color Schemes</h3>
                     <p>Visualize positions in Classic, Forest, Ocean, Desert, Sunset, Midnight, or Monochrome board themes.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+    <!-- Related Tools -->
+    <section class="related-tools section">
+        <div class="container">
+            <h2>More Tools</h2>
+            <div class="related-tools__grid">
+                <a href="xg-to-mat.html" class="related-tools__link">
+                    <div class="related-tools__name">XG to MAT Converter</div>
+                    <p class="related-tools__desc">Convert eXtreme Gammon .xg match files to Jellyfish .mat text format.</p>
+                </a>
+                <a href="met-calculator.html" class="related-tools__link">
+                    <div class="related-tools__name">Match Equity Table</div>
+                    <p class="related-tools__desc">Look up match winning chances at any score using the Kazaross XG2 table.</p>
+                </a>
             </div>
         </div>
     </section>

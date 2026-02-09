@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Convert eXtreme Gammon .xg match files to Jellyfish .mat format online. Free, runs entirely in your browser. No upload needed.">
+    <meta name="description" content="Convert eXtreme Gammon .xg match files to Jellyfish .mat format online. Free, private, and runs entirely in your browser with no upload. Compatible with GNU Backgammon.">
     <meta name="author" content="AnkiGammon">
     <title>XG to MAT Converter - AnkiGammon Tools</title>
 
@@ -28,6 +28,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="XG to MAT Converter - AnkiGammon Tools">
     <meta name="twitter:description" content="Convert eXtreme Gammon .xg match files to Jellyfish .mat format online. Free, runs entirely in your browser.">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
 
     <!-- SEO -->
     <meta name="robots" content="index, follow">
@@ -42,6 +43,12 @@
       "url": "https://ankigammon.com/tools/xg-to-mat",
       "applicationCategory": "UtilityApplication",
       "operatingSystem": "Any (browser-based)",
+      "featureList": [
+        "Drag-and-drop .xg file upload",
+        "Converts to Jellyfish .mat text format",
+        "Browser-based processing, no server upload",
+        "Compatible with GNU Backgammon and Backgammon Studio"
+      ],
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -54,6 +61,21 @@
       }
     }
     </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ankigammon.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://ankigammon.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "XG to MAT Converter" }
+      ]
+    }
+    </script>
+
+    <!-- Resource hints -->
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
     <!-- CSS -->
     <link rel="stylesheet" href="../css/reset.css">
@@ -94,6 +116,15 @@
     </nav>
 
     <main>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb container" aria-label="Breadcrumb">
+        <ol class="breadcrumb__list">
+            <li class="breadcrumb__item"><a href="../" class="breadcrumb__link">Home</a></li>
+            <li class="breadcrumb__item"><a href="./" class="breadcrumb__link">Tools</a></li>
+            <li class="breadcrumb__item"><span class="breadcrumb__current">XG to MAT Converter</span></li>
+        </ol>
+    </nav>
+
     <!-- Tool Hero -->
     <section class="tool-hero section">
         <div class="container">
@@ -168,8 +199,8 @@
             <h2>About This Tool</h2>
             <div class="info-grid">
                 <div class="info-card">
-                    <h3>Browser-Based</h3>
-                    <p>Your files are processed entirely in your browser using JavaScript. Nothing is uploaded to any server. Your data stays on your machine.</p>
+                    <h3>Instant Results</h3>
+                    <p>Drop your .xg file and get the .mat output instantly. Everything is processed in your browser with no server round-trips.</p>
                 </div>
                 <div class="info-card">
                     <h3>What is .xg?</h3>
@@ -179,6 +210,22 @@
                     <h3>What is .mat?</h3>
                     <p>The .mat format (Jellyfish format) is a widely-supported plain text format for backgammon matches. Compatible with GNU Backgammon, Backgammon Studio, and many other tools.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+    <!-- Related Tools -->
+    <section class="related-tools section">
+        <div class="container">
+            <h2>More Tools</h2>
+            <div class="related-tools__grid">
+                <a href="position-converter.html" class="related-tools__link">
+                    <div class="related-tools__name">Position ID Converter</div>
+                    <p class="related-tools__desc">Convert between XGID, GNUID, and OGID formats with interactive board visualization.</p>
+                </a>
+                <a href="met-calculator.html" class="related-tools__link">
+                    <div class="related-tools__name">Match Equity Table</div>
+                    <p class="related-tools__desc">Look up match winning chances at any score using the Kazaross XG2 table.</p>
+                </a>
             </div>
         </div>
     </section>
