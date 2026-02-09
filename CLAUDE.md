@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the **marketing website** for AnkiGammon (https://ankigammon.com), a desktop application that converts backgammon game analysis into Anki flashcards for spaced repetition learning. This repository contains **only the static website**, not the application code.
 
-- **Technology**: Pure HTML/CSS/JavaScript (no build process, no frameworks)
+- **Technology**: Pure HTML/CSS/JavaScript with a Python build script for shared partials
 - **Deployment**: Automatic via GitHub Actions to GitHub Pages on push to `main`
 - **Live URL**: https://ankigammon.com/
 
@@ -15,23 +15,31 @@ This is the **marketing website** for AnkiGammon (https://ankigammon.com), a des
 To preview changes locally:
 
 ```bash
-cd website/public/
+python website/build.py
+cd website/build/
 python -m http.server 8000
 # Visit http://localhost:8000
 ```
 
-Alternative: Use any static server (VS Code Live Server extension, Node's `http-server`, etc.)
-
-**No build process exists** - files are served directly as-written.
+The build script assembles HTML pages from shared partials in `website/_partials/`. Always run `build.py` after editing HTML source files or partials.
 
 ## Architecture
 
 ### File Structure
 
 ```
-website/public/
-├── index.html           # Single-page marketing site
-├── css/                 # Modular stylesheets (7 files)
+website/
+├── build.py             # Assembles HTML from shared partials
+├── _partials/           # Shared HTML fragments (nav, footer, etc.)
+│   ├── nav.html         # Navigation bar (uses {{BASE}}, {{TOOLS_HREF}}, {{TOOLS_ACTIVE}})
+│   ├── footer.html      # Footer with social links
+│   ├── favicons.html    # Favicon link tags (uses {{BASE}})
+│   ├── css.html         # CSS stylesheet links (uses {{BASE}})
+│   └── kofi.html        # Ko-fi donation widget
+├── build/               # Generated output (gitignored) — deploy target
+└── public/              # Source HTML + static assets
+    ├── index.html       # Single-page marketing site (source with partial markers)
+    ├── css/             # Modular stylesheets (7 files)
 │   ├── reset.css        # Browser normalization
 │   ├── variables.css    # Design system (colors, spacing, fonts)
 │   ├── base.css         # Typography foundations
@@ -59,9 +67,11 @@ website/public/
 │   ├── xg-to-mat.html          # XG to MAT converter tool
 │   ├── position-converter.html # Position ID converter & visualizer
 │   └── met-calculator.html     # Match equity table calculator
-└── assets/
-    └── images/          # WebP screenshots (13 files)
+    └── assets/
+        └── images/      # WebP screenshots (13 files)
 ```
+
+HTML source files in `public/` use `<!-- PARTIAL:name -->` comment markers that the build script replaces with the contents of `_partials/name.html`. Template variables like `{{BASE}}` are resolved per-page based on directory depth (empty for root, `../` for `tools/`).
 
 ### Design System
 
@@ -113,9 +123,9 @@ When editing content, **maintain the structured data** to preserve search rankin
 
 **Automatic deployment** triggers when changes to `website/**` are pushed to `main`:
 
-1. GitHub Actions workflow (`.github/workflows/pages.yml`) validates HTML structure
-2. Uploads `website/public/` directory as artifact
-3. Deploys to GitHub Pages
+1. GitHub Actions workflow (`.github/workflows/pages.yml`) runs `python website/build.py`
+2. Validates build output exists
+3. Uploads `website/build/` directory as artifact and deploys to GitHub Pages
 
 **No manual deployment needed.** Just push to `main` and wait ~2 minutes.
 
@@ -138,6 +148,8 @@ This context is important when updating copy, screenshots, or install instructio
 
 - **Main HTML**: [website/public/index.html](website/public/index.html)
 - **Tools index**: [website/public/tools/index.html](website/public/tools/index.html)
+- **Shared partials**: [website/_partials/](website/_partials/) (nav, footer, favicons, css, kofi)
+- **Build script**: [website/build.py](website/build.py)
 - **Design tokens**: [website/public/css/variables.css](website/public/css/variables.css)
 - **Components**: [website/public/css/components.css](website/public/css/components.css)
 - **Tool styles**: [website/public/css/tool.css](website/public/css/tool.css)
@@ -165,9 +177,13 @@ Platform-specific install tabs are in `index.html` under `id="install"`. The [pl
 
 1. Create a parser module in `js/` (e.g., `js/my-parser.js`) following the IIFE pattern
 2. Create an app/UI module in `js/` (e.g., `js/my-tool-app.js`)
-3. Create the tool page in `tools/` (e.g., `tools/my-tool.html`) — include core CSS plus `tool.css`
+3. Create the tool page in `tools/` (e.g., `tools/my-tool.html`) — use `<!-- PARTIAL:favicons -->`, `<!-- PARTIAL:css -->`, `<!-- PARTIAL:nav -->`, `<!-- PARTIAL:footer -->`, and `<!-- PARTIAL:kofi -->` markers instead of duplicating shared blocks
 4. Add a card linking to it in [tools/index.html](website/public/tools/index.html)
 5. Update the Schema.org `hasPart` array in `tools/index.html` `<head>`
+
+### Modifying Navigation or Footer
+
+Edit the shared partial in `website/_partials/` (e.g., `nav.html` or `footer.html`). Changes apply to all pages after running `python website/build.py`.
 
 ### Changing Colors/Spacing
 
