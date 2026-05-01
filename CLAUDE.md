@@ -35,7 +35,8 @@ website/
 │   ├── footer.html      # Footer with social links
 │   ├── favicons.html    # Favicon link tags (uses {{BASE}})
 │   ├── css.html         # CSS stylesheet links (uses {{BASE}})
-│   └── kofi.html        # Ko-fi donation widget
+│   ├── kofi.html        # Ko-fi donation widget
+│   └── icons/           # Lucide SVG icons (one file per icon, fetched from lucide-static)
 ├── build/               # Generated output (gitignored) — deploy target
 └── public/              # Source HTML + static assets
     ├── index.html       # Single-page marketing site (source with partial markers)
@@ -72,6 +73,8 @@ website/
 ```
 
 HTML source files in `public/` use `<!-- PARTIAL:name -->` comment markers that the build script replaces with the contents of `_partials/name.html`. Template variables like `{{BASE}}` are resolved per-page based on directory depth (empty for root, `../` for `tools/`).
+
+Icons use `<!-- ICON:name -->` markers, expanded after partials. The build reads `_partials/icons/<name>.svg` (canonical Lucide SVGs from `lucide-static@1.14.0`), strips the license comment, and rewrites the root `<svg>` opening tag to `<svg class="icon icon-xl" xmlns="..." viewBox="0 0 24 24">` so styling is governed entirely by the `.icon` and `.icon-xl` CSS rules. Unknown icon names fail the build loudly. **Do not hand-write SVG paths**: to add an icon, fetch it from `https://unpkg.com/lucide-static@1.14.0/icons/<name>.svg` and drop it into `_partials/icons/`.
 
 ### Design System
 
@@ -136,7 +139,7 @@ AnkiGammon is a desktop Python application that:
 - Converts backgammon position analysis to Anki flashcards
 - Supports drag-and-drop `.xg` files with auto-blunder filtering
 - Accepts position IDs (XGID/OGID/GNUID) and auto-generates GnuBG analysis
-- Features score matrices, 6 color schemes, interactive move visualization
+- Features score matrices, 7 color schemes, dual analysis engines (GnuBG cross-platform, XG Windows-only experimental), drag-and-drop deck tree with AnkiConnect sync, interactive move visualization
 - Exports via AnkiConnect API or APKG files
 - **Installation methods**:
   - Windows: Pre-built `.exe` (no Python required)
@@ -184,6 +187,12 @@ Platform-specific install tabs are in `index.html` under `id="install"`. The [pl
 ### Modifying Navigation or Footer
 
 Edit the shared partial in `website/_partials/` (e.g., `nav.html` or `footer.html`). Changes apply to all pages after running `python website/build.py`.
+
+### Adding or Replacing an Icon
+
+1. Find the icon on https://lucide.dev (note the canonical name, e.g. `cpu`, `circle-play`, `folder-tree`).
+2. Fetch the canonical SVG: `curl -sL https://unpkg.com/lucide-static@1.14.0/icons/<name>.svg -o website/_partials/icons/<name>.svg`. Do not hand-write the path data.
+3. Reference it in HTML with `<!-- ICON:<name> -->`. The build normalizes attributes; styling comes from `.icon` + size class (currently always `.icon-xl`).
 
 ### Changing Colors/Spacing
 

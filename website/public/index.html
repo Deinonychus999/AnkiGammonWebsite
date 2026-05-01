@@ -92,7 +92,7 @@
           "name": "Do I need XG analysis or can I just paste position IDs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. GnuBG needs to be installed separately and configured in AnkiGammon settings. You can configure the analysis depth (0-4 ply) in settings."
+            "text": "You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon runs an analysis engine in the background to generate complete move and cube analysis. Pick GNU Backgammon (cross-platform, configurable 0-4 ply) or eXtreme Gammon (Windows only, drives an installed XG copy via UI automation - currently experimental). The chosen engine needs to be installed separately and configured in AnkiGammon settings."
           }
         },
         {
@@ -132,7 +132,7 @@
           "name": "What other customization options are available?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), move score matrix (see best moves across different match scores), split subdecks (separate checker and cube decisions into different subdecks), configurable GnuBG analysis depth (0-4 ply to balance speed vs. accuracy), pip count display toggle, and export method choice (AnkiConnect for instant export or APKG for portable files)."
+            "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: deck tree organization (drag-and-drop positions into named decks and subdecks, with AnkiConnect sync), show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), move score matrix (see best moves across different match scores), split subdecks (separate checker and cube decisions into different subdecks), choice of analysis engine (GnuBG 0-4 ply or eXtreme Gammon on Windows), pip count display toggle, and export method choice (AnkiConnect for instant export or APKG for portable files)."
           }
         },
         {
@@ -321,36 +321,15 @@
             <div class="feature-grid">
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
+                        <!-- ICON:download -->
                     </div>
-                    <h3>Drag & Drop Any Backgammon File</h3>
-                    <p>Import match or position files. Pre-analyzed files are used directly; others are analyzed automatically by GnuBG. Filter by error threshold and player.</p>
+                    <h3>Drop In Anything Backgammon</h3>
+                    <p>Drag match or position files onto the window, or paste an XGID, OGID, GNUID, or full XG analysis straight in. Format is detected automatically, pre-analyzed positions are kept, and the rest get analyzed for you.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                            <path d="M2 17l10 5 10-5"/>
-                            <path d="M2 12l10 5 10-5"/>
-                        </svg>
-                    </div>
-                    <h3>Automatic Format Detection</h3>
-                    <p>Paste any format: XGID, OGID, GNUID position IDs, or full XG analysis text. AnkiGammon automatically detects the format and tells you if you need to install GnuBG.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="7" height="7"/>
-                            <rect x="14" y="3" width="7" height="7"/>
-                            <rect x="14" y="14" width="7" height="7"/>
-                            <rect x="3" y="14" width="7" height="7"/>
-                        </svg>
+                        <!-- ICON:grid-2x2 -->
                     </div>
                     <h3>Score Matrix Generation</h3>
                     <p>Optionally generate detailed score matrices showing optimal cube actions and best moves at different match scores. Helps you understand how match score affects decisions.</p>
@@ -358,13 +337,7 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="13.5" cy="6.5" r=".5"/>
-                            <circle cx="17.5" cy="10.5" r=".5"/>
-                            <circle cx="8.5" cy="7.5" r=".5"/>
-                            <circle cx="6.5" cy="12.5" r=".5"/>
-                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
-                        </svg>
+                        <!-- ICON:palette -->
                     </div>
                     <h3>Customize Board Appearance</h3>
                     <p>Choose from 7 color schemes (Classic, Forest, Ocean, Desert, Sunset, Midnight, Monochrome) and toggle board orientation (clockwise/counter-clockwise). All settings save automatically.</p>
@@ -372,24 +345,15 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
-                        </svg>
+                        <!-- ICON:cpu -->
                     </div>
-                    <h3>Automatic GnuBG Analysis</h3>
-                    <p>Drag raw match files or enter position IDs without analysis and AnkiGammon automatically runs GnuBG to generate complete move and cube analysis. Pick how deep to analyze (0-4 ply). Deeper is more accurate but slower.</p>
+                    <h3>Pair With Your Favorite Engine</h3>
+                    <p>Point AnkiGammon at your install of GNU Backgammon (free, cross-platform) at the depth you choose, or eXtreme Gammon on Windows <em>(experimental)</em>. It runs the analysis for you.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                        </svg>
+                        <!-- ICON:file-text -->
                     </div>
                     <h3>Add Custom Notes to Positions</h3>
                     <p>Add your own explanations, insights, and reminders to any position. Your notes appear on the flashcard back, making it easy to capture key lessons and strategic patterns while building your deck.</p>
@@ -397,10 +361,7 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                            <path d="M13 8l7-4v16l-7-4"/>
-                        </svg>
+                        <!-- ICON:circle-play -->
                     </div>
                     <h3>Interactive Move Visualization</h3>
                     <p>Click moves on the card back to see animated checker movements with smooth arc paths. Optional feature you can enable/disable to match your learning preference.</p>
@@ -408,9 +369,7 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                        </svg>
+                        <!-- ICON:zap -->
                     </div>
                     <h3>Two Ways to Export</h3>
                     <p>Choose AnkiConnect for instant one-click export to running Anki, or APKG files for offline/portable decks. Shows progress as it exports.</p>
@@ -418,11 +377,15 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <line x1="12" y1="20" x2="12" y2="10"/>
-                            <line x1="18" y1="20" x2="18" y2="4"/>
-                            <line x1="6" y1="20" x2="6" y2="16"/>
-                        </svg>
+                        <!-- ICON:folder-tree -->
+                    </div>
+                    <h3>Build a Library, Not a Pile</h3>
+                    <p>Sort positions into named decks and subdecks with drag-and-drop, drop files straight onto the deck you want, and stay in sync with Anki.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <!-- ICON:bar-chart-2 -->
                     </div>
                     <h3>Full Move Analysis</h3>
                     <p>Every card includes equity values, win/gammon/backgammon percentages, and error calculations for all candidate moves. Show options on the front or hide them.</p>
@@ -739,7 +702,12 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon automatically runs GnuBG in the background to generate complete move and cube analysis. GnuBG needs to be installed separately and configured in AnkiGammon settings. You can configure the analysis depth (0-4 ply) in settings. For cube decisions, it can even generate full score matrices showing equity at different match scores.</p>
+                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon runs an analysis engine in the background to generate complete move and cube analysis. Pick the engine that fits your setup:</p>
+                            <ul>
+                                <li><strong>GNU Backgammon:</strong> free, open-source, cross-platform (Windows/macOS/Linux). Configurable depth (0-4 ply).</li>
+                                <li><strong>eXtreme Gammon:</strong> Windows only, drives your installed copy of XG2 via UI automation. Currently experimental, so fall back to GnuBG if it doesn't work on your setup.</li>
+                            </ul>
+                            <p>The engine you pick needs to be installed separately and configured in AnkiGammon settings. For cube decisions, either engine can generate full score matrices showing equity at different match scores.</p>
                         </div>
                     </div>
                 </div>
@@ -812,12 +780,13 @@
                         <div class="faq-answer-content">
                             <p>AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved:</p>
                             <ul>
+                                <li><strong>Deck tree organization:</strong> Sort positions into named decks and subdecks with drag-and-drop, and sync the tree with Anki via AnkiConnect</li>
                                 <li><strong>Show options toggle:</strong> Display multiple-choice options on card front or hide them. Number of choices is customizable.</li>
                                 <li><strong>Interactive moves:</strong> Enable/disable animated checker movements when clicking moves on the card back</li>
                                 <li><strong>Score matrix generation:</strong> Optionally generate detailed cube equity matrices for match play</li>
                                 <li><strong>Move score matrix:</strong> See how the best moves change across different match scores</li>
                                 <li><strong>Split subdecks:</strong> Separate checker and cube decisions into different subdecks</li>
-                                <li><strong>GnuBG analysis depth:</strong> Choose 0-4 ply to balance speed vs. accuracy</li>
+                                <li><strong>Analysis engine &amp; depth:</strong> Choose GnuBG (0-4 ply) or eXtreme Gammon (Very Quick to Extensive, Windows only)</li>
                                 <li><strong>Pip count display:</strong> Toggle pip counts on/off</li>
                                 <li><strong>Export method:</strong> AnkiConnect (instant) or APKG (portable files)</li>
                             </ul>

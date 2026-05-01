@@ -13,9 +13,19 @@ import shutil
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SRC_DIR = os.path.join(SCRIPT_DIR, "public")
 PARTIALS_DIR = os.path.join(SCRIPT_DIR, "_partials")
+ICONS_DIR = os.path.join(PARTIALS_DIR, "icons")
 BUILD_DIR = os.path.join(SCRIPT_DIR, "build")
 
 PARTIAL_RE = re.compile(r"^[ \t]*<!-- PARTIAL:(\w[\w-]*) -->[ \t]*$", re.MULTILINE)
+ICON_RE = re.compile(r"<!-- ICON:([a-z0-9-]+) -->")
+SVG_OPEN_RE = re.compile(r"<svg\b[^>]*>", re.IGNORECASE)
+SVG_LICENSE_COMMENT_RE = re.compile(r"\A\s*<!--[^>]*-->\s*")
+
+# Canonical opening tag for inlined icons. Width/height come from the .icon-xl
+# CSS class; stroke/fill come from the .icon class. See css/components.css.
+ICON_SVG_OPEN = '<svg class="icon icon-xl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+
+_icon_cache = {}
 
 
 def get_variables(depth):
@@ -36,6 +46,25 @@ def resolve_partial(name, variables):
     for key, value in variables.items():
         content = content.replace(key, value)
     return content
+
+
+def resolve_icon(name):
+    """Read an icon SVG file, strip license comment, and rewrite the root tag.
+
+    Source files come from lucide-static (see _partials/icons/). Their `class`,
+    `width`, `height`, `stroke`, and `fill` attributes are replaced so styling
+    is governed by the .icon and .icon-xl CSS rules instead.
+    """
+    if name not in _icon_cache:
+        path = os.path.join(ICONS_DIR, f"{name}.svg")
+        if not os.path.exists(path):
+            raise SystemExit(f"build.py: unknown icon {name!r} (expected {path})")
+        with open(path, encoding="utf-8") as f:
+            svg = f.read()
+        svg = SVG_LICENSE_COMMENT_RE.sub("", svg).strip()
+        svg = SVG_OPEN_RE.sub(ICON_SVG_OPEN, svg, count=1)
+        _icon_cache[name] = svg
+    return _icon_cache[name]
 
 
 def build():
@@ -66,6 +95,7 @@ def build():
                 return resolve_partial(m.group(1), variables)
 
             content = PARTIAL_RE.sub(replace_match, content)
+            content = ICON_RE.sub(lambda m: resolve_icon(m.group(1)), content)
 
             if content != original:
                 with open(filepath, "w", encoding="utf-8") as f:
