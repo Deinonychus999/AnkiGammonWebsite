@@ -39,12 +39,4 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- Policies -->
-  <url>
-    <loc>https://ankigammon.com/code-signing-policy</loc>
-    <lastmod>2026-05-07</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-
 </urlset>
