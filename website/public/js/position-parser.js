@@ -130,11 +130,14 @@
             cubeOwner:   cubePos === 0 ? 'centered' : (cubePos === -1 ? 'x_owns' : 'o_owns'),
             onRoll:      'O',
             _xgidTurn:   turn,
+            _xgidRules:  cj,
             dice:        null,
             scoreX:      scoreX,
             scoreO:      scoreO,
             matchLength: ml,
-            crawford:    cj === 1
+            crawford:    ml > 0 && (cj & 1) !== 0,
+            jacoby:      ml === 0 && (cj & 1) !== 0,
+            beaversAllowed: ml === 0 && (cj & 2) !== 0
         };
 
         diceStr = diceStr.toUpperCase().trim();
@@ -171,7 +174,11 @@
         var cubePos = meta.cubeOwner === 'centered' ? 0 :
                       meta.cubeOwner === 'x_owns'   ? -1 : 1;
         var diceStr = meta.dice ? '' + meta.dice[0] + meta.dice[1] : '00';
-        var cj = meta.crawford ? 1 : 0;
+        var cj = meta._xgidRules !== undefined
+            ? meta._xgidRules
+            : ((meta.matchLength || 0) > 0
+                ? (meta.crawford ? 1 : 0)
+                : ((meta.jacoby ? 1 : 0) | (meta.beaversAllowed ? 2 : 0)));
 
         // For turn=-1, reverse the normalization done in parseXGID
         var scoreOOut = meta.scoreO || 0;

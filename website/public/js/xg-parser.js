@@ -1,7 +1,7 @@
 /**
  * XG Binary File Parser
  *
- * Parses eXtreme Gammon .xg binary files into a structured JavaScript object.
+ * Parses eXtreme Gammon .xg match files and .xgp position files.
  * Based on the xgdatatools library (LGPL) by Michael Petch.
  *
  * File format reference:
@@ -17,6 +17,10 @@
     var RECORD_SIZE = 2560;
     var FILE_INDEX_ENTRY_SIZE = 532;
     var ARCHIVE_RECORD_SIZE = 36;
+    var MAX_ARCHIVE_FILES = 1000;
+    var MAX_EXTRACTED_FILE_SIZE = 128 * 1024 * 1024;
+    var MAX_XGP_RECORDS = 128;
+    var MAX_XGP_GAME_DATA_SIZE = MAX_XGP_RECORDS * RECORD_SIZE;
 
     var ENTRY_HEADER_MATCH = 0;
     var ENTRY_HEADER_GAME = 1;
@@ -53,15 +57,54 @@
     function getInt8(dv, off) { return dv.getInt8(off); }
     function getUint8(dv, off) { return dv.getUint8(off); }
 
-    /** Try to decompress with zlib header, then fall back to raw deflate */
-    function decompress(data) {
+    function readSignedBytes(dv, offset, count) {
+        var values = [];
+        for (var i = 0; i < count; i++) {
+            values.push(getInt8(dv, offset + i));
+        }
+        return values;
+    }
+
+    function inflateWithLimit(data, maxOutputSize, raw) {
+        if (!isFinite(maxOutputSize) || maxOutputSize <= 0) {
+            throw new Error('Invalid decompression size limit');
+        }
+
+        var inflator = new pako.Inflate({
+            raw: raw,
+            chunkSize: 64 * 1024
+        });
+        var outputSize = 0;
+
+        inflator.onData = function (chunk) {
+            outputSize += chunk.length;
+            if (outputSize > maxOutputSize) {
+                var limitError = new Error('Decompressed data exceeds the allowed size');
+                limitError.outputLimitExceeded = true;
+                throw limitError;
+            }
+            this.chunks.push(chunk);
+        };
+
+        var succeeded = inflator.push(data, true);
+        if (!succeeded || inflator.err || !inflator.ended || !inflator.result) {
+            throw new Error(inflator.msg || 'Invalid compressed data');
+        }
+        return inflator.result;
+    }
+
+    /** Try zlib, then raw deflate, while enforcing an output-size cap. */
+    function decompress(data, maxOutputSize) {
         try {
-            return pako.inflate(data);
+            return inflateWithLimit(data, maxOutputSize, false);
         } catch (e) {
+            if (e && e.outputLimitExceeded) throw e;
             try {
-                return pako.inflateRaw(data);
+                return inflateWithLimit(data, maxOutputSize, true);
             } catch (e2) {
-                throw new Error('Failed to decompress data: ' + e2.message);
+                if (e2 && e2.outputLimitExceeded) throw e2;
+                var detail = e2 && e2.message ? e2.message : String(e2);
+                throw new Error('Failed to decompress data: ' + detail);
             }
         }
     }
@@ -89,6 +132,11 @@
      * Each FileRecord is 532 bytes: <256B 256B l l l l B B xx>
      */
     function parseFileIndex(registryBytes, filecount) {
+        var requiredSize = filecount * FILE_INDEX_ENTRY_SIZE;
+        if (registryBytes.length < requiredSize) {
+            throw new Error('The XG archive file index is truncated');
+        }
+
         var files = [];
         for (var i = 0; i < filecount; i++) {
             var off = i * FILE_INDEX_ENTRY_SIZE;
@@ -117,19 +165,118 @@
     /**
      * Extract and decompress a file from the archive.
      */
-    function extractArchiveFile(buffer, fileRec, startOfArcData) {
+    function extractArchiveFile(buffer, fileRec, startOfArcData, endOfArcData, maxOutputSize) {
         var dataStart = startOfArcData + fileRec.start;
 
+        if (fileRec.start < 0 || fileRec.osize <= 0 || fileRec.csize < 0 ||
+                fileRec.osize > MAX_EXTRACTED_FILE_SIZE ||
+                fileRec.osize > maxOutputSize ||
+                dataStart < startOfArcData || dataStart >= endOfArcData) {
+            throw new Error('The XG archive contains an invalid file entry');
+        }
+
         if (!fileRec.compressed) {
+            if (dataStart + fileRec.osize > endOfArcData) {
+                throw new Error('The XG archive contains a truncated file');
+            }
             return new Uint8Array(buffer, dataStart, fileRec.osize);
         }
 
-        // For compressed files, we need enough data to decompress.
-        // Use csize as a hint, but grab extra in case csize understates.
-        var available = buffer.byteLength - ARCHIVE_RECORD_SIZE - dataStart;
-        var sliceLen = Math.min(available, Math.max(fileRec.csize, fileRec.osize * 2));
-        var compressed = new Uint8Array(buffer, dataStart, sliceLen);
-        return decompress(compressed);
+        if (fileRec.csize <= 0 || dataStart + fileRec.csize > endOfArcData) {
+            throw new Error('The XG archive contains truncated compressed data');
+        }
+
+        // Use the exact compressed size. Pako 2 inflates concatenated zlib
+        // streams, so including the next archive member would merge files.
+        var compressed = new Uint8Array(buffer, dataStart, fileRec.csize);
+        var extracted = decompress(compressed, fileRec.osize);
+        if (extracted.length !== fileRec.osize) {
+            throw new Error('The extracted XG game data has an invalid size');
+        }
+        return extracted;
+    }
+
+    /**
+     * Validate the GDF archive and return its embedded temp.xg game data.
+     */
+    function extractGameData(arrayBuffer, maxGameDataSize) {
+        if (Object.prototype.toString.call(arrayBuffer) !== '[object ArrayBuffer]') {
+            throw new Error('Expected binary XG file data');
+        }
+
+        var fileSize = arrayBuffer.byteLength;
+        if (fileSize < GDF_HEADER_SIZE + ARCHIVE_RECORD_SIZE) {
+            throw new Error('File is too small to be a valid XG file');
+        }
+
+        var dv = new DataView(arrayBuffer);
+
+        // GDF stores the "HMGR" magic with its bytes reversed.
+        var magic = String.fromCharCode(
+            dv.getUint8(3), dv.getUint8(2), dv.getUint8(1), dv.getUint8(0)
+        );
+        if (magic !== 'HMGR') {
+            throw new Error('Not a valid eXtreme Gammon file');
+        }
+
+        var arcRec = parseArchiveRecord(dv, fileSize);
+        if (arcRec.filecount <= 0 || arcRec.filecount > MAX_ARCHIVE_FILES) {
+            throw new Error('The XG archive has an invalid file count');
+        }
+        if (arcRec.registrysize <= 0 || arcRec.archivesize <= 0) {
+            throw new Error('The XG archive has invalid size metadata');
+        }
+
+        var endOfArcData = fileSize - ARCHIVE_RECORD_SIZE;
+        var registryStart = endOfArcData - arcRec.registrysize;
+        var startOfArcData = registryStart - arcRec.archivesize;
+        if (registryStart < GDF_HEADER_SIZE || registryStart > endOfArcData ||
+                startOfArcData < GDF_HEADER_SIZE || startOfArcData > registryStart) {
+            throw new Error('The XG archive layout is invalid');
+        }
+
+        var registryRaw = new Uint8Array(arrayBuffer, registryStart, arcRec.registrysize);
+        var expectedRegistrySize = arcRec.filecount * FILE_INDEX_ENTRY_SIZE;
+        var registryBytes = arcRec.compressedregistry
+            ? decompress(registryRaw, expectedRegistrySize)
+            : registryRaw;
+        if (registryBytes.length !== expectedRegistrySize) {
+            throw new Error('The XG archive file index has an invalid size');
+        }
+        var files = parseFileIndex(registryBytes, arcRec.filecount);
+
+        var tempXgRec = null;
+        for (var fi = 0; fi < files.length; fi++) {
+            if (files[fi].name.toLowerCase() === 'temp.xg') {
+                tempXgRec = files[fi];
+                break;
+            }
+        }
+        if (!tempXgRec) {
+            throw new Error('The XG archive does not contain position data');
+        }
+
+        var tempXgData = extractArchiveFile(
+            arrayBuffer,
+            tempXgRec,
+            startOfArcData,
+            registryStart,
+            maxGameDataSize
+        );
+        if (tempXgData.length < RECORD_SIZE || tempXgData.length % RECORD_SIZE !== 0) {
+            throw new Error('The embedded XG game data is truncated');
+        }
+
+        var gameDv = new DataView(
+            tempXgData.buffer,
+            tempXgData.byteOffset,
+            tempXgData.byteLength
+        );
+        if (getUint32(gameDv, 556) !== 0x494C4D44) {
+            throw new Error('The embedded XG game data is invalid');
+        }
+
+        return tempXgData;
     }
 
     // ── Record Parsing Layer ───────────────────────────────────────────
@@ -238,6 +385,7 @@
             score1: getInt32(dv, 12),
             score2: getInt32(dv, 16),
             crawfordApply: !!getUint8(dv, 20),
+            position: readSignedBytes(dv, 21, 26),
             gameNumber: getInt32(dv, 48)
         };
     }
@@ -251,6 +399,7 @@
     function parseMoveEntry(data, offset) {
         var dv = new DataView(data.buffer, data.byteOffset + offset);
 
+        var position = readSignedBytes(dv, 9, 26);
         var activeP = getInt32(dv, 64);
 
         // Moves: 8 × int32 at offset 68
@@ -266,6 +415,7 @@
         var cubeA = getInt32(dv, 108);
 
         return {
+            position: position,
             activePlayer: activeP,
             moves: moves,
             dice: dice,
@@ -287,7 +437,10 @@
             take: getInt32(dv, 20),
             beaver: getInt32(dv, 24),
             raccoon: getInt32(dv, 28),
-            cubeValue: getInt32(dv, 32)
+            cubeValue: getInt32(dv, 32),
+            position: readSignedBytes(dv, 36, 26),
+            jacobyBits: getInt32(dv, 112),
+            isBeaver: dv.getInt16(122, true)
         };
     }
 
@@ -310,67 +463,9 @@
     // ── Main Parse Function ────────────────────────────────────────────
 
     function parse(arrayBuffer) {
-        var fileSize = arrayBuffer.byteLength;
-        if (fileSize < GDF_HEADER_SIZE + ARCHIVE_RECORD_SIZE) {
-            throw new Error('File is too small to be a valid .xg file');
-        }
+        var tempXgData = extractGameData(arrayBuffer, MAX_EXTRACTED_FILE_SIZE);
 
-        var dv = new DataView(arrayBuffer);
-
-        // 1. Verify GDF header magic bytes "HMGR" (stored reversed: RGMH in bytes)
-        var m0 = dv.getUint8(3), m1 = dv.getUint8(2), m2 = dv.getUint8(1), m3 = dv.getUint8(0);
-        var magic = String.fromCharCode(m0, m1, m2, m3);
-        if (magic !== 'HMGR') {
-            throw new Error('Not a valid .xg file (expected HMGR magic, got "' + magic + '")');
-        }
-
-        // 2. Read archive record (last 36 bytes)
-        var arcRec = parseArchiveRecord(dv, fileSize);
-        if (arcRec.filecount <= 0) {
-            throw new Error('Archive contains no files');
-        }
-
-        // 3. Calculate positions
-        var endOfArcData = fileSize - ARCHIVE_RECORD_SIZE;
-        var registryStart = endOfArcData - arcRec.registrysize;
-        var startOfArcData = registryStart - arcRec.archivesize;
-
-        // 4. Extract file index
-        var registryRaw = new Uint8Array(arrayBuffer, registryStart, arcRec.registrysize);
-        var registryBytes;
-        if (arcRec.compressedregistry) {
-            registryBytes = decompress(registryRaw);
-        } else {
-            registryBytes = registryRaw;
-        }
-
-        var files = parseFileIndex(registryBytes, arcRec.filecount);
-
-        // 5. Find temp.xg
-        var tempXgRec = null;
-        for (var fi = 0; fi < files.length; fi++) {
-            if (files[fi].name.toLowerCase() === 'temp.xg') {
-                tempXgRec = files[fi];
-                break;
-            }
-        }
-        if (!tempXgRec) {
-            throw new Error('temp.xg not found in archive');
-        }
-
-        // 6. Decompress temp.xg
-        var tempXgData = extractArchiveFile(arrayBuffer, tempXgRec, startOfArcData);
-
-        // Validate: check DMLI magic at offset 556 in the game file
-        if (tempXgData.length > 560) {
-            var gameDv = new DataView(tempXgData.buffer, tempXgData.byteOffset);
-            var gameMagic = getUint32(gameDv, 556);
-            if (gameMagic !== 0x494C4D44) {
-                throw new Error('Invalid game file (DMLI magic not found)');
-            }
-        }
-
-        // 7. Iterate 2560-byte records
+        // Iterate 2560-byte records.
         var recordCount = Math.floor(tempXgData.length / RECORD_SIZE);
         var matchInfo = null;
         var fileVersion = -1;
@@ -440,6 +535,157 @@
         return { match: matchInfo, games: games };
     }
 
+    function encodeXGPosition(rawPosition) {
+        if (!rawPosition || rawPosition.length !== 26) {
+            throw new Error('The XGP position record is incomplete');
+        }
+
+        var positiveTotal = 0;
+        var negativeTotal = 0;
+        var chars = [];
+
+        for (var i = 0; i < rawPosition.length; i++) {
+            var count = rawPosition[i];
+            var magnitude = Math.abs(count);
+            if (magnitude > 15) {
+                throw new Error('The XGP file contains an invalid checker count');
+            }
+
+            if (count > 0) positiveTotal += count;
+            if (count < 0) negativeTotal += magnitude;
+
+            if (count === 0) {
+                chars.push('-');
+            } else if (count > 0) {
+                chars.push(String.fromCharCode(64 + count));
+            } else {
+                chars.push(String.fromCharCode(96 + magnitude));
+            }
+        }
+
+        if (positiveTotal > 15 || negativeTotal > 15) {
+            throw new Error('The XGP file contains an invalid checker position');
+        }
+
+        return chars.join('');
+    }
+
+    function cubeExponent(cubeCode) {
+        var exponent = Math.abs(cubeCode);
+        if (exponent > 7) {
+            throw new Error('The XGP file contains an invalid doubling cube value');
+        }
+        return exponent;
+    }
+
+    function cubeOwnerField(cubeCode) {
+        return cubeCode === 0 ? 0 : (cubeCode > 0 ? 1 : -1);
+    }
+
+    /**
+     * Extract the single position in an eXtreme Gammon .xgp file.
+     *
+     * XGP may include both a CubeEntry (context) and a MoveEntry. Match the
+     * desktop parser by preferring the MoveEntry when present. Returning XGID
+     * keeps PositionParser as the visualizer's one normalization path.
+     */
+    function parsePosition(arrayBuffer) {
+        var tempXgData = extractGameData(arrayBuffer, MAX_XGP_GAME_DATA_SIZE);
+        var recordCount = Math.floor(tempXgData.length / RECORD_SIZE);
+
+        if (recordCount > MAX_XGP_RECORDS) {
+            throw new Error('This file contains a match, not a single XGP position');
+        }
+
+        var matchInfo = null;
+        var gameInfo = null;
+        var moveEntry = null;
+        var cubeEntry = null;
+        var gameHeaderCount = 0;
+        var moveEntryCount = 0;
+        var cubeEntryCount = 0;
+        var hasFooter = false;
+
+        for (var r = 0; r < recordCount; r++) {
+            var recOffset = r * RECORD_SIZE;
+            var entryType = tempXgData[recOffset + 8];
+
+            if (entryType === ENTRY_HEADER_MATCH && !matchInfo) {
+                matchInfo = parseHeaderMatch(tempXgData, recOffset);
+            } else if (entryType === ENTRY_HEADER_GAME) {
+                gameHeaderCount++;
+                if (!gameInfo) gameInfo = parseHeaderGame(tempXgData, recOffset);
+            } else if (entryType === ENTRY_MOVE) {
+                moveEntryCount++;
+                if (!moveEntry) moveEntry = parseMoveEntry(tempXgData, recOffset);
+            } else if (entryType === ENTRY_CUBE) {
+                cubeEntryCount++;
+                if (!cubeEntry) cubeEntry = parseCubeEntry(tempXgData, recOffset);
+            } else if (entryType === ENTRY_FOOTER_GAME ||
+                    entryType === ENTRY_FOOTER_MATCH) {
+                hasFooter = true;
+            }
+        }
+
+        if (!matchInfo || !gameInfo) {
+            throw new Error('The XGP file is missing its position header');
+        }
+        if (gameHeaderCount !== 1 || moveEntryCount > 1 ||
+                cubeEntryCount > 1 || hasFooter) {
+            throw new Error('This file contains a match, not a single XGP position');
+        }
+        if (!moveEntry && !cubeEntry) {
+            throw new Error('No renderable position was found in this XGP file');
+        }
+
+        var selected = moveEntry || cubeEntry;
+        var cubeCode = moveEntry ? moveEntry.cubeA : cubeEntry.cubeValue;
+        var turn;
+        var diceField;
+        var decisionType;
+
+        if (moveEntry) {
+            turn = moveEntry.activePlayer === 1 ? 1 : -1;
+            if (moveEntry.dice[0] < 1 || moveEntry.dice[0] > 6 ||
+                    moveEntry.dice[1] < 1 || moveEntry.dice[1] > 6) {
+                throw new Error('The XGP file contains invalid dice');
+            }
+            diceField = '' + moveEntry.dice[0] + moveEntry.dice[1];
+            decisionType = 'checker play';
+        } else {
+            turn = cubeCode > 0 ? 1 :
+                (cubeCode < 0 ? -1 : (cubeEntry.activePlayer === 1 ? 1 : -1));
+            diceField = '00';
+            decisionType = 'cube decision';
+        }
+
+        var matchLength = matchInfo.matchLength;
+        var rulesField;
+        if (moveEntry) {
+            rulesField = gameInfo.crawfordApply ? 1 : 0;
+        } else if (matchLength > 0) {
+            rulesField = gameInfo.crawfordApply ? 1 : 0;
+        } else {
+            var jacobyBits = cubeEntry ? cubeEntry.jacobyBits : (matchInfo.jacoby ? 1 : 0);
+            rulesField = jacobyBits & 3;
+            if (cubeEntry && cubeEntry.isBeaver) rulesField |= 2;
+        }
+
+        var xgid = 'XGID=' + encodeXGPosition(selected.position) + ':' +
+            cubeExponent(cubeCode) + ':' + cubeOwnerField(cubeCode) + ':' +
+            turn + ':' + diceField + ':' +
+            gameInfo.score1 + ':' + gameInfo.score2 + ':' +
+            rulesField + ':' + matchLength + ':8';
+
+        return {
+            xgid: xgid,
+            decisionType: decisionType
+        };
+    }
+
     // ── Public API ─────────────────────────────────────────────────────
-    window.XGParser = { parse: parse };
+    window.XGParser = {
+        parse: parse,
+        parsePosition: parsePosition
+    };
 })();

@@ -59,6 +59,7 @@ website/
 │   ├── mat-writer.js    # MAT format writer
 │   ├── xg-to-mat-app.js # XG to MAT converter UI
 │   ├── board-renderer.js        # SVG backgammon board renderer (7 color schemes)
+│   ├── board-image-exporter.js  # Shared SVG-to-PNG download/clipboard helper
 │   ├── position-parser.js       # Position ID parser (XGID/GNUID/OGID)
 │   ├── position-converter-app.js # Position converter UI
 │   ├── met-data.js              # Kazaross XG2 match equity table data
@@ -66,7 +67,7 @@ website/
 ├── tools/               # Tool pages
 │   ├── index.html              # Tools landing page
 │   ├── xg-to-mat.html          # XG to MAT converter tool
-│   ├── position-converter.html # Position ID converter & visualizer
+│   ├── position-converter.html # Position converter & visualizer
 │   └── met-calculator.html     # Match equity table calculator
     └── assets/
         └── images/      # WebP screenshots (13 files)
@@ -106,7 +107,7 @@ Each JS file is self-contained and handles one feature. When adding new interact
 Browser-based backgammon utilities at [/tools/](website/public/tools/). Each tool runs entirely client-side with no server uploads.
 
 - **XG to MAT Converter** - Parses XG binary match files and converts to Jellyfish .mat text format via drag-and-drop
-- **Position ID Converter** - Converts between XGID, GNUID, and OGID position formats with interactive SVG board visualization
+- **Position Converter & Visualizer** - Accepts XGID, GNUID, OGID, and eXtreme Gammon .xgp position files with interactive SVG board visualization and PNG export
 - **Match Equity Table Calculator** - Looks up match winning chances (MWC) at any score using the Kazaross XG2 table, with interactive color-coded 25x25 grid and equity swing calculator
 
 Tool pages share the site's core CSS and add [tool.css](website/public/css/tool.css) for tool-specific styles. Each tool has a parser module and an app/UI module in `js/`.

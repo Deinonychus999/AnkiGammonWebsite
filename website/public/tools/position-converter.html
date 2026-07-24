@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Convert between XGID, GNUID, and OGID backgammon position ID formats online. Visualize any position with an interactive SVG board. Free, runs in your browser.">
+    <meta name="description" content="Visualize an eXtreme Gammon .xgp file or convert between XGID, GNUID, and OGID backgammon position formats. Export the board as a PNG image.">
     <meta name="author" content="AnkiGammon">
-    <title>Position ID Converter & Visualizer - AnkiGammon Tools</title>
+    <title>Backgammon Position Converter & Visualizer - AnkiGammon Tools</title>
 
     <!-- PARTIAL:favicons -->
 
@@ -15,15 +15,15 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/tools/position-converter">
-    <meta property="og:title" content="Position ID Converter & Visualizer - AnkiGammon Tools">
-    <meta property="og:description" content="Convert between XGID, GNUID, and OGID backgammon position formats. Visualize any position with an interactive board.">
+    <meta property="og:title" content="Backgammon Position Converter & Visualizer - AnkiGammon Tools">
+    <meta property="og:description" content="Upload an .xgp position file or paste a position ID, visualize the board, and export it as a PNG image.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:site_name" content="AnkiGammon">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Position ID Converter & Visualizer - AnkiGammon Tools">
-    <meta name="twitter:description" content="Convert between XGID, GNUID, and OGID backgammon position formats. Visualize any position with an interactive board.">
+    <meta name="twitter:title" content="Backgammon Position Converter & Visualizer - AnkiGammon Tools">
+    <meta name="twitter:description" content="Upload an .xgp position file or paste a position ID, visualize the board, and export it as a PNG image.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
 
     <!-- SEO -->
@@ -34,14 +34,16 @@
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Position ID Converter & Visualizer",
-      "description": "Convert between XGID, GNUID, and OGID backgammon position ID formats with board visualization. Runs entirely in your browser.",
+      "name": "Backgammon Position Converter & Visualizer",
+      "description": "Upload an eXtreme Gammon .xgp position file or convert between XGID, GNUID, and OGID formats, then visualize and export the board as a PNG image.",
       "url": "https://ankigammon.com/tools/position-converter",
       "applicationCategory": "UtilityApplication",
       "operatingSystem": "Any (browser-based)",
       "featureList": [
         "Converts between XGID, GNUID, and OGID formats",
+        "Reads eXtreme Gammon .xgp position files",
         "Interactive SVG board visualization",
+        "PNG image download and clipboard copy",
         "7 color schemes",
         "Auto-detects input format",
         "Browser-based, no server upload"
@@ -66,7 +68,7 @@
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ankigammon.com/" },
         { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://ankigammon.com/tools/" },
-        { "@type": "ListItem", "position": 3, "name": "Position ID Converter & Visualizer" }
+        { "@type": "ListItem", "position": 3, "name": "Position Converter & Visualizer" }
       ]
     }
     </script>
@@ -89,10 +91,10 @@
     <!-- Tool Hero -->
     <section class="tool-hero section">
         <div class="container">
-            <h1>Position ID Converter & Visualizer</h1>
+            <h1>Position Converter & Visualizer</h1>
             <p class="hero-subtitle">
-                Convert between XGID, GNUID, and OGID formats.
-                Visualize any backgammon position. Runs entirely in your browser.
+                Paste a position ID or upload an eXtreme Gammon .xgp file.
+                Visualize, convert, and export the position as an image in your browser.
             </p>
         </div>
     </section>
@@ -112,16 +114,37 @@
                     <button class="btn btn-primary" id="convert-btn" type="button">Convert & Visualize</button>
                     <span class="input-area__hint">Auto-detects format</span>
                 </div>
+
+                <div class="input-area__divider"><span>or</span></div>
+
+                <div class="xgp-upload" id="xgp-drop-zone">
+                    <div class="xgp-upload__icon"><!-- ICON:file-text --></div>
+                    <div class="xgp-upload__content">
+                        <p class="xgp-upload__text">
+                            Drag &amp; drop an .xgp position file here, or
+                            <button class="xgp-upload__browse" id="xgp-browse-btn" type="button">browse files</button>
+                        </p>
+                        <p class="xgp-upload__hint">The file is processed locally in your browser</p>
+                    </div>
+                    <input type="file" id="xgp-file-input" accept=".xgp" hidden>
+                </div>
+            </div>
+
+            <!-- Processing -->
+            <div class="processing" id="processing" role="status" aria-live="polite" aria-atomic="true" hidden>
+                <div class="processing__spinner" aria-hidden="true"></div>
+                <p class="processing__text">Reading XGP position...</p>
             </div>
 
             <!-- Error -->
-            <div class="tool-error" id="error-display" hidden>
+            <div class="tool-error" id="error-display" role="alert" tabindex="-1" hidden>
                 <p class="tool-error__message" id="error-message"></p>
                 <button class="tool-error__retry" id="error-retry" type="button">Try Again</button>
             </div>
 
             <!-- Results -->
             <div class="results" id="results" hidden>
+                <h2 class="visually-hidden" id="results-heading" tabindex="-1">Position preview and conversions</h2>
 
                 <!-- Board Visualization -->
                 <div class="board-section">
@@ -134,7 +157,8 @@
                             <button class="btn btn-secondary btn-sm" id="swap-colors-btn" type="button" title="Swap checker colors">Swap Colors</button>
                             <button class="btn btn-secondary btn-sm" id="swap-direction-btn" type="button" title="Switch between clockwise and counter-clockwise board layout">Swap Direction</button>
                             <button class="btn btn-secondary btn-sm" id="copy-image-btn" type="button" title="Copy board as PNG image">Copy as Image</button>
-                            <select id="scheme-select" class="scheme-select">
+                            <button class="btn btn-primary btn-sm" id="download-image-btn" type="button" title="Download board as PNG image">Download PNG</button>
+                            <select id="scheme-select" class="scheme-select" aria-label="Board color scheme">
                                 <option value="classic">Classic</option>
                                 <option value="forest">Forest</option>
                                 <option value="ocean">Ocean</option>
@@ -145,6 +169,7 @@
                             </select>
                         </div>
                     </div>
+                    <p class="board-section__status" id="image-action-status" role="status" aria-live="polite" hidden></p>
                     <div class="board-container" id="board-container"></div>
                 </div>
 
@@ -153,21 +178,21 @@
                     <div class="format-output">
                         <div class="results__toolbar">
                             <span class="results__label">XGID</span>
-                            <button class="btn btn-secondary btn-sm copy-btn" data-target="xgid-output" type="button">Copy</button>
+                            <button class="btn btn-secondary btn-sm copy-btn" data-target="xgid-output" type="button" aria-label="Copy XGID">Copy</button>
                         </div>
                         <pre class="results__output format-output__text" id="xgid-output"></pre>
                     </div>
                     <div class="format-output">
                         <div class="results__toolbar">
                             <span class="results__label">GNUID</span>
-                            <button class="btn btn-secondary btn-sm copy-btn" data-target="gnuid-output" type="button">Copy</button>
+                            <button class="btn btn-secondary btn-sm copy-btn" data-target="gnuid-output" type="button" aria-label="Copy GNUID">Copy</button>
                         </div>
                         <pre class="results__output format-output__text" id="gnuid-output"></pre>
                     </div>
                     <div class="format-output">
                         <div class="results__toolbar">
                             <span class="results__label">OGID</span>
-                            <button class="btn btn-secondary btn-sm copy-btn" data-target="ogid-output" type="button">Copy</button>
+                            <button class="btn btn-secondary btn-sm copy-btn" data-target="ogid-output" type="button" aria-label="Copy OGID">Copy</button>
                         </div>
                         <pre class="results__output format-output__text" id="ogid-output"></pre>
                     </div>
@@ -185,16 +210,16 @@
             <h2>About This Tool</h2>
             <div class="info-grid">
                 <div class="info-card">
-                    <h3>Instant Results</h3>
-                    <p>Conversions and board rendering happen instantly in your browser. No server round-trips, no waiting.</p>
+                    <h3>Paste or Upload</h3>
+                    <p>Paste an XGID, GNUID, or OGID, or drop in a single-position .xgp file from eXtreme Gammon.</p>
                 </div>
                 <div class="info-card">
                     <h3>Three Formats</h3>
                     <p>XGID (eXtreme Gammon), GNUID (GNU Backgammon), and OGID (OpenGammon) are all supported with automatic format detection.</p>
                 </div>
                 <div class="info-card">
-                    <h3>7 Color Schemes</h3>
-                    <p>Visualize positions in Classic, Forest, Ocean, Desert, Sunset, Midnight, or Monochrome board themes.</p>
+                    <h3>Export Your Board</h3>
+                    <p>Choose from seven color schemes, change the board direction, then download or copy a high-resolution PNG.</p>
                 </div>
             </div>
         </div>
@@ -219,9 +244,13 @@
 
     <!-- PARTIAL:footer -->
 
+    <!-- pako for XGP zlib decompression -->
+    <script src="https://unpkg.com/pako@2.1.0/dist/pako.min.js"></script>
     <!-- Tool scripts -->
+    <script src="../js/xg-parser.js"></script>
     <script src="../js/position-parser.js"></script>
     <script src="../js/board-renderer.js"></script>
+    <script src="../js/board-image-exporter.js"></script>
     <script src="../js/position-converter-app.js"></script>
 
     <!-- PARTIAL:kofi -->
