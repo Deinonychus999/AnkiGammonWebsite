@@ -117,9 +117,13 @@
         var main = el('div', 'deck-row__main');
         var head = el('div', 'deck-row__head');
         var title = el('h3', 'deck-row__title');
-        var link = el('a', 'deck-row__link', deck.title);
-        link.href = deck.id + '/';
-        title.appendChild(link);
+        if (hasPage(deck)) {
+            var link = el('a', 'deck-row__link', deck.title);
+            link.href = deck.id + '/';
+            title.appendChild(link);
+        } else {
+            title.textContent = deck.title;
+        }
         head.appendChild(title);
         var byline = 'by ' + deck.author + (deck.published_at ? ' · ' + formatDate(deck.published_at) : '');
         head.appendChild(el('span', 'deck-row__byline', byline));
@@ -132,11 +136,13 @@
 
         var previews = previewsFromXgids(((deck.summary || {}).previewXgids || []).slice(0, 1));
         if (previews.length) {
-            var boardLink = el('a', 'deck-row__board');
-            boardLink.href = deck.id + '/';
-            boardLink.setAttribute('aria-label', 'Open ' + deck.title);
-            boardLink.innerHTML = window.BoardRenderer.render(previews[0].position, previews[0].metadata, 'classic', false, 'ccw');
-            row.appendChild(boardLink);
+            var board = el(hasPage(deck) ? 'a' : 'div', 'deck-row__board');
+            if (hasPage(deck)) {
+                board.href = deck.id + '/';
+                board.setAttribute('aria-label', 'Open ' + deck.title);
+            }
+            board.innerHTML = window.BoardRenderer.render(previews[0].position, previews[0].metadata, 'classic', false, 'ccw');
+            row.appendChild(board);
         }
         var dl = el('a', 'btn btn-primary deck-row__download', 'Download');
         dl.href = API + deck.apkg_url;
@@ -165,6 +171,12 @@
     var sortSelect = document.getElementById('deck-sort');
     var countLabel = document.getElementById('deck-count');
     var allDecks = [];
+    // Deck pages are generated at build time, so only prerendered decks have one to link to.
+    var builtIds = null;
+
+    function hasPage(deck) {
+        return !builtIds || builtIds[deck.id] === true;
+    }
 
     function setCatalogStatus(text, kind) {
         if (!catalogStatus) return;
@@ -230,13 +242,17 @@
         // The build prerenders the catalog; hydrate from it, then refresh from the API.
         var payload = embeddedCatalog();
         var embedded = payload ? (payload.decks || []) : null;
-        if (embedded) showDecks(embedded);
+        if (embedded) {
+            builtIds = {};
+            embedded.forEach(function (d) { if (d && d.id) builtIds[d.id] = true; });
+            showDecks(embedded);
+        }
         if (!API || (payload && payload.frozen)) {
             if (!embedded) setCatalogStatus('The deck catalog is not online yet.', 'muted');
             return;
         }
         if (!embedded) setCatalogStatus('Loading decks\u2026', 'muted');
-        fetch(API + '/catalog', { headers: { Accept: 'application/json' } })
+        fetch(API + '/catalog', { headers: { Accept: 'application/json' }, cache: 'no-store' })
             .then(function (r) {
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.json();

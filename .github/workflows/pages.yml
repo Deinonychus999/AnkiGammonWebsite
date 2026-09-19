@@ -22,6 +22,9 @@ on:
   schedule:
     - cron: '17 4 * * *'
   workflow_dispatch:
+  # Sent by the decks Worker when a deck is approved or removed.
+  repository_dispatch:
+    types: [deck-catalog-changed]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:

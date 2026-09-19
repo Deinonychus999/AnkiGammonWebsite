@@ -77,9 +77,9 @@ async function route(request, url, env, ctx) {
     if (request.method === 'GET' && path === '/admin/state') return json(await readState(env), 200, NO_STORE);
     if (request.method === 'POST' && path === '/admin/recount') return recount(env);
     if (request.method === 'GET' && parts[1] === 'pending' && parts.length === 4) return getPendingFile(env, parts[2], parts[3]);
-    if (request.method === 'POST' && parts[1] === 'approve' && parts.length === 3) return approve(env, parts[2]);
+    if (request.method === 'POST' && parts[1] === 'approve' && parts.length === 3) return approve(env, ctx, parts[2]);
     if (request.method === 'POST' && parts[1] === 'reject' && parts.length === 3) return reject(env, parts[2]);
-    if (request.method === 'DELETE' && parts[1] === 'decks' && parts.length === 3) return unpublish(env, parts[2]);
+    if (request.method === 'DELETE' && parts[1] === 'decks' && parts.length === 3) return unpublish(env, ctx, parts[2]);
   }
 
   throw new HttpError(404, 'Not found');
@@ -241,7 +241,7 @@ async function getPendingFile(env, id, file) {
   return new Response(obj.body, { headers });
 }
 
-async function approve(env, id) {
+async function approve(env, ctx, id) {
   assertId(id);
   const metaObj = await env.DECKS.get(`pending/${id}/meta.json`);
   if (!metaObj) throw new HttpError(404, 'No pending submission with that id');
@@ -282,6 +282,7 @@ async function approve(env, id) {
   }
 
   console.log(JSON.stringify({ event: 'deck_approved', id }));
+  ctx.waitUntil(triggerSiteBuild(env));
   return json({ id, status: 'published' }, 200, NO_STORE);
 }
 
@@ -303,7 +304,7 @@ async function reject(env, id) {
   return json({ id, status: 'rejected' }, 200, NO_STORE);
 }
 
-async function unpublish(env, id) {
+async function unpublish(env, ctx, id) {
   assertId(id);
   const catalog = await readCatalog(env);
   const before = catalog.decks.length;
@@ -321,7 +322,28 @@ async function unpublish(env, id) {
   }
 
   console.log(JSON.stringify({ event: 'deck_unpublished', id }));
+  ctx.waitUntil(triggerSiteBuild(env));
   return json({ id, status: 'removed' }, 200, NO_STORE);
+}
+
+/** Asks GitHub Actions to rebuild the site so the catalog and deck pages update now instead of at the daily run. */
+async function triggerSiteBuild(env) {
+  if (!env.GITHUB_DISPATCH_TOKEN) return;
+  try {
+    const res = await fetch('https://api.github.com/repos/Deinonychus999/AnkiGammonWebsite/dispatches', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'ankigammon-decks-worker',
+      },
+      body: JSON.stringify({ event_type: 'deck-catalog-changed' }),
+    });
+    if (res.status !== 204) console.error(JSON.stringify({ event: 'site_build_trigger_failed', status: res.status }));
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'site_build_trigger_failed', message: String(err && err.message) }));
+  }
 }
 
 /** Rebuilds state.json from a full listing, for when the running totals drift. */

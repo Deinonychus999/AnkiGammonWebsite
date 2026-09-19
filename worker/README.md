@@ -68,6 +68,10 @@ Set once, in the dashboard, and paste the same value into the review page when m
 
 To get a Discord message whenever a deck is submitted: in your Discord server open Server Settings → Integrations → Webhooks → New Webhook, pick the channel, copy the webhook URL, and add it as a second secret named `DISCORD_WEBHOOK_URL` in the same Variables and Secrets screen as the admin token. Without the secret the Worker simply does not notify.
 
+### Rebuild the site on approval (optional)
+
+Deck pages and the prerendered list come from the site build. Without this secret they refresh at the daily run; with it, every approve or remove triggers a build right away. Create a fine-grained GitHub personal access token scoped to the `AnkiGammonWebsite` repository with **Actions: Read and write** (Settings → Developer settings → Fine-grained tokens), and add it as a secret named `GITHUB_DISPATCH_TOKEN` on the Worker.
+
 ### Redeploying after code changes
 
 ```bash
