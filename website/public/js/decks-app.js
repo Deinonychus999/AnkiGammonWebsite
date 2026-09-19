@@ -377,18 +377,16 @@
             contact_email: f.contact_email.value.trim(),
             license: LICENSE,
             attestations: {
-                own_work: f.own_work.checked,
-                no_paid_content: f.no_paid_content.checked,
-                license_grant: f.license_grant.checked
+                own_work: f.agree.checked,
+                no_paid_content: f.agree.checked,
+                license_grant: f.agree.checked
             }
         };
         var problems = [];
         if (!meta.title) problems.push('Give the deck a title.');
         if (!meta.author) problems.push('Add the name to show as the author.');
         if (meta.description.length < 20) problems.push('Describe the deck in at least a sentence.');
-        if (!meta.attestations.own_work || !meta.attestations.no_paid_content || !meta.attestations.license_grant) {
-            problems.push('All three confirmations are required.');
-        }
+        if (!meta.attestations.own_work) problems.push('Please tick the confirmation above.');
         return { meta: meta, problems: problems };
     }
 
