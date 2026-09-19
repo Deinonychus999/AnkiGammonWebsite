@@ -306,10 +306,7 @@
         panel.hidden = !open;
         toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
         toggleBtn.textContent = open ? 'Close' : 'Share a deck';
-        if (open) {
-            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            browseBtn.focus({ preventScroll: true });
-        }
+        if (open) browseBtn.focus({ preventScroll: true });
     }
 
     function setState(state) {
