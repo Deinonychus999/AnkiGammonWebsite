@@ -23,9 +23,11 @@
     <section class="section" style="padding-top: 0;">
         <div class="container">
             <form class="review-auth" id="review-auth">
+                <!-- Password managers only offer to fill a login when a username field exists. -->
+                <input class="visually-hidden" type="text" name="username" value="admin" autocomplete="username" aria-hidden="true" tabindex="-1">
                 <label class="deck-form__field">
                     <span class="deck-form__label">Admin token</span>
-                    <input class="deck-form__input" type="password" id="review-token" autocomplete="current-password">
+                    <input class="deck-form__input" type="password" id="review-token" name="password" autocomplete="current-password">
                 </label>
                 <button class="btn btn-primary" type="submit">Load queue</button>
             </form>
