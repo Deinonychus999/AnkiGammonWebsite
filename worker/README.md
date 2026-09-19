@@ -70,7 +70,7 @@ To get a Discord message whenever a deck is submitted: in your Discord server op
 
 ### Rebuild the site on approval (optional)
 
-Deck pages and the prerendered list come from the site build. Without this secret they refresh at the daily run; with it, every approve or remove triggers a build right away. Create a fine-grained GitHub personal access token scoped to the `AnkiGammonWebsite` repository with **Actions: Read and write** (Settings → Developer settings → Fine-grained tokens), and add it as a secret named `GITHUB_DISPATCH_TOKEN` on the Worker.
+Deck pages and the prerendered list come from the site build. Without this secret they refresh at the daily run; with it, every approve or remove triggers a build right away. Create a fine-grained GitHub personal access token scoped to the `AnkiGammonWebsite` repository with **Contents: Read and write** (the repository-dispatch endpoint sits under Contents, not Actions; Settings → Developer settings → Fine-grained tokens), and add it as a secret named `GITHUB_DISPATCH_TOKEN` on the Worker.
 
 ### Redeploying after code changes
 
