@@ -27,11 +27,16 @@
         return tokenInput.value.trim();
     }
 
-    function api(method, path) {
-        return fetch(API + path, {
+    function api(method, path, body) {
+        var init = {
             method: method,
             headers: { Authorization: 'Bearer ' + token(), Accept: 'application/json' }
-        }).then(function (r) {
+        };
+        if (body !== undefined) {
+            init.headers['Content-Type'] = 'application/json';
+            init.body = JSON.stringify(body);
+        }
+        return fetch(API + path, init).then(function (r) {
             return r.json().catch(function () { return {}; }).then(function (data) {
                 if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
                 return data;
@@ -46,6 +51,7 @@
             ['Submitted', C.formatDate(meta.submitted_at)],
             ['Deck file', C.formatBytes(meta.apkg_bytes) + (meta.apkg_filename ? ' · ' + meta.apkg_filename : '')],
             ['Contact', meta.contact_email || '—'],
+            ['Anki decks', ((meta.summary || {}).ankiDecks || []).join(', ') || '—'],
             ['Analysis sources', Object.keys(s.sourceDescriptions || {}).map(function (k) {
                 return k + ' (' + s.sourceDescriptions[k] + ')';
             }).join('; ') || '—'],
@@ -77,6 +83,7 @@
             if (window.confirm('Reject and delete "' + meta.title + '"?')) act('POST', '/admin/reject/' + meta.id, rejectBtn, 'Rejected and deleted "' + meta.title + '".');
         });
         wrap.appendChild(dl);
+        wrap.appendChild(editButton(meta));
         wrap.appendChild(approve);
         wrap.appendChild(rejectBtn);
         return wrap;
@@ -92,6 +99,7 @@
             if (window.confirm('Remove "' + deck.title + '" from the catalog and delete its files?')) act('DELETE', '/admin/decks/' + deck.id, remove, 'Removed "' + deck.title + '" from the catalog.');
         });
         wrap.appendChild(dl);
+        wrap.appendChild(editButton(deck));
         wrap.appendChild(remove);
         return wrap;
     }
@@ -117,10 +125,23 @@
             .catch(function (err) { setStatus('Download failed: ' + err.message, 'error'); });
     }
 
-    function act(method, path, button, successMessage) {
+    function editButton(deck) {
+        var btn = C.el('button', 'btn btn-secondary btn-sm', 'Edit');
+        btn.type = 'button';
+        btn.addEventListener('click', function () {
+            var title = window.prompt('Deck title', deck.title);
+            if (title === null) return;
+            var description = window.prompt('Description', deck.description);
+            if (description === null) return;
+            act('POST', '/admin/edit/' + deck.id, btn, 'Updated "' + title.trim() + '".', { title: title, description: description });
+        });
+        return btn;
+    }
+
+    function act(method, path, button, successMessage, body) {
         button.disabled = true;
         button.textContent = 'Working\u2026';
-        api(method, path)
+        api(method, path, body)
             .then(function () { return load(successMessage); })
             .catch(function (err) {
                 button.disabled = false;

@@ -80,6 +80,7 @@ async function route(request, url, env, ctx) {
     if (request.method === 'POST' && parts[1] === 'approve' && parts.length === 3) return approve(env, ctx, parts[2]);
     if (request.method === 'POST' && parts[1] === 'reject' && parts.length === 3) return reject(env, parts[2]);
     if (request.method === 'DELETE' && parts[1] === 'decks' && parts.length === 3) return unpublish(env, ctx, parts[2]);
+    if (request.method === 'POST' && parts[1] === 'edit' && parts.length === 3) return editMeta(request, env, ctx, parts[2]);
   }
 
   throw new HttpError(404, 'Not found');
@@ -346,6 +347,39 @@ async function triggerSiteBuild(env) {
   }
 }
 
+/** Changes a deck's title or description, wherever it currently lives (pending or public). */
+async function editMeta(request, env, ctx, id) {
+  assertId(id);
+  const body = parseJson(await request.text(), 'body');
+  if (!body || typeof body !== 'object') throw new HttpError(400, 'Invalid body');
+  const changes = {};
+  if (body.title !== undefined) changes.title = cleanText(body.title, 80, 'title', true);
+  if (body.description !== undefined) {
+    const description = typeof body.description === 'string' ? body.description.trim() : '';
+    if (!description) throw new HttpError(400, 'Missing description');
+    if (description.length > 2000) throw new HttpError(400, 'description is too long');
+    changes.description = description;
+  }
+  if (!Object.keys(changes).length) throw new HttpError(400, 'Nothing to change');
+
+  for (const area of ['pending', 'public']) {
+    const key = `${area}/${id}/meta.json`;
+    const obj = await env.DECKS.get(key);
+    if (!obj) continue;
+    const meta = { ...(await obj.json()), ...changes };
+    await env.DECKS.put(key, JSON.stringify(meta), { httpMetadata: { contentType: 'application/json' } });
+    if (area === 'public') {
+      const catalog = await readCatalog(env);
+      catalog.decks = catalog.decks.map((d) => (d.id === id ? catalogEntry(meta) : d));
+      await writeCatalog(env, catalog);
+      ctx.waitUntil(triggerSiteBuild(env));
+    }
+    console.log(JSON.stringify({ event: 'deck_edited', id, area, fields: Object.keys(changes) }));
+    return json({ id, status: area === 'public' ? 'published' : 'pending', ...changes }, 200, NO_STORE);
+  }
+  throw new HttpError(404, 'No deck with that id');
+}
+
 /** Rebuilds state.json from a full listing, for when the running totals drift. */
 async function recount(env) {
   const state = { pending_count: 0, pending_bytes: 0, public_bytes: 0 };
@@ -458,6 +492,9 @@ function validateMeta(meta) {
     matchLengths: countMap(s.matchLengths, 'summary.matchLengths', 20),
     sourceDescriptions: countMap(s.sourceDescriptions, 'summary.sourceDescriptions', 50),
     sourceFiles: countMap(s.sourceFiles, 'summary.sourceFiles', 200),
+    ankiDecks: Array.isArray(s.ankiDecks)
+      ? s.ankiDecks.slice(0, 20).filter((d) => typeof d === 'string' && d.length <= 200)
+      : [],
     previewXgids: Array.isArray(s.previewXgids)
       ? s.previewXgids.slice(0, 4).filter((x) => typeof x === 'string' && XGID_RE.test(x))
       : [],

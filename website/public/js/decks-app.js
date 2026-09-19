@@ -412,6 +412,7 @@
             matchLengths: summary.matchLengths,
             sourceDescriptions: summary.sourceDescriptions,
             sourceFiles: summary.sourceFiles,
+            ankiDecks: summary.ankiDecks || [],
             previewXgids: current.result.previews.map(function (p) { return p.xgid; })
         };
 

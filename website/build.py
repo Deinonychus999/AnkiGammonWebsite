@@ -228,6 +228,14 @@ def deck_jsonld(deck):
     return json.dumps(data, ensure_ascii=False, indent=2)
 
 
+def anki_decks_html(paths):
+    if not paths:
+        return ""
+    codes = ", ".join(f"<code>{html.escape(p)}</code>" for p in paths[:6])
+    noun = "deck" if len(paths) == 1 else "decks"
+    return f'<p class="deck-detail__anki">Imports into Anki as the {noun} {codes}.</p>'
+
+
 def meta_description(text, limit=155):
     text = " ".join((text or "").split())
     if len(text) <= limit:
@@ -260,6 +268,7 @@ def render_deck_page(deck):
         "{{DECK_URL}}": e(f"{SITE_URL}/decks/{deck['id']}/"),
         "{{DECK_DOWNLOAD_URL}}": e(DECKS_API + deck["apkg_url"]),
         "{{DECK_PREVIEW_XGIDS_JSON}}": json.dumps(summary.get("previewXgids") or []),
+        "{{DECK_ANKI_DECKS_HTML}}": anki_decks_html(summary.get("ankiDecks") or []),
         "{{DECK_JSONLD}}": deck_jsonld(deck),
     }
     for key, value in values.items():

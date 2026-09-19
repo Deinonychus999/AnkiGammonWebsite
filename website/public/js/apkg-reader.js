@@ -126,25 +126,60 @@
         return models;
     }
 
-    function readDeckNames(db) {
-        var names = [];
+    function deckNamesById(db) {
+        var names = {};
         try {
             var rows = db.exec('SELECT decks FROM col');
             if (rows.length && rows[0].values.length) {
                 var decks = JSON.parse(rows[0].values[0][0] || '{}');
-                Object.keys(decks).forEach(function (id) {
-                    var name = decks[id].name;
-                    if (name && name !== 'Default') names.push(name);
-                });
+                Object.keys(decks).forEach(function (id) { names[String(id)] = decks[id].name || ''; });
             }
-        } catch (e) { /* deck names are only a title suggestion */ }
-        if (!names.length) {
+        } catch (e) { /* fall through to the table form */ }
+        if (!Object.keys(names).length) {
             try {
-                var t = db.exec('SELECT name FROM decks');
-                if (t.length) t[0].values.forEach(function (r) { if (r[0] !== 'Default') names.push(r[0]); });
-            } catch (e) { /* same */ }
+                var t = db.exec('SELECT id, name FROM decks');
+                if (t.length) t[0].values.forEach(function (row) { names[String(row[0])] = row[1] || ''; });
+            } catch (e) { /* no deck names available */ }
         }
         return names;
+    }
+
+    /** Full Anki deck paths that actually contain cards, most cards first. */
+    function readCardDecks(db) {
+        var names = deckNamesById(db);
+        var out = [];
+        try {
+            var rows = db.exec('SELECT did, COUNT(*) FROM cards GROUP BY did ORDER BY COUNT(*) DESC');
+            if (rows.length) {
+                rows[0].values.forEach(function (row) {
+                    var name = names[String(row[0])];
+                    if (name && name !== 'Default') out.push(name);
+                });
+            }
+        } catch (e) { /* deck paths are informational */ }
+        return out;
+    }
+
+    function commonDeckPrefix(paths) {
+        var parts = paths.map(function (p) { return p.split('::'); });
+        var prefix = [];
+        for (var i = 0; ; i++) {
+            var seg = parts[0][i];
+            if (seg === undefined) break;
+            for (var k = 1; k < parts.length; k++) if (parts[k][i] !== seg) return prefix;
+            prefix.push(seg);
+        }
+        return prefix;
+    }
+
+    function suggestTitle(cardDecks, fileName) {
+        if (cardDecks.length === 1) return cardDecks[0].split('::').join(' / ');
+        if (cardDecks.length > 1) {
+            var prefix = commonDeckPrefix(cardDecks);
+            if (prefix.length) return prefix.join(' / ');
+            return cardDecks[0].split('::')[0];
+        }
+        return fileName.replace(/\.apkg$/i, '');
     }
 
     function parseTags(raw) {
@@ -271,8 +306,8 @@
             } catch (e) { /* already validated; skip defensively */ }
         }
 
-        var deckNames = readDeckNames(db);
-        var suggestedTitle = deckNames.length ? deckNames[0].split('::')[0] : fileName.replace(/\.apkg$/i, '');
+        var cardDecks = readCardDecks(db);
+        var suggestedTitle = suggestTitle(cardDecks, fileName);
 
         return {
             ok: errors.length === 0,
@@ -280,7 +315,7 @@
             warnings: warnings,
             summary: {
                 suggestedTitle: suggestedTitle,
-                deckNames: deckNames,
+                ankiDecks: cardDecks,
                 positions: stats.positions,
                 checkerPlays: stats.checkerPlays,
                 cubeActions: stats.cubeActions,

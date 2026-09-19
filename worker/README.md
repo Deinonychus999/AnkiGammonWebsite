@@ -17,6 +17,7 @@ Cloudflare Worker + R2 bucket behind the [Community Decks](https://ankigammon.co
 | POST | `/admin/approve/<id>` | bearer | Move to `public/`, add to catalog |
 | POST | `/admin/reject/<id>` | bearer | Delete the pending submission |
 | DELETE | `/admin/decks/<id>` | bearer | Remove a published deck |
+| POST | `/admin/edit/<id>` | bearer | JSON `{ title?, description? }`: change a pending or published deck's text |
 
 Admin calls send `Authorization: Bearer <ADMIN_TOKEN>`. The review page at `/decks/review.html` wraps these.
 

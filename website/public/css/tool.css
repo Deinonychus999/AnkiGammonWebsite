@@ -1549,6 +1549,16 @@
     font-size: 0.9rem;
     margin-bottom: var(--space-md);
 }
+.deck-detail__anki {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin: calc(-1 * var(--space-sm)) 0 var(--space-md);
+}
+.deck-detail__anki code {
+    font-family: var(--font-code);
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
 .deck-detail__desc {
     color: var(--text-secondary);
     line-height: 1.6;
