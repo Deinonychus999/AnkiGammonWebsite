@@ -98,8 +98,14 @@
         remove.addEventListener('click', function () {
             if (window.confirm('Remove "' + deck.title + '" from the catalog and delete its files?')) act('DELETE', '/admin/decks/' + deck.id, remove, 'Removed "' + deck.title + '" from the catalog.');
         });
+        var resetBtn = C.el('button', 'btn btn-secondary btn-sm', 'Reset votes');
+        resetBtn.type = 'button';
+        resetBtn.addEventListener('click', function () {
+            if (window.confirm('Clear every thumbs vote on "' + deck.title + '"?')) act('POST', '/admin/reset-votes/' + deck.id, resetBtn, 'Votes reset for "' + deck.title + '".');
+        });
         wrap.appendChild(dl);
         wrap.appendChild(editButton(deck));
+        wrap.appendChild(resetBtn);
         wrap.appendChild(remove);
         return wrap;
     }

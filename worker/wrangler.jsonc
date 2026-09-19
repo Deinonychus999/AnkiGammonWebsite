@@ -9,12 +9,19 @@
     "head_sampling_rate": 1
   },
   "vars": {
-    "ALLOWED_ORIGINS": "https://ankigammon.com,http://localhost:8000"
+    "ALLOWED_ORIGINS": "https://ankigammon.com,http://localhost:8765"
   },
   "r2_buckets": [
     {
       "binding": "DECKS",
       "bucket_name": "ankigammon-decks"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ankigammon-decks",
+      "database_id": "24b1574b-19cf-45b4-a162-6e9558f03443"
     }
   ]
 }

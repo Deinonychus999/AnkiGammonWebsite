@@ -66,8 +66,15 @@
                     <a class="btn btn-primary deck-header__cta" href="{{DECK_DOWNLOAD_URL}}">Download .apkg</a>
                 </header>
 
-                <p class="deck-detail__stats">{{DECK_STATS}}</p>
+                <p class="deck-detail__stats">{{DECK_STATS}}<span id="deck-downloads">{{DECK_DOWNLOADS_HTML}}</span></p>
                 {{DECK_ANKI_DECKS_HTML}}
+
+                <div class="deck-votes" id="deck-votes" data-deck-id="{{DECK_ID}}">
+                    <span class="deck-votes__label">Rate this deck</span>
+                    <button class="deck-votes__btn" type="button" data-vote="1" aria-label="Thumbs up" aria-pressed="false"><!-- ICON:thumbs-up --><span id="deck-up">{{DECK_UP}}</span></button>
+                    <button class="deck-votes__btn" type="button" data-vote="-1" aria-label="Thumbs down" aria-pressed="false"><!-- ICON:thumbs-down --><span id="deck-down">{{DECK_DOWN}}</span></button>
+                    <span class="deck-votes__hint" id="deck-votes-hint" hidden></span>
+                </div>
 
                 <div class="deck-detail__desc">
                     {{DECK_DESCRIPTION_HTML}}

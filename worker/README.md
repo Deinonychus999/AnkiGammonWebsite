@@ -9,6 +9,8 @@ Cloudflare Worker + R2 bucket behind the [Community Decks](https://ankigammon.co
 | GET | `/catalog` | none | Published decks as `{ "decks": [...] }` |
 | GET | `/decks/<id>/deck.apkg` | none | Download a published deck |
 | GET | `/decks/<id>/pack.json` | none | Position pack for a published deck (see below) |
+| GET | `/decks/<id>/stats` | none | `{ downloads, up, down }` for a published deck |
+| POST | `/decks/<id>/vote` | none | JSON `{ voter, value }`, value 1, -1 or 0 (remove); one vote per voter, at most 3 voters per deck per IP |
 | POST | `/submit` | none | Multipart form: `meta` (JSON), `apkg` (file), `pack` (file). Stored under `pending/` |
 | GET | `/admin/pending` | bearer | List pending submissions and storage totals |
 | GET | `/admin/state` | bearer | Storage totals used by the cost guard |
@@ -18,8 +20,11 @@ Cloudflare Worker + R2 bucket behind the [Community Decks](https://ankigammon.co
 | POST | `/admin/reject/<id>` | bearer | Delete the pending submission |
 | DELETE | `/admin/decks/<id>` | bearer | Remove a published deck |
 | POST | `/admin/edit/<id>` | bearer | JSON `{ title?, description? }`: change a pending or published deck's text |
+| POST | `/admin/reset-votes/<id>` | bearer | Delete every vote on a deck and zero its counts |
 
 Admin calls send `Authorization: Bearer <ADMIN_TOKEN>`. The review page at `/decks/review.html` wraps these.
+
+`/catalog` entries carry `stats` (`downloads`, `up`, `down`) merged in from D1 at read time; `catalog.json` in the bucket does not contain them. Every `GET` of a `deck.apkg` from a non-crawler User-Agent counts as a download.
 
 ## License
 
@@ -57,6 +62,10 @@ One-time, in the Cloudflare dashboard:
 
 The Worker `ankigammon-decks` and the bucket `ankigammon-decks` were first created through the Cloudflare API on 2026-09-19; the Worker is served at `https://ankigammon-decks.frankcool999.workers.dev`, which is the value of `window.ANKIGAMMON_DECKS_API` in `website/public/decks/index.html` and `review.html`.
 
+### Download counts and votes (D1)
+
+The D1 database `ankigammon-decks` holds `deck_stats`, `votes`, and `settings` (`schema.sql`). It was created through the Cloudflare API on 2026-09-19 and is bound to the Worker as `DB` (see `wrangler.jsonc`). To recreate it: create a D1 database with that name, run `schema.sql` against it (`npx wrangler d1 execute ankigammon-decks --remote --file=schema.sql`), and put its id in `wrangler.jsonc`. `POST /admin/recount` adds missing `deck_stats` rows for published decks.
+
 ### Admin token
 
 Set once, in the dashboard, and paste the same value into the review page when moderating:
@@ -93,5 +102,6 @@ The Worker is the only writer to the bucket, so it enforces the storage side its
 - Those checks read `state.json` (a Class B op), so refused requests never spend a Class A op.
 - Deck files up to 50 MB, packs up to 20 MB.
 - `GET /admin/state` shows the running totals; `POST /admin/recount` rebuilds them from a listing if they ever drift.
+- D1 on the Free plan is capped at 5 GB, 5 million rows read and 100 thousand rows written per day; past that, queries fail rather than bill. A deck download is one row written, a vote a handful.
 
 The Worker re-checks the pack's shape (format, XGIDs, position arrays) but trusts the browser-side validation for note-type checks; the review step is the real gate.

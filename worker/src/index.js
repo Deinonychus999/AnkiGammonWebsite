@@ -7,6 +7,10 @@
  *   catalog.json                                     list served to the site and the app
  *   state.json                                       running byte and queue totals
  *
+ * Download counts and thumbs votes live in the DB binding (D1, see
+ * schema.sql): deck_stats, votes, settings. D1 on the Workers Free plan has
+ * hard daily caps and cannot bill.
+ *
  * Cost guard: the R2 free tier is 10 GB-month of storage, 1M Class A and 10M
  * Class B operations. Storage is the only dimension a public upload form can
  * realistically blow through, so submissions are refused once the tracked
@@ -23,6 +27,10 @@ const MAX_META_BYTES = 64 * 1024;
 const LICENSE = 'CC-BY-4.0';
 const XGID_RE = /^XGID=[a-pA-P-]{26}(:-?\d+){9}$/;
 const NO_STORE = { 'Cache-Control': 'no-store' };
+const MAX_VOTES_PER_IP = 3;
+const VOTER_RE = /^[a-f0-9-]{16,64}$/;
+const BOT_UA_RE = /bot|crawl|spider|slurp|preview|facebookexternalhit|headlesschrome/i;
+const EMPTY_STATS = { downloads: 0, up: 0, down: 0 };
 
 export default {
   /**
@@ -68,7 +76,9 @@ async function route(request, url, env, ctx) {
 
   if (isRead && path === '/robots.txt') return new Response('User-agent: *\nDisallow: /\n', { headers: { 'Content-Type': 'text/plain' } });
   if (isRead && path === '/catalog') return getCatalog(env);
-  if (isRead && parts[0] === 'decks' && parts.length === 3) return getPublicFile(env, parts[1], parts[2]);
+  if (request.method === 'GET' && parts[0] === 'decks' && parts.length === 3 && parts[2] === 'stats') return getStats(env, parts[1]);
+  if (request.method === 'POST' && parts[0] === 'decks' && parts.length === 3 && parts[2] === 'vote') return vote(request, env, parts[1]);
+  if (isRead && parts[0] === 'decks' && parts.length === 3) return getPublicFile(request, env, ctx, parts[1], parts[2]);
   if (request.method === 'POST' && path === '/submit') return submit(request, env, ctx);
 
   if (parts[0] === 'admin') {
@@ -81,6 +91,7 @@ async function route(request, url, env, ctx) {
     if (request.method === 'POST' && parts[1] === 'reject' && parts.length === 3) return reject(env, parts[2]);
     if (request.method === 'DELETE' && parts[1] === 'decks' && parts.length === 3) return unpublish(env, ctx, parts[2]);
     if (request.method === 'POST' && parts[1] === 'edit' && parts.length === 3) return editMeta(request, env, ctx, parts[2]);
+    if (request.method === 'POST' && parts[1] === 'reset-votes' && parts.length === 3) return resetVotes(env, parts[2]);
   }
 
   throw new HttpError(404, 'Not found');
@@ -89,14 +100,15 @@ async function route(request, url, env, ctx) {
 // ── Public endpoints ──────────────────────────────────────────────────
 
 async function getCatalog(env) {
-  const obj = await env.DECKS.get('catalog.json');
-  const body = obj ? await obj.text() : '{"decks":[]}';
-  return new Response(body, {
+  const catalog = await readCatalog(env);
+  const stats = await readAllStats(env);
+  catalog.decks = catalog.decks.map((d) => ({ ...d, stats: stats[d.id] || EMPTY_STATS }));
+  return new Response(JSON.stringify(catalog), {
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=300' },
   });
 }
 
-async function getPublicFile(env, id, file) {
+async function getPublicFile(request, env, ctx, id, file) {
   assertId(id);
   if (file !== 'deck.apkg' && file !== 'pack.json') throw new HttpError(404, 'Not found');
   const obj = await env.DECKS.get(`public/${id}/${file}`);
@@ -105,10 +117,44 @@ async function getPublicFile(env, id, file) {
   if (file === 'deck.apkg') {
     headers.set('Content-Type', 'application/octet-stream');
     headers.set('Content-Disposition', `attachment; filename="${obj.customMetadata?.filename || id + '.apkg'}"`);
+    if (request.method === 'GET' && !BOT_UA_RE.test(request.headers.get('User-Agent') || '')) ctx.waitUntil(countDownload(env, id));
   } else {
     headers.set('Content-Type', 'application/json; charset=utf-8');
   }
   return new Response(obj.body, { headers });
+}
+
+async function getStats(env, id) {
+  assertId(id);
+  return json({ id, ...((await readStats(env, id)) || EMPTY_STATS) }, 200, NO_STORE);
+}
+
+async function vote(request, env, id) {
+  assertId(id);
+  const body = parseJson(await request.text(), 'body');
+  if (!body || typeof body !== 'object') throw new HttpError(400, 'Invalid body');
+  const voter = typeof body.voter === 'string' ? body.voter.toLowerCase() : '';
+  if (!VOTER_RE.test(voter)) throw new HttpError(400, 'Invalid voter');
+  const value = body.value;
+  if (value !== 1 && value !== -1 && value !== 0) throw new HttpError(400, 'value must be 1, -1 or 0');
+  if (!(await readStats(env, id))) throw new HttpError(404, 'No published deck with that id');
+
+  if (value === 0) {
+    await env.DB.prepare('DELETE FROM votes WHERE deck_id = ? AND voter = ?').bind(id, voter).run();
+  } else {
+    const ipHash = await hashIp(env, request.headers.get('CF-Connecting-IP') || '');
+    const existing = await env.DB.prepare('SELECT value FROM votes WHERE deck_id = ? AND voter = ?').bind(id, voter).first();
+    if (!existing) {
+      const fromIp = await env.DB.prepare('SELECT COUNT(*) AS n FROM votes WHERE deck_id = ? AND ip_hash = ?').bind(id, ipHash).first();
+      if (fromIp && fromIp.n >= MAX_VOTES_PER_IP) throw new HttpError(429, 'This deck already has the maximum number of votes from your network');
+    }
+    await env.DB.prepare(
+      'INSERT INTO votes (deck_id, voter, ip_hash, value, voted_at) VALUES (?, ?, ?, ?, ?) '
+      + 'ON CONFLICT (deck_id, voter) DO UPDATE SET value = excluded.value, ip_hash = excluded.ip_hash, voted_at = excluded.voted_at',
+    ).bind(id, voter, ipHash, value, new Date().toISOString()).run();
+  }
+  const stats = await refreshVoteCounts(env, id);
+  return json({ id, vote: value, ...stats }, 200, NO_STORE);
 }
 
 async function submit(request, env, ctx) {
@@ -267,6 +313,7 @@ async function approve(env, ctx, id) {
   catalog.decks = catalog.decks.filter((d) => d.id !== id);
   catalog.decks.unshift(catalogEntry(published));
   await writeCatalog(env, catalog);
+  await ensureStatsRow(env, id);
 
   // The catalog write above is the commit point; cleanup problems are logged, not surfaced.
   try {
@@ -316,6 +363,7 @@ async function unpublish(env, ctx, id) {
   const metaObj = await env.DECKS.get(`public/${id}/meta.json`);
   const meta = metaObj ? await metaObj.json() : null;
   await env.DECKS.delete([`public/${id}/meta.json`, `public/${id}/deck.apkg`, `public/${id}/pack.json`]);
+  await deleteStats(env, id);
 
   if (meta) {
     const state = await readState(env);
@@ -399,7 +447,10 @@ async function recount(env) {
     cursor = page.truncated ? page.cursor : undefined;
   } while (cursor);
   await writeState(env, state);
-  return json(state, 200, NO_STORE);
+
+  const catalog = await readCatalog(env);
+  for (const deck of catalog.decks) await ensureStatsRow(env, deck.id);
+  return json({ ...state, published: catalog.decks.length }, 200, NO_STORE);
 }
 
 // ── State and catalog ─────────────────────────────────────────────────
@@ -450,6 +501,94 @@ function catalogEntry(meta) {
     pack_url: `/decks/${meta.id}/pack.json`,
     published_at: meta.published_at,
   };
+}
+
+// ── Download counts and votes ─────────────────────────────────────────
+
+async function countDownload(env, id) {
+  try {
+    await env.DB.prepare('INSERT INTO deck_stats (id, downloads) VALUES (?, 1) ON CONFLICT (id) DO UPDATE SET downloads = downloads + 1').bind(id).run();
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'download_count_failed', id, message: String(err && err.message) }));
+  }
+}
+
+async function readStats(env, id) {
+  const row = await env.DB.prepare('SELECT downloads, up, down FROM deck_stats WHERE id = ?').bind(id).first();
+  return row ? { downloads: row.downloads, up: row.up, down: row.down } : null;
+}
+
+/** Empty when D1 is unreachable, so the catalog still serves without counts. */
+async function readAllStats(env) {
+  try {
+    const { results } = await env.DB.prepare('SELECT id, downloads, up, down FROM deck_stats').all();
+    const out = {};
+    for (const r of results) out[r.id] = { downloads: r.downloads, up: r.up, down: r.down };
+    return out;
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'stats_read_failed', message: String(err && err.message) }));
+    return {};
+  }
+}
+
+async function ensureStatsRow(env, id) {
+  try {
+    await env.DB.prepare('INSERT OR IGNORE INTO deck_stats (id) VALUES (?)').bind(id).run();
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'stats_row_failed', id, message: String(err && err.message) }));
+  }
+}
+
+async function deleteStats(env, id) {
+  try {
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM votes WHERE deck_id = ?').bind(id),
+      env.DB.prepare('DELETE FROM deck_stats WHERE id = ?').bind(id),
+    ]);
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'stats_delete_failed', id, message: String(err && err.message) }));
+  }
+}
+
+async function refreshVoteCounts(env, id) {
+  await env.DB.prepare(
+    'UPDATE deck_stats SET up = (SELECT COUNT(*) FROM votes WHERE deck_id = ?1 AND value = 1), '
+    + 'down = (SELECT COUNT(*) FROM votes WHERE deck_id = ?1 AND value = -1) WHERE id = ?1',
+  ).bind(id).run();
+  return readStats(env, id);
+}
+
+async function resetVotes(env, id) {
+  assertId(id);
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM votes WHERE deck_id = ?').bind(id),
+    env.DB.prepare('UPDATE deck_stats SET up = 0, down = 0 WHERE id = ?').bind(id),
+  ]);
+  console.log(JSON.stringify({ event: 'votes_reset', id }));
+  return json({ id, status: 'votes reset' }, 200, NO_STORE);
+}
+
+let ipSalt;
+
+/** Generated once per database so stored IP hashes cannot be reversed by hashing the IPv4 space. */
+async function getIpSalt(env) {
+  if (ipSalt) return ipSalt;
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  await env.DB.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('ip_salt', ?)").bind(hex(bytes)).run();
+  const row = await env.DB.prepare("SELECT value FROM settings WHERE key = 'ip_salt'").first();
+  ipSalt = row.value;
+  return ipSalt;
+}
+
+async function hashIp(env, ip) {
+  const salt = await getIpSalt(env);
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt}|${ip}`));
+  return hex(new Uint8Array(digest));
+}
+
+function hex(bytes) {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 // ── Validation helpers ────────────────────────────────────────────────
@@ -549,8 +688,7 @@ function makeId(title) {
   const slug = title.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'deck';
   const bytes = new Uint8Array(4);
   crypto.getRandomValues(bytes);
-  const suffix = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
-  return `${slug}-${suffix}`;
+  return `${slug}-${hex(bytes)}`;
 }
 
 function safeFilename(name, id) {

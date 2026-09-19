@@ -59,6 +59,40 @@
         return parts;
     }
 
+    var THUMB_UP_PATH = '<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>';
+    var THUMB_DOWN_PATH = '<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/>';
+
+    function thumbIcon(up) {
+        return '<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">' + (up ? THUMB_UP_PATH : THUMB_DOWN_PATH) + '</svg>';
+    }
+
+    function deckCounts(deck) {
+        var s = deck.stats || {};
+        return { downloads: s.downloads || 0, up: s.up || 0, down: s.down || 0 };
+    }
+
+    function voteCountsNode(counts) {
+        if (!counts.up && !counts.down) return null;
+        var span = el('span', 'deck-row__votes');
+        span.innerHTML = '<span class="deck-row__vote" title="Thumbs up">' + thumbIcon(true) + ' ' + counts.up + '</span> '
+            + '<span class="deck-row__vote" title="Thumbs down">' + thumbIcon(false) + ' ' + counts.down + '</span>';
+        return span;
+    }
+
+    function countsLine(className, deck) {
+        var counts = deckCounts(deck);
+        var line = el('p', className);
+        var parts = [];
+        if (counts.downloads) parts.push(plural(counts.downloads, 'download'));
+        line.textContent = parts.join(' · ');
+        var votes = voteCountsNode(counts);
+        if (votes) {
+            if (line.textContent) line.appendChild(document.createTextNode(' · '));
+            line.appendChild(votes);
+        }
+        return line.textContent || votes ? line : null;
+    }
+
     function summaryBadges(summary) {
         var wrap = el('div', 'deck-badges');
         statsParts(summary).forEach(function (text, i) {
@@ -97,6 +131,8 @@
         titleWrap.appendChild(el('p', 'deck-card__byline', byline));
         card.appendChild(titleWrap);
         card.appendChild(summaryBadges(deck.summary || {}));
+        var counts = deck.stats ? countsLine('deck-card__byline', deck) : null;
+        if (counts) card.appendChild(counts);
         card.appendChild(el('p', 'deck-card__desc', deck.description));
 
         var foot = el('div', 'deck-card__foot');
@@ -130,7 +166,15 @@
         main.appendChild(head);
         var stats = statsParts(deck.summary || {});
         if (deck.apkg_bytes) stats.push(formatBytes(deck.apkg_bytes));
-        main.appendChild(el('p', 'deck-row__stats', stats.join(' · ')));
+        var counts = deckCounts(deck);
+        if (counts.downloads) stats.push(plural(counts.downloads, 'download'));
+        var statsLine = el('p', 'deck-row__stats', stats.join(' · '));
+        var votes = voteCountsNode(counts);
+        if (votes) {
+            statsLine.appendChild(document.createTextNode(' · '));
+            statsLine.appendChild(votes);
+        }
+        main.appendChild(statsLine);
         main.appendChild(el('p', 'deck-row__desc', deck.description));
         row.appendChild(main);
 
@@ -189,6 +233,13 @@
         var sorted = decks.slice();
         if (mode === 'positions') {
             sorted.sort(function (a, b) { return ((b.summary || {}).positions || 0) - ((a.summary || {}).positions || 0); });
+        } else if (mode === 'downloads') {
+            sorted.sort(function (a, b) { return deckCounts(b).downloads - deckCounts(a).downloads; });
+        } else if (mode === 'rating') {
+            sorted.sort(function (a, b) {
+                var ca = deckCounts(a), cb = deckCounts(b);
+                return (cb.up - cb.down) - (ca.up - ca.down) || cb.up - ca.up;
+            });
         } else if (mode === 'title') {
             sorted.sort(function (a, b) { return a.title.localeCompare(b.title); });
         } else {
@@ -269,6 +320,113 @@
 
     if (filterInput) filterInput.addEventListener('input', renderCatalog);
     if (sortSelect) sortSelect.addEventListener('change', renderCatalog);
+
+    // ── Deck page: thumbs up / down ────────────────────────────────────
+
+    var VOTER_KEY = 'ankigammon-voter';
+    var VOTES_KEY = 'ankigammon-votes';
+
+    function randomHex(bytes) {
+        var buf = new Uint8Array(bytes);
+        window.crypto.getRandomValues(buf);
+        var out = '';
+        for (var i = 0; i < buf.length; i++) out += ('0' + buf[i].toString(16)).slice(-2);
+        return out;
+    }
+
+    function voterId() {
+        var id = null;
+        try { id = localStorage.getItem(VOTER_KEY); } catch (e) { /* storage blocked */ }
+        if (!id) {
+            id = randomHex(16);
+            try { localStorage.setItem(VOTER_KEY, id); } catch (e) { /* storage blocked */ }
+        }
+        return id;
+    }
+
+    function rememberedVotes() {
+        try { return JSON.parse(localStorage.getItem(VOTES_KEY) || '{}') || {}; } catch (e) { return {}; }
+    }
+
+    function rememberVote(id, value) {
+        var votes = rememberedVotes();
+        if (value) votes[id] = value; else delete votes[id];
+        try { localStorage.setItem(VOTES_KEY, JSON.stringify(votes)); } catch (e) { /* storage blocked */ }
+    }
+
+    function initDeckVotes() {
+        var box = document.getElementById('deck-votes');
+        if (!box) return;
+        var id = box.getAttribute('data-deck-id');
+        var buttons = box.querySelectorAll('[data-vote]');
+        var upCount = document.getElementById('deck-up');
+        var downCount = document.getElementById('deck-down');
+        var downloads = document.getElementById('deck-downloads');
+        var hint = document.getElementById('deck-votes-hint');
+        var myVote = rememberedVotes()[id] || 0;
+        if (!API) { box.hidden = true; return; }
+
+        function say(text, kind) {
+            hint.textContent = text;
+            hint.hidden = !text;
+            hint.className = 'deck-votes__hint' + (kind ? ' deck-votes__hint--' + kind : '');
+        }
+
+        function paint(stats) {
+            if (stats) {
+                upCount.textContent = stats.up || 0;
+                downCount.textContent = stats.down || 0;
+                if (downloads) downloads.textContent = stats.downloads ? ' · ' + plural(stats.downloads, 'download') : '';
+            }
+            Array.prototype.forEach.call(buttons, function (btn) {
+                var active = parseInt(btn.getAttribute('data-vote'), 10) === myVote;
+                btn.classList.toggle('deck-votes__btn--active', active);
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+        }
+
+        function setBusy(busy) {
+            Array.prototype.forEach.call(buttons, function (btn) { btn.disabled = busy; });
+        }
+
+        function cast(value) {
+            setBusy(true);
+            fetch(API + '/decks/' + id + '/vote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ voter: voterId(), value: value })
+            })
+                .then(function (r) {
+                    return r.json().catch(function () { return {}; }).then(function (data) {
+                        if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+                        return data;
+                    });
+                })
+                .then(function (data) {
+                    myVote = value;
+                    rememberVote(id, value);
+                    paint(data);
+                    say(value ? 'Thanks for rating this deck.' : 'Vote removed.', 'success');
+                })
+                .catch(function (err) { say(err.message || 'The vote could not be saved.', 'error'); })
+                .then(function () { setBusy(false); });
+        }
+
+        Array.prototype.forEach.call(buttons, function (btn) {
+            btn.addEventListener('click', function () {
+                var value = parseInt(btn.getAttribute('data-vote'), 10);
+                cast(myVote === value ? 0 : value);
+            });
+        });
+
+        paint(null);
+        fetch(API + '/decks/' + id + '/stats', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(paint)
+            .catch(function () { /* prerendered counts stay */ });
+    }
+
+    initDeckVotes();
 
     // ── Share panel ────────────────────────────────────────────────────
 

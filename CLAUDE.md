@@ -81,7 +81,7 @@ website/
 - generates one static page per deck at `decks/<id>/index.html` from `_templates/deck.html`;
 - appends a sitemap entry per deck.
 
-A build without network access still succeeds, just with no deck data. Set `DECKS_CATALOG_FILE=path/to/catalog.json` to build from a local file instead (previews, tests); such builds are marked frozen and skip the live refresh. The Pages workflow also runs on a daily schedule so newly approved decks get their pages without a push. `decks/review.html` is the moderation page: `noindex` and disallowed in `robots.txt`.
+A build without network access still succeeds, just with no deck data. Set `DECKS_CATALOG_FILE=path/to/catalog.json` to build from a local file instead (previews, tests); such builds are marked frozen and skip the live refresh. The Pages workflow also runs on a daily schedule so newly approved decks get their pages without a push. `decks/review.html` is the moderation page: `noindex` and disallowed in `robots.txt`. Download counts and thumbs votes live in a D1 database bound to the Worker as `DB` (`worker/schema.sql`); `/catalog` merges them into each deck as `stats`, the list and deck pages prerender them, and `decks-app.js` refreshes them and handles voting on deck pages.
 
 HTML source files in `public/` use `<!-- PARTIAL:name -->` comment markers that the build script replaces with the contents of `_partials/name.html`. Template variables like `{{BASE}}` are resolved per-page based on directory depth (empty for root, `../` for `tools/`).
 

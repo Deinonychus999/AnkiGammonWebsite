@@ -68,23 +68,24 @@ def resolve_partial(name, variables):
     return content
 
 
-def resolve_icon(name):
+def resolve_icon(name, css_class="icon icon-xl"):
     """Read an icon SVG file, strip license comment, and rewrite the root tag.
 
     Source files come from lucide-static (see _partials/icons/). Their `class`,
     `width`, `height`, `stroke`, and `fill` attributes are replaced so styling
     is governed by the .icon and .icon-xl CSS rules instead.
     """
-    if name not in _icon_cache:
+    key = (name, css_class)
+    if key not in _icon_cache:
         path = os.path.join(ICONS_DIR, f"{name}.svg")
         if not os.path.exists(path):
             raise SystemExit(f"build.py: unknown icon {name!r} (expected {path})")
         with open(path, encoding="utf-8") as f:
             svg = f.read()
         svg = SVG_LICENSE_COMMENT_RE.sub("", svg).strip()
-        svg = SVG_OPEN_RE.sub(ICON_SVG_OPEN, svg, count=1)
-        _icon_cache[name] = svg
-    return _icon_cache[name]
+        svg = SVG_OPEN_RE.sub(ICON_SVG_OPEN.replace('class="icon icon-xl"', f'class="{css_class}"'), svg, count=1)
+        _icon_cache[key] = svg
+    return _icon_cache[key]
 
 
 # ── Community deck catalog ─────────────────────────────────────────────
@@ -148,6 +149,23 @@ def deck_stats(deck):
     return parts
 
 
+def deck_counts(deck):
+    s = deck.get("stats") or {}
+    return {"downloads": s.get("downloads") or 0, "up": s.get("up") or 0, "down": s.get("down") or 0}
+
+
+def vote_counts_html(counts):
+    """Same markup as decks-app.js voteCountsNode(); empty until somebody has voted."""
+    if not counts["up"] and not counts["down"]:
+        return ""
+    return (
+        '<span class="deck-row__votes">'
+        f'<span class="deck-row__vote" title="Thumbs up">{resolve_icon("thumbs-up", "icon")} {counts["up"]}</span> '
+        f'<span class="deck-row__vote" title="Thumbs down">{resolve_icon("thumbs-down", "icon")} {counts["down"]}</span>'
+        "</span>"
+    )
+
+
 def format_date(iso):
     try:
         return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).strftime("%b %d, %Y").replace(" 0", " ")
@@ -167,6 +185,11 @@ def render_deck_row(deck):
     stats = deck_stats(deck)
     if deck.get("apkg_bytes"):
         stats.append(format_bytes(deck["apkg_bytes"]))
+    counts = deck_counts(deck)
+    if counts["downloads"]:
+        stats.append(plural(counts["downloads"], "download"))
+    votes = vote_counts_html(counts)
+    stats_html = e(" · ".join(stats)) + (" · " + votes if votes else "")
     return (
         '<article class="deck-row">'
         '<div class="deck-row__main">'
@@ -174,7 +197,7 @@ def render_deck_row(deck):
         f'<h3 class="deck-row__title"><a class="deck-row__link" href="{e(deck["id"])}/">{e(deck["title"])}</a></h3>'
         f'<span class="deck-row__byline">{byline}</span>'
         "</div>"
-        f'<p class="deck-row__stats">{e(" · ".join(stats))}</p>'
+        f'<p class="deck-row__stats">{stats_html}</p>'
         f'<p class="deck-row__desc">{e(deck.get("description", ""))}</p>'
         "</div>"
         f'<a class="btn btn-primary deck-row__download" href="{e(DECKS_API + deck["apkg_url"])}" title="Download {e(deck["title"])} (.apkg)">Download</a>'
@@ -225,6 +248,14 @@ def deck_jsonld(deck):
             "contentSize": format_bytes(deck.get("apkg_bytes")),
         },
     }
+    counts = deck_counts(deck)
+    interactions = [
+        {"@type": "InteractionCounter", "interactionType": f"https://schema.org/{action}", "userInteractionCount": n}
+        for action, n in (("DownloadAction", counts["downloads"]), ("LikeAction", counts["up"]), ("DislikeAction", counts["down"]))
+        if n
+    ]
+    if interactions:
+        data["interactionStatistic"] = interactions
     return json.dumps(data, ensure_ascii=False, indent=2)
 
 
@@ -254,6 +285,7 @@ def render_deck_page(deck):
     stats = deck_stats(deck)
     if deck.get("apkg_bytes"):
         stats.append(format_bytes(deck["apkg_bytes"]))
+    counts = deck_counts(deck)
     title_tag = f"{deck['title']} by {deck.get('author', '')} - Backgammon Anki Deck | AnkiGammon"
     values = {
         "{{DECK_ID}}": e(deck["id"]),
@@ -263,6 +295,9 @@ def render_deck_page(deck):
         "{{DECK_DATE}}": e(format_date(deck.get("published_at", ""))),
         "{{DECK_DATE_ISO}}": e(date_only(deck.get("published_at"))),
         "{{DECK_STATS}}": e(" · ".join(stats)),
+        "{{DECK_DOWNLOADS_HTML}}": e(" · " + plural(counts["downloads"], "download")) if counts["downloads"] else "",
+        "{{DECK_UP}}": str(counts["up"]),
+        "{{DECK_DOWN}}": str(counts["down"]),
         "{{DECK_DESCRIPTION_HTML}}": description_html,
         "{{DECK_META_DESCRIPTION}}": e(meta_description(deck.get("description", ""))),
         "{{DECK_URL}}": e(f"{SITE_URL}/decks/{deck['id']}/"),
