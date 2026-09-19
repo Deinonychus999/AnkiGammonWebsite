@@ -49,6 +49,10 @@
     color: var(--text-primary);
 }
 
+.nav-link--active {
+    color: var(--text-primary);
+}
+
 .nav-link--icon {
     display: inline-flex;
     align-items: center;

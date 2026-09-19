@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{DECK_META_DESCRIPTION}}">
+    <meta name="author" content="{{DECK_AUTHOR}}">
+    <title>{{DECK_TITLE_TAG}}</title>
+
+    <!-- PARTIAL:favicons -->
+
+    <link rel="canonical" href="{{DECK_URL}}">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{DECK_URL}}">
+    <meta property="og:title" content="{{DECK_TITLE}} - Backgammon Anki Deck">
+    <meta property="og:description" content="{{DECK_META_DESCRIPTION}}">
+    <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+    <meta property="og:site_name" content="AnkiGammon">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{DECK_TITLE}} - Backgammon Anki Deck">
+    <meta name="twitter:description" content="{{DECK_META_DESCRIPTION}}">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+
+    <meta name="robots" content="index, follow">
+
+    <script type="application/ld+json">
+    {{DECK_JSONLD}}
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ankigammon.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Community Decks", "item": "https://ankigammon.com/decks/" },
+        { "@type": "ListItem", "position": 3, "name": "{{DECK_TITLE}}" }
+      ]
+    }
+    </script>
+
+    <!-- PARTIAL:css -->
+</head>
+<body>
+    <!-- PARTIAL:nav -->
+
+    <main>
+    <nav class="breadcrumb container" aria-label="Breadcrumb">
+        <ol class="breadcrumb__list">
+            <li class="breadcrumb__item"><a href="../../" class="breadcrumb__link">Home</a></li>
+            <li class="breadcrumb__item"><a href="../" class="breadcrumb__link">Community Decks</a></li>
+            <li class="breadcrumb__item"><span class="breadcrumb__current">{{DECK_TITLE}}</span></li>
+        </ol>
+    </nav>
+
+    <section class="section deck-page">
+        <div class="container">
+            <article class="deck-detail">
+                <header class="deck-header">
+                    <div class="deck-header__text">
+                        <h1 class="deck-detail__title">{{DECK_TITLE}}</h1>
+                        <p class="deck-header__lead">Backgammon Anki deck by {{DECK_AUTHOR}} &middot; <time datetime="{{DECK_DATE_ISO}}">{{DECK_DATE}}</time></p>
+                    </div>
+                    <a class="btn btn-primary deck-header__cta" href="{{DECK_DOWNLOAD_URL}}">Download .apkg</a>
+                </header>
+
+                <p class="deck-detail__stats">{{DECK_STATS}}</p>
+
+                <div class="deck-detail__desc">
+                    {{DECK_DESCRIPTION_HTML}}
+                </div>
+
+                <div class="deck-preview deck-preview--strip" id="deck-detail-preview" aria-label="First positions in the deck"></div>
+
+                <p class="deck-list-note">
+                    Import the downloaded <code>.apkg</code> into Anki with <strong>File &rarr; Import</strong>. Published under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>, credited to {{DECK_AUTHOR}}. Made with <a href="../../">AnkiGammon</a>.
+                    <a href="../">All community decks</a>
+                </p>
+            </article>
+        </div>
+    </section>
+    </main>
+
+    <!-- PARTIAL:footer -->
+
+    <script>window.ANKIGAMMON_DECKS_API = "{{DECKS_API}}";</script>
+    <script src="../../js/position-parser.js"></script>
+    <script src="../../js/board-renderer.js"></script>
+    <script src="../../js/decks-app.js"></script>
+    <script>
+        (function () {
+            var container = document.getElementById('deck-detail-preview');
+            var previews = window.DeckCards.previewsFromXgids({{DECK_PREVIEW_XGIDS_JSON}});
+            if (previews.length) window.DeckCards.renderPreviewBoards(container, previews);
+            else container.hidden = true;
+        })();
+    </script>
+
+    <!-- PARTIAL:kofi -->
+</body>
+</html>

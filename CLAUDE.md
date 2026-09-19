@@ -73,6 +73,16 @@ website/
         └── images/      # WebP screenshots (13 files)
 ```
 
+### Community decks (build-time data)
+
+`build.py` fetches the published deck catalog from the decks API (`DECKS_API` in `build.py`, a Cloudflare Worker whose source lives in `worker/`) and:
+
+- prerenders the deck rows into `decks/index.html` at the `<!-- CATALOG:rows -->`, `<!-- CATALOG:data -->`, and `<!-- CATALOG:jsonld -->` markers, so crawlers see the list without JavaScript (the page hydrates from the embedded JSON, then refreshes from the API);
+- generates one static page per deck at `decks/<id>/index.html` from `_templates/deck.html`;
+- appends a sitemap entry per deck.
+
+A build without network access still succeeds, just with no deck data. Set `DECKS_CATALOG_FILE=path/to/catalog.json` to build from a local file instead (previews, tests); such builds are marked frozen and skip the live refresh. The Pages workflow also runs on a daily schedule so newly approved decks get their pages without a push. `decks/review.html` is the moderation page: `noindex` and disallowed in `robots.txt`.
+
 HTML source files in `public/` use `<!-- PARTIAL:name -->` comment markers that the build script replaces with the contents of `_partials/name.html`. Template variables like `{{BASE}}` are resolved per-page based on directory depth (empty for root, `../` for `tools/`).
 
 Icons use `<!-- ICON:name -->` markers, expanded after partials. The build reads `_partials/icons/<name>.svg` (canonical Lucide SVGs from `lucide-static@1.14.0`), strips the license comment, and rewrites the root `<svg>` opening tag to `<svg class="icon icon-xl" xmlns="..." viewBox="0 0 24 24">` so styling is governed entirely by the `.icon` and `.icon-xl` CSS rules. Unknown icon names fail the build loudly. **Do not hand-write SVG paths**: to add an icon, fetch it from `https://unpkg.com/lucide-static@1.14.0/icons/<name>.svg` and drop it into `_partials/icons/`.

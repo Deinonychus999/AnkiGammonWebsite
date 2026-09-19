@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ankigammon-decks",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://ankigammon.com,http://localhost:8000"
+  },
+  "r2_buckets": [
+    {
+      "binding": "DECKS",
+      "bucket_name": "ankigammon-decks"
+    }
+  ]
+}

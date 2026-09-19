@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free backgammon Anki decks made with AnkiGammon and shared by other players: checker plays and cube decisions with engine analysis, ready to import into Anki.">
+    <meta name="author" content="AnkiGammon">
+    <title>Free Backgammon Anki Decks | AnkiGammon</title>
+
+    <!-- PARTIAL:favicons -->
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ankigammon.com/decks/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ankigammon.com/decks/">
+    <meta property="og:title" content="Free Backgammon Anki Decks | AnkiGammon">
+    <meta property="og:description" content="Free backgammon Anki decks made with AnkiGammon and shared by other players, ready to import into Anki.">
+    <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+    <meta property="og:site_name" content="AnkiGammon">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Free Backgammon Anki Decks | AnkiGammon">
+    <meta name="twitter:description" content="Free backgammon Anki decks made with AnkiGammon and shared by other players, ready to import into Anki.">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+
+    <!-- SEO -->
+    <meta name="robots" content="index, follow">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Free Backgammon Anki Decks",
+      "description": "Free backgammon Anki decks made with AnkiGammon and shared by other players.",
+      "url": "https://ankigammon.com/decks/",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "AnkiGammon",
+        "url": "https://ankigammon.com/"
+      }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ankigammon.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Community Decks" }
+      ]
+    }
+    </script>
+
+    <!-- CATALOG:jsonld -->
+
+    <!-- Resource hints -->
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+    <!-- PARTIAL:css -->
+</head>
+<body>
+    <!-- PARTIAL:nav -->
+
+    <main>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb container" aria-label="Breadcrumb">
+        <ol class="breadcrumb__list">
+            <li class="breadcrumb__item"><a href="../" class="breadcrumb__link">Home</a></li>
+            <li class="breadcrumb__item"><span class="breadcrumb__current">Community Decks</span></li>
+        </ol>
+    </nav>
+
+    <section class="section deck-page">
+        <div class="container">
+
+            <header class="deck-header">
+                <div class="deck-header__text">
+                    <h1>Backgammon Anki Decks</h1>
+                    <p class="deck-header__lead">Free flashcard decks made with AnkiGammon, shared by other players.</p>
+                </div>
+                <button class="btn btn-primary deck-header__cta" id="deck-share-toggle" type="button" aria-expanded="false" aria-controls="deck-share">Share a deck</button>
+            </header>
+
+            <!-- Share panel (opened from the header button) -->
+            <section class="deck-share" id="deck-share" hidden aria-labelledby="deck-share-title">
+                <div class="deck-share__head">
+                    <h2 class="deck-share__title" id="deck-share-title">Share a deck</h2>
+                    <button class="deck-share__close" id="deck-share-close" type="button" aria-label="Close">&times;</button>
+                </div>
+                <p class="deck-share__intro">
+                    Export the deck as an <code>.apkg</code>, from AnkiGammon (<strong>File &rarr; Export &rarr; APKG</strong>) or from Anki (<strong>File &rarr; Export</strong>, Anki Deck Package), and drop the file here. It is checked in your browser first; nothing is uploaded until you submit.
+                </p>
+
+                <div class="drop-zone drop-zone--compact" id="deck-drop-zone">
+                    <p class="drop-zone__text">
+                        Drop an .apkg file here, or
+                        <button class="drop-zone__browse" id="deck-browse-btn" type="button">browse</button>
+                    </p>
+                    <p class="drop-zone__hint">AnkiGammon decks up to 50 MB</p>
+                    <input type="file" id="deck-file-input" accept=".apkg" hidden>
+                </div>
+
+                <div class="processing" id="deck-processing" hidden>
+                    <div class="processing__spinner"></div>
+                    <p class="processing__text">Reading the deck&hellip;</p>
+                </div>
+
+                <div class="tool-error deck-invalid" id="deck-invalid" hidden>
+                    <p class="tool-error__message">This deck can't be submitted</p>
+                    <ul class="deck-invalid__list" id="deck-invalid-list"></ul>
+                    <button class="tool-error__retry" id="deck-invalid-retry" type="button">Try another file</button>
+                </div>
+
+                <div class="deck-valid" id="deck-valid" hidden>
+                    <div class="deck-valid__summary">
+                        <p class="deck-valid__title">AnkiGammon deck recognized <span class="deck-valid__file" id="deck-valid-file"></span></p>
+                        <div id="deck-valid-badges"></div>
+                        <ul class="deck-valid__warnings" id="deck-valid-warnings" hidden></ul>
+                        <div class="deck-preview deck-preview--strip" id="deck-valid-preview" aria-label="First positions in the deck"></div>
+                    </div>
+
+                    <form class="deck-form" id="deck-form" novalidate>
+                        <div class="deck-form__grid">
+                            <label class="deck-form__field">
+                                <span class="deck-form__label">Deck title</span>
+                                <input class="deck-form__input" type="text" name="title" maxlength="80" required>
+                            </label>
+                            <label class="deck-form__field">
+                                <span class="deck-form__label">Author name</span>
+                                <input class="deck-form__input" type="text" name="author" maxlength="60" required autocomplete="nickname">
+                            </label>
+                            <label class="deck-form__field deck-form__field--wide">
+                                <span class="deck-form__label">Description</span>
+                                <textarea class="deck-form__input deck-form__textarea" name="description" maxlength="2000" rows="3" required placeholder="What positions are in it, how they were analyzed, and who it is for."></textarea>
+                            </label>
+                            <label class="deck-form__field deck-form__field--wide">
+                                <span class="deck-form__label">Contact email <span class="deck-form__optional">(optional, never shown)</span></span>
+                                <input class="deck-form__input" type="email" name="contact_email" maxlength="200" autocomplete="email">
+                            </label>
+                        </div>
+
+                        <fieldset class="deck-form__checks">
+                            <label class="deck-form__check">
+                                <input type="checkbox" name="own_work" required>
+                                <span>I built this deck with AnkiGammon from positions I am entitled to share, and any notes are my own.</span>
+                            </label>
+                            <label class="deck-form__check">
+                                <input type="checkbox" name="no_paid_content" required>
+                                <span>It does not reproduce a commercial product or another author's paid deck.</span>
+                            </label>
+                            <label class="deck-form__check">
+                                <input type="checkbox" name="license_grant" required>
+                                <span>I publish it under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>, credited to the author name above.</span>
+                            </label>
+                        </fieldset>
+
+                        <div class="tool-error deck-form__error" id="deck-form-error" hidden></div>
+
+                        <p class="deck-form__offline" id="deck-offline" hidden>
+                            Submissions are not open yet. Your deck passed the check, so hold on to it and share it on
+                            <a data-discord-link href="#" target="_blank" rel="noopener noreferrer">Discord</a> in the meantime.
+                        </p>
+
+                        <div class="deck-form__actions">
+                            <button class="btn btn-primary" id="deck-submit-btn" type="submit">Submit for review</button>
+                            <button class="btn btn-secondary" id="deck-cancel-btn" type="button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="deck-sent" id="deck-sent" hidden>
+                    <p class="deck-sent__title">Thanks, it's in the review queue</p>
+                    <p class="deck-sent__text">It will appear here once approved. Reference: <code id="deck-sent-id"></code></p>
+                    <div class="deck-form__actions">
+                        <button class="btn btn-secondary" id="deck-sent-another" type="button">Share another</button>
+                        <button class="btn btn-secondary" id="deck-sent-done" type="button">Done</button>
+                    </div>
+                </div>
+
+                <ul class="deck-share__rules">
+                    <li>Only decks made with AnkiGammon are accepted; the file is checked before anything is uploaded.</li>
+                    <li>Positions and engine analysis are facts, but a curated collection with notes belongs to its author. No copies of paid decks or commercial problem sets.</li>
+                    <li>Every submission is reviewed before it is listed. Something of yours listed without permission? Say so on <a data-discord-link href="#" target="_blank" rel="noopener noreferrer">Discord</a> and it comes down.</li>
+                    <li>To update or remove a deck you shared, message on <a data-discord-link href="#" target="_blank" rel="noopener noreferrer">Discord</a> with its reference id.</li>
+                </ul>
+            </section>
+
+            <!-- Catalog -->
+            <!-- CATALOG:data -->
+            <div class="deck-toolbar" id="deck-toolbar" hidden>
+                <input class="deck-toolbar__filter" type="search" id="deck-filter" placeholder="Filter by title, author, or description" aria-label="Filter decks">
+                <select class="deck-toolbar__sort" id="deck-sort" aria-label="Sort decks">
+                    <option value="newest">Newest first</option>
+                    <option value="positions">Most positions</option>
+                    <option value="title">Title A&ndash;Z</option>
+                </select>
+                <span class="deck-toolbar__count" id="deck-count"></span>
+            </div>
+
+            <p class="deck-list-status" id="deck-list-status" hidden></p>
+            <div class="deck-rows" id="deck-list">
+                <!-- CATALOG:rows -->
+            </div>
+
+            <p class="deck-list-note">
+                Import a downloaded <code>.apkg</code> into Anki with <strong>File &rarr; Import</strong>. All decks are CC BY 4.0.
+            </p>
+
+            <div class="deck-faq">
+                <details class="deck-faq__item">
+                    <summary>What is in a backgammon Anki deck?</summary>
+                    <p>Each card shows a backgammon position on the front, with the dice, score, and cube, and asks for the best checker play or cube decision. The back shows the engine's ranked moves with equities from GNU Backgammon or eXtreme Gammon. Anki's spaced repetition schedules the positions you get wrong until they stick.</p>
+                </details>
+                <details class="deck-faq__item">
+                    <summary>How do I study one of these decks?</summary>
+                    <p>Download the <code>.apkg</code> file, open Anki, choose <strong>File &rarr; Import</strong>, and pick the file. The deck appears in your collection and you can review on desktop, iOS, or Android. Decks made with AnkiGammon are matched by position ID, so a newer version of the same deck updates the cards without losing your review history.</p>
+                </details>
+                <details class="deck-faq__item">
+                    <summary>Can I make my own deck?</summary>
+                    <p>Yes. <a href="../">AnkiGammon</a> is free and open source: paste position IDs, drop a match file from eXtreme Gammon or GNU Backgammon, and it builds the cards for you. Export the deck as an <code>.apkg</code> and share it here for other players.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- PARTIAL:footer -->
+
+    <script>window.ANKIGAMMON_DECKS_API = "{{DECKS_API}}";</script>
+    <!-- pako for zip inflate -->
+    <script src="https://unpkg.com/pako@2.1.0/dist/pako.min.js"></script>
+    <script src="../js/position-parser.js"></script>
+    <script src="../js/board-renderer.js"></script>
+    <script src="../js/apkg-reader.js"></script>
+    <script src="../js/decks-app.js"></script>
+
+    <!-- PARTIAL:kofi -->
+</body>
+</html>

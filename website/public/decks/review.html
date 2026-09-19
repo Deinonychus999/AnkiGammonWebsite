@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Deck Review - AnkiGammon</title>
+
+    <!-- PARTIAL:favicons -->
+    <!-- PARTIAL:css -->
+</head>
+<body>
+    <!-- PARTIAL:nav -->
+
+    <main>
+    <section class="tool-hero section">
+        <div class="container">
+            <h1>Deck Review</h1>
+            <p class="hero-subtitle">Approve or reject submitted community decks.</p>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+        <div class="container">
+            <form class="review-auth" id="review-auth">
+                <label class="deck-form__field">
+                    <span class="deck-form__label">Admin token</span>
+                    <input class="deck-form__input" type="password" id="review-token" autocomplete="current-password">
+                </label>
+                <button class="btn btn-primary" type="submit">Load queue</button>
+            </form>
+
+            <p class="deck-list-status" id="review-status" hidden></p>
+
+            <div class="deck-section-head">
+                <h2 id="review-pending-heading">Pending</h2>
+            </div>
+            <div class="deck-list" id="review-pending">
+                <p class="deck-list-status deck-list-status--muted">Enter the admin token and click Load queue to see submissions.</p>
+            </div>
+
+            <div class="deck-section-head" style="margin-top: var(--space-2xl);">
+                <h2 id="review-published-heading">Published</h2>
+            </div>
+            <div class="deck-list" id="review-published">
+                <p class="deck-list-status deck-list-status--muted">Published decks appear here after the queue is loaded.</p>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- PARTIAL:footer -->
+
+    <script>window.ANKIGAMMON_DECKS_API = "{{DECKS_API}}";</script>
+    <script src="../js/position-parser.js"></script>
+    <script src="../js/board-renderer.js"></script>
+    <script src="../js/decks-app.js"></script>
+    <script src="../js/decks-review.js"></script>
+</body>
+</html>
