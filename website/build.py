@@ -352,6 +352,42 @@ def update_sitemap(decks):
 
 # ── Build ──────────────────────────────────────────────────────────────
 
+MET_DATA_JS = os.path.join(SRC_DIR, "js", "met-data.js")
+MET_ROW_RE = re.compile(r"/\*\s*\d+-away\s*\*/\s*\[([^\]]+)\]")
+MET_GRID_SIZE = 7  # matches the page's default 7-point view
+
+
+def met_color(mwc):
+    """Mirrors mwcToColor in js/met-calculator-app.js."""
+    if mwc <= 0.5:
+        t = mwc / 0.5
+        start, end = (138, 40, 40), (59, 62, 69)
+    else:
+        t = (mwc - 0.5) / 0.5
+        start, end = (59, 62, 69), (36, 107, 48)
+    r, g, b = (int(a + (b - a) * t + 0.5) for a, b in zip(start, end))
+    return f"rgb({r},{g},{b})"
+
+
+def render_met_grid():
+    """Static copy of the default grid so the equities are in the HTML; the app redraws it on load."""
+    with open(MET_DATA_JS, encoding="utf-8") as f:
+        rows = [[float(v) for v in m.group(1).split(",")] for m in MET_ROW_RE.finditer(f.read())]
+    n = MET_GRID_SIZE
+    out = ['<table class="met-grid"><thead><tr><th class="met-cell met-cell--corner">You \ Opp</th>']
+    out += [f'<th class="met-cell met-cell--col-header">{j}</th>' for j in range(1, n + 1)]
+    out.append("</tr></thead><tbody>")
+    for i in range(1, n + 1):
+        out.append(f'<tr><th class="met-cell met-cell--row-header">{i}</th>')
+        for j in range(1, n + 1):
+            mwc = rows[i - 1][j - 1]
+            out.append(f'<td class="met-cell" data-r="{i}" data-c="{j}" '
+                       f'style="background-color:{met_color(mwc)}">{mwc * 100:.1f}</td>')
+        out.append("</tr>")
+    out.append("</tbody></table>")
+    return "".join(out)
+
+
 def build():
     # Clean and copy source to build directory
     if os.path.exists(BUILD_DIR):
@@ -388,6 +424,8 @@ def build():
             content = content.replace("{{DECKS_API}}", DECKS_API)
             if rel.replace(os.sep, "/") == "decks/index.html":
                 content = inject_catalog(content, decks)
+            if rel.replace(os.sep, "/") == "tools/met-calculator.html":
+                content = content.replace("<!-- MET:grid -->", render_met_grid())
 
             if content != original:
                 with open(filepath, "w", encoding="utf-8") as f:

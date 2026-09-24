@@ -16,10 +16,11 @@ To preview changes locally:
 
 ```bash
 python website/build.py
-cd website/build/
-python -m http.server 8000
-# Visit http://localhost:8000
+python website/serve.py
+# Visit http://localhost:8765
 ```
+
+`serve.py` serves `website/build/` the way GitHub Pages does, so extensionless tool URLs like `/tools/xg-to-mat` resolve to `xg-to-mat.html`. It serves from outside `build/`, so rebuilding while it runs works.
 
 The build script assembles HTML pages from shared partials in `website/_partials/`. Always run `build.py` after editing HTML source files or partials.
 
@@ -116,7 +117,7 @@ Each JS file is self-contained and handles one feature. When adding new interact
 
 Browser-based backgammon utilities at [/tools/](website/public/tools/). Each tool runs entirely client-side with no server uploads.
 
-- **XG to MAT Converter** - Parses XG binary match files and converts to Jellyfish .mat text format via drag-and-drop
+- **XG to MAT Converter** - Parses XG binary match files and converts to .mat text format via drag-and-drop
 - **Position Converter & Visualizer** - Accepts XGID, GNUID, OGID, and eXtreme Gammon .xgp position files with interactive SVG board visualization and PNG export
 - **Match Equity Table Calculator** - Looks up match winning chances (MWC) at any score using the Kazaross XG2 table, with interactive color-coded 25x25 grid and equity swing calculator
 
@@ -128,7 +129,7 @@ The site includes extensive SEO optimization in [index.html](website/public/inde
 
 - Open Graph meta tags for social sharing
 - Twitter Card metadata
-- **6 Schema.org JSON-LD blocks**: SoftwareApplication, FAQPage, BreadcrumbList, Organization, WebSite, HowTo
+- **5 Schema.org JSON-LD blocks**: SoftwareApplication, FAQPage, Organization, WebSite, HowTo
 - Sitemap.xml with 5 URLs
 
 When editing content, **maintain the structured data** to preserve search rankings.

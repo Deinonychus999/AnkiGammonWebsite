@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Convert eXtreme Gammon .xg match files to Jellyfish .mat format online. Free, private, and runs entirely in your browser with no upload. Compatible with GNU Backgammon.">
+    <meta name="description" content="Convert eXtreme Gammon .xg match files to .mat format online. Free, private, and runs entirely in your browser with no upload. Compatible with GNU Backgammon.">
     <meta name="author" content="AnkiGammon">
     <title>XG to MAT Converter - AnkiGammon Tools</title>
 
@@ -16,14 +16,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/tools/xg-to-mat">
     <meta property="og:title" content="XG to MAT Converter - AnkiGammon Tools">
-    <meta property="og:description" content="Convert eXtreme Gammon .xg match files to Jellyfish .mat format online. Free, runs entirely in your browser.">
+    <meta property="og:description" content="Convert eXtreme Gammon .xg match files to .mat format online. Free, runs entirely in your browser.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:site_name" content="AnkiGammon">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="XG to MAT Converter - AnkiGammon Tools">
-    <meta name="twitter:description" content="Convert eXtreme Gammon .xg match files to Jellyfish .mat format online. Free, runs entirely in your browser.">
+    <meta name="twitter:description" content="Convert eXtreme Gammon .xg match files to .mat format online. Free, runs entirely in your browser.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
 
     <!-- SEO -->
@@ -35,15 +35,15 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "XG to MAT Converter",
-      "description": "Convert eXtreme Gammon .xg match files to Jellyfish .mat text format. Runs entirely in your browser.",
+      "description": "Convert eXtreme Gammon .xg match files to .mat text format. Runs entirely in your browser.",
       "url": "https://ankigammon.com/tools/xg-to-mat",
       "applicationCategory": "UtilityApplication",
       "operatingSystem": "Any (browser-based)",
       "featureList": [
         "Drag-and-drop .xg file upload",
-        "Converts to Jellyfish .mat text format",
+        "Converts to .mat text format",
         "Browser-based processing, no server upload",
-        "Compatible with GNU Backgammon and Backgammon Studio"
+        "Compatible with GNU Backgammon"
       ],
       "offers": {
         "@type": "Offer",
@@ -93,7 +93,7 @@
         <div class="container">
             <h1>XG to MAT Converter</h1>
             <p class="hero-subtitle">
-                Convert eXtreme Gammon .xg match files to Jellyfish .mat text format.
+                Convert eXtreme Gammon .xg match files to .mat text format.
                 Runs entirely in your browser.
             </p>
         </div>
@@ -156,23 +156,68 @@
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- Guide -->
     <section class="tool-info section">
-        <div class="container">
-            <h2>About This Tool</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3>Instant Results</h3>
-                    <p>Drop your .xg file and get the .mat output instantly. Everything is processed in your browser with no server round-trips.</p>
-                </div>
-                <div class="info-card">
-                    <h3>What is .xg?</h3>
-                    <p>The .xg format is the native binary format used by eXtreme Gammon, a popular backgammon analysis program. It stores full match records with analysis data.</p>
-                </div>
-                <div class="info-card">
-                    <h3>What is .mat?</h3>
-                    <p>The .mat format (Jellyfish format) is a widely-supported plain text format for backgammon matches. Compatible with GNU Backgammon, Backgammon Studio, and many other tools.</p>
-                </div>
+        <div class="container tool-guide">
+            <h2>What is a .mat file?</h2>
+            <p>A <strong>.mat</strong> file is the plain-text match format most backgammon software reads: download a match from Backgammon Galaxy, Backgammon Heroes, OpenGammon, or BG Hub and you usually get one. GNU Backgammon, eXtreme Gammon, BGBlitz, and Snowie all import it.</p>
+            <p>An <strong>.xg</strong> file is eXtreme Gammon's own binary format. It stores the match together with XG's analysis, rollouts, and comments, and only XG reads it. Converting to .mat lets you open an XG match in GNU Backgammon, which is free and runs on Windows, macOS, and Linux, or in anything else that reads .mat. If you own XG, it can export .mat itself with <strong>File &rarr; Export &rarr; JellyFish</strong>; this tool is for when you don't have XG at hand, or someone sends you an .xg file.</p>
+
+            <h2>How to use</h2>
+            <ol>
+                <li>Drag an .xg match file onto the box above, or click <strong>browse files</strong>.</li>
+                <li>The file is read and converted in your browser. Nothing is uploaded.</li>
+                <li>Check the preview, then click <strong>Download .mat</strong> (same file name, ending in .mat) or <strong>Copy to Clipboard</strong>.</li>
+                <li>Open the .mat file in GNU Backgammon or any other program that reads .mat.</li>
+            </ol>
+
+            <h2>What gets converted</h2>
+            <ul>
+                <li><strong>Match length</strong>, as the <code>7 point match</code> header line, or <code>0 point match</code> for a money session.</li>
+                <li><strong>Player names</strong>, accents included.</li>
+                <li><strong>Every completed game</strong>, with the score at the start of the game.</li>
+                <li><strong>Every checker play</strong>, as the roll and the points each checker moved from and to, higher die first: <code>64: 24/18 13/9</code>.</li>
+                <li><strong>Cube actions</strong>: <code>Doubles =&gt; 2</code>, then <code>Takes</code>, <code>Drops</code>, or <code>Beavers</code>.</li>
+                <li><strong>Results</strong>: <code>Wins 2 points</code>, with <code>and the match</code> on the game that ends the match.</li>
+            </ul>
+            <p>A .mat file is a plain move list, so XG's analysis, rollouts, and comments, the event details, and hit markers don't carry over. GNU Backgammon works out the Crawford game from the score and resignations from the points won.</p>
+
+            <h3>Limitations</h3>
+            <ul>
+                <li>A game still in progress when the file was saved is left out.</li>
+                <li>Games started from a custom position (XG's Setup Position) or played as Nackgammon are converted as if they started from the normal opening position, so they come out wrong.</li>
+                <li>Single-position .xgp files aren't match files; open them in the <a href="position-converter">Position Converter</a> instead.</li>
+            </ul>
+
+            <h2>Opening the .mat in GNU Backgammon</h2>
+            <ol>
+                <li>Choose <strong>File &rarr; Open</strong> (Ctrl+O) and select the .mat file. GNU Backgammon recognizes the format.</li>
+                <li>Choose <strong>Analyse &rarr; Analyse match or session</strong>, then <strong>Analyse &rarr; Match or session statistics</strong> for the summary.</li>
+                <li>Or type <code>import mat "path/to/file.mat"</code> in the command panel (<strong>View &rarr; Panels &rarr; Command</strong>).</li>
+            </ol>
+
+            <h2>Frequently asked questions</h2>
+            <div class="faq-details">
+                <details class="faq-details__item">
+                    <summary>Can GNU Backgammon open .xg files directly?</summary>
+                    <p>No. GNU Backgammon imports .mat, SGF, Snowie text, FIBS oldmoves, and a few other formats, but not eXtreme Gammon's .xg. Convert the file to .mat first.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Doesn't eXtreme Gammon export .mat itself?</summary>
+                    <p>Yes, with <strong>File &rarr; Export &rarr; JellyFish</strong>. eXtreme Gammon is a paid Windows program, though, so this tool covers everyone without it, on any operating system.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Is my match file uploaded anywhere?</summary>
+                    <p>No. The file is read and converted by JavaScript in your browser, and the download is generated on your computer.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Why is XG's analysis missing?</summary>
+                    <p>The .mat format only records moves, cube actions, and results; it has no place for evaluations or comments. Open the file in GNU Backgammon and run <strong>Analyse &rarr; Analyse match or session</strong> for a fresh analysis.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>What does <code>64: 24/18 13/9</code> mean?</summary>
+                    <p>The player rolled 6-4 and moved one checker from the 24-point to the 18-point and another from the 13-point to the 9-point. Points are numbered from the moving player's side, 25 is the bar, and 0 is off the board.</p>
+                </details>
             </div>
         </div>
     </section>
@@ -181,11 +226,11 @@
         <div class="container">
             <h2>More Tools</h2>
             <div class="related-tools__grid">
-                <a href="position-converter.html" class="related-tools__link">
+                <a href="position-converter" class="related-tools__link">
                     <div class="related-tools__name">Position Converter &amp; Visualizer</div>
                     <p class="related-tools__desc">Convert between XGID, GNUID, and OGID formats with interactive board visualization.</p>
                 </a>
-                <a href="met-calculator.html" class="related-tools__link">
+                <a href="met-calculator" class="related-tools__link">
                     <div class="related-tools__name">Match Equity Table</div>
                     <p class="related-tools__desc">Look up match winning chances at any score using the Kazaross XG2 table.</p>
                 </a>

@@ -92,6 +92,10 @@
         text-align: center;
     }
 
+    .footer-links {
+        justify-content: center;
+    }
+
     /* Carousel Mobile Styles */
     .embla {
         padding: 0 var(--space-md);

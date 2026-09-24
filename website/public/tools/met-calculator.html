@@ -178,7 +178,7 @@
                         </div>
                     </div>
                     <p class="met-table-hint">Rows = your points away &middot; Columns = opponent points away &middot; Click any cell for details</p>
-                    <div class="met-grid-wrapper" id="met-grid"></div>
+                    <div class="met-grid-wrapper" id="met-grid"><!-- MET:grid --></div>
                     <div class="met-grid-wrapper" id="post-crawford-table" hidden></div>
                     <div class="met-cell-info" id="selected-cell-info" hidden></div>
                 </div>
@@ -187,23 +187,79 @@
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- Guide -->
     <section class="tool-info section">
-        <div class="container">
-            <h2>About This Tool</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3>What is MWC?</h3>
-                    <p>Match Winning Chance (MWC) is the probability of winning a match from a given score. It depends on how many points each player still needs and whether the Crawford rule applies.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Crawford Rule</h3>
-                    <p>When a player reaches 1 point away from winning, the next game is the "Crawford game" where the doubling cube cannot be used. After that, the cube is available again (post-Crawford).</p>
-                </div>
-                <div class="info-card">
-                    <h3>Kazaross XG2</h3>
-                    <p>The Kazaross XG2 table is the standard match equity table, rolled up to 9-point matches and extrapolated to 25. It is used by eXtreme Gammon and most competitive players.</p>
-                </div>
+        <div class="container tool-guide">
+            <h2>What is a match equity table?</h2>
+            <p>In a backgammon match, what counts is winning the match, not the individual game. A <strong>match equity table</strong> (MET) gives your <strong>match winning chance</strong> (MWC) at every score. Scores are written as how many points each player still needs, the "away" score: leading 5&ndash;3 in a 7-point match is 2-away vs 4-away, exactly the same as leading 9&ndash;7 in an 11-point match.</p>
+            <p>Every match starts at 50%. A few reference points from the table:</p>
+            <ul>
+                <li><strong>2-away vs 4-away:</strong> the leader wins 66.870% of the time.</li>
+                <li><strong>3-away vs 5-away:</strong> the leader wins 64.795%.</li>
+                <li><strong>1-away vs 2-away</strong> (Crawford game): the leader wins 67.736%.</li>
+                <li><strong>1-away vs 1-away</strong> (double match point): 50%, since one game decides the match.</li>
+            </ul>
+
+            <h3>The Crawford game and post-Crawford scores</h3>
+            <p>The row and column labeled 1 are the <strong>Crawford game</strong>. When a player first reaches 1-away, the next game is played without the doubling cube. After it (post-Crawford), the cube is back in play and the trailer doubles at the first opportunity: the leader needs only one point, so a higher cube costs the trailer nothing.</p>
+            <p>When the trailer needs an even number of points, the leader has a <strong>free drop</strong>: passing one double doesn't reduce the number of games the trailer must win. That's why the 2-away trailer wins only 48.803% post-Crawford, not 50%. Tick <strong>Post-Crawford</strong> in the calculator, or open the Post-Crawford tab, to see these scores.</p>
+
+            <h2>About the Kazaross XG2 table</h2>
+            <p>Neil Kazaross rolled out the Kazaross XG2 table with eXtreme Gammon 2, finishing before XG2's release so it could ship as the program's default. Every score in a 9-point match was rolled out 100,000 times, with XG 3-ply checker play and XGR cube decisions (XGR+ for the 2-away post-Crawford score).</p>
+            <p>Longer scores come from the earlier Rockwell-Kazaross table (2010, David Rockwell and Neil Kazaross), which rolled out every score in a 15-point match 38,880 times with GNU Backgammon 2-ply and was extended to 25-away from a calculated template checked against take points. Within a 9-point match, the two tables differ by at most 0.07% (0.02% on average).</p>
+            <p>Kazaross XG2 is the default match equity table in both eXtreme Gammon and GNU Backgammon. Earlier tables, such as Zadeh (1977) and the Woolsey tables (1982 and 1992), came from math models, expert consensus, or match statistics rather than bot rollouts.</p>
+
+            <h2>Using match equity for cube decisions</h2>
+            <p>To find your <strong>take point</strong> when doubled, compare your match winning chances after passing, after taking and losing, and after taking and winning:</p>
+            <p class="tool-guide__formula">take point = (pass &minus; take and lose) &divide; (take and win &minus; take and lose)</p>
+            <p>You need to win at least that share of games to take. Three examples, ignoring gammons and the value of owning the cube:</p>
+            <div class="tool-guide__scroll">
+                <table class="swings-table">
+                    <thead>
+                        <tr><th>Score and cube</th><th>Pass</th><th>Take and lose</th><th>Take and win</th><th>Take point</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>7-away vs 7-away, doubled to 2</td><td>43.739%</td><td>37.362%</td><td>62.638%</td><td>25.2%</td></tr>
+                        <tr><td>2-away vs 2-away, doubled to 2</td><td>32.264%</td><td>0%</td><td>100%</td><td>32.3%</td></tr>
+                        <tr><td>4-away vs 2-away, doubled to 2</td><td>18.564%</td><td>0%</td><td>50.000%</td><td>37.1%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>At the start of a 7-point match the take point is close to the 25% of a money game. At 2-away vs 2-away the game decides the match, so gammons and redoubles don't matter and the take point is simply your chance after passing: 2-away vs 1-away in the Crawford game. Trailing 4-away vs 2-away, you need 37.1% before counting gammons, but a gammon on the 2-cube wins you the whole match, which lowers the real take point.</p>
+            <p>The <strong>Equity Swings</strong> panel shows your match winning chance after every possible result from the score you enter. Real cube decisions also depend on gammon chances and cube ownership, which bots like eXtreme Gammon and GNU Backgammon model in full.</p>
+
+            <h2>Memorizing the table</h2>
+            <p>Most players learn the scores where the leader is 1- or 2-away by heart, since the shortcuts break down there, and estimate the rest:</p>
+            <ul>
+                <li><strong>Neil's Numbers</strong> (Neil Kazaross): leader's MWC &asymp; 50% + lead &times; N, where N depends on how far away the trailer is: 3&rarr;10, 4&rarr;9, 5&rarr;8, 6&rarr;7, 8&rarr;6, 11&rarr;5, 15&rarr;4, interpolating between them. At 4-away vs 7-away: 50 + 3 &times; 6.5 = 69.5%, against 69.924% in the table.</li>
+                <li><strong>Neil's New Numbers</strong> (2011) update the values for rollout-based tables: 5&rarr;7.5, 6&rarr;7, 7&rarr;6.5, 8&rarr;6, 11&rarr;5, 13&rarr;4.5, 16&rarr;4, 20&rarr;3.5.</li>
+                <li><strong>Janowski's formula:</strong> leader &asymp; 50 + 85D &divide; (T + 6), where D is the difference in away scores and T is the trailer's away score. At 3-away vs 8-away: 80.4%, against 80.468% in the table.</li>
+                <li><strong>Turner's formula:</strong> leader &asymp; 50 + (24 &divide; T + 3) &times; D. Easier to do in your head; it gives 80% for the same score.</li>
+            </ul>
+            <p>None of these work in the Crawford game, and the formulas lose accuracy when the trailer is 13-away or more.</p>
+
+            <h2>Frequently asked questions</h2>
+            <div class="faq-details">
+                <details class="faq-details__item">
+                    <summary>How do I read the table?</summary>
+                    <p>Rows are how many points you need, columns are how many your opponent needs, and each cell is your chance of winning the match. Enter a match length and score above, or click any cell, to look up a score and see the equity swings from it.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Which match equity table does eXtreme Gammon use?</summary>
+                    <p>Kazaross XG2 is eXtreme Gammon's default table, and GNU Backgammon's default as well.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>What is the Crawford rule?</summary>
+                    <p>When a player first reaches 1-away, the next game (the Crawford game) is played without the doubling cube. From the following game on, the cube is back in play.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Why isn't 2-away vs 1-away post-Crawford 50%?</summary>
+                    <p>The leader has a free drop. They can pass the trailer's immediate double after a bad start, which only brings the score to double match point (50%), and take after a good one. That leaves the trailer at 48.803%.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>How different are Kazaross XG2 and Rockwell-Kazaross?</summary>
+                    <p>Barely. Within a 9-point match they differ by at most 0.07%, and beyond that Kazaross XG2 uses the Rockwell-Kazaross numbers.</p>
+                </details>
             </div>
         </div>
     </section>
@@ -212,11 +268,11 @@
         <div class="container">
             <h2>More Tools</h2>
             <div class="related-tools__grid">
-                <a href="xg-to-mat.html" class="related-tools__link">
+                <a href="xg-to-mat" class="related-tools__link">
                     <div class="related-tools__name">XG to MAT Converter</div>
-                    <p class="related-tools__desc">Convert eXtreme Gammon .xg match files to Jellyfish .mat text format.</p>
+                    <p class="related-tools__desc">Convert eXtreme Gammon .xg match files to .mat text format.</p>
                 </a>
-                <a href="position-converter.html" class="related-tools__link">
+                <a href="position-converter" class="related-tools__link">
                     <div class="related-tools__name">Position Converter &amp; Visualizer</div>
                     <p class="related-tools__desc">Convert between XGID, GNUID, and OGID formats with interactive board visualization.</p>
                 </a>

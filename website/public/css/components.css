@@ -673,6 +673,10 @@
     flex-wrap: wrap;
 }
 
+.footer-links--site {
+    flex-basis: 100%;
+}
+
 .footer-link {
     color: var(--text-secondary);
     transition: color 0.2s;

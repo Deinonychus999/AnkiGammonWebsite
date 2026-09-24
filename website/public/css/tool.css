@@ -316,6 +316,99 @@
     line-height: 1.6;
 }
 
+/* ===== Long-form guide below a tool ===== */
+.tool-guide {
+    max-width: 760px;
+}
+
+.tool-guide h2 {
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-md);
+}
+
+.tool-guide h2:first-child {
+    margin-top: 0;
+}
+
+.tool-guide h3 {
+    font-size: 1.1rem;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+}
+
+.tool-guide p,
+.tool-guide li {
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.tool-guide p + p,
+.tool-guide ul + p,
+.tool-guide ol + p,
+.tool-guide__scroll + p,
+.tool-guide ul,
+.tool-guide ol,
+.tool-guide .swings-table,
+.tool-guide .tool-guide__scroll {
+    margin-top: var(--space-md);
+}
+
+.tool-guide ul,
+.tool-guide ol {
+    padding-left: var(--space-lg);
+}
+
+.tool-guide ul {
+    list-style: disc;
+}
+
+.tool-guide ol {
+    list-style: decimal;
+}
+
+.tool-guide li + li {
+    margin-top: var(--space-xs);
+}
+
+.tool-guide strong {
+    color: var(--text-primary);
+}
+
+.tool-guide code {
+    font-family: var(--font-code);
+    font-size: 0.9em;
+    color: var(--text-primary);
+}
+
+.tool-guide a {
+    color: var(--accent-primary);
+}
+
+.tool-guide__scroll {
+    overflow-x: auto;
+}
+
+.tool-guide .swings-table td {
+    white-space: normal;
+    vertical-align: top;
+}
+
+.tool-guide .swings-table code {
+    word-break: break-all;
+}
+
+.tool-guide__formula {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--font-code);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    overflow-x: auto;
+}
+
 /* ===== Input Area (text-based tool input) ===== */
 .input-area {
     background: var(--bg-elevated);
@@ -1061,6 +1154,11 @@
 
     .met-layout {
         flex-direction: column;
+        align-items: stretch;
+    }
+
+    .met-layout > * {
+        min-width: 0;
     }
 
     .met-lookup {
@@ -1639,37 +1737,37 @@
     color: var(--accent-primary);
 }
 
-/* Catalog FAQ */
-.deck-faq {
+/* FAQ (details/summary) */
+.faq-details {
     margin-top: var(--space-xl);
     border-top: 1px solid var(--border);
 }
-.deck-faq__item {
+.faq-details__item {
     border-bottom: 1px solid var(--border);
     padding: var(--space-sm) 0;
 }
-.deck-faq__item summary {
+.faq-details__item summary {
     cursor: pointer;
     color: var(--text-secondary);
     font-size: 0.95rem;
     font-weight: 500;
     padding: var(--space-xs) 0;
 }
-.deck-faq__item summary:hover,
-.deck-faq__item[open] summary {
+.faq-details__item summary:hover,
+.faq-details__item[open] summary {
     color: var(--text-primary);
 }
-.deck-faq__item p {
+.faq-details__item p {
     color: var(--text-secondary);
     font-size: 0.9rem;
     line-height: 1.6;
     padding: var(--space-xs) 0 var(--space-sm);
     max-width: 720px;
 }
-.deck-faq__item a {
+.faq-details__item a {
     color: var(--accent-primary);
 }
-.deck-faq__item code {
+.faq-details__item code {
     font-family: var(--font-code);
     font-size: 0.85em;
     color: var(--text-primary);
