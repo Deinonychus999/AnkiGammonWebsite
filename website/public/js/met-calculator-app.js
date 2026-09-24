@@ -115,7 +115,7 @@
       crawfordBadgeEl.hidden = true;
     }
 
-    showSwings(yourAway, oppAway, mwc);
+    showSwings(yourAway, oppAway, mwc, isPostCrawford);
 
     // Sync grid filter to match length
     var best = 25;
@@ -132,7 +132,7 @@
   }
 
   /* ---- Swings Table ---- */
-  function showSwings(yourAway, oppAway, currentMwc) {
+  function showSwings(yourAway, oppAway, currentMwc, isPostCrawford) {
     var outcomes = [
       { label: 'Win Single', pts: 1, win: true },
       { label: 'Win Gammon', pts: 2, win: true },
@@ -151,7 +151,7 @@
       var resultMwc;
       if (newYour === 0) resultMwc = 1.0;
       else if (newOpp === 0) resultMwc = 0.0;
-      else resultMwc = window.MET.getMWC(newYour, newOpp, false);
+      else resultMwc = window.MET.getMWC(newYour, newOpp, isPostCrawford);
 
       var change = resultMwc - currentMwc;
       var changeClass = change >= 0 ? 'swing-positive' : 'swing-negative';

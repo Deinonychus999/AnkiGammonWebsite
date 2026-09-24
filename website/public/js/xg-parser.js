@@ -304,6 +304,7 @@
         var matchLength = getInt32(dv, 92);
         var crawford = !!getUint8(dv, 100);
         var jacoby = !!getUint8(dv, 101);
+        var beaver = !!getUint8(dv, 102);
 
         // Version is deep in the struct. We need to calculate the exact offset.
         // From the struct format analysis (unpacked_data index 489 maps to Version)
@@ -367,6 +368,7 @@
             matchLength: matchLength === 99999 ? 0 : matchLength,
             crawford: crawford,
             jacoby: jacoby,
+            beaver: beaver,
             version: version,
             magic: magic
         };
@@ -661,14 +663,13 @@
 
         var matchLength = matchInfo.matchLength;
         var rulesField;
-        if (moveEntry) {
+        if (matchLength > 0) {
             rulesField = gameInfo.crawfordApply ? 1 : 0;
-        } else if (matchLength > 0) {
-            rulesField = gameInfo.crawfordApply ? 1 : 0;
+        } else if (cubeEntry) {
+            rulesField = cubeEntry.jacobyBits & 3;
+            if (cubeEntry.isBeaver) rulesField |= 2;
         } else {
-            var jacobyBits = cubeEntry ? cubeEntry.jacobyBits : (matchInfo.jacoby ? 1 : 0);
-            rulesField = jacobyBits & 3;
-            if (cubeEntry && cubeEntry.isBeaver) rulesField |= 2;
+            rulesField = (matchInfo.jacoby ? 1 : 0) | (matchInfo.beaver ? 2 : 0);
         }
 
         var xgid = 'XGID=' + encodeXGPosition(selected.position) + ':' +

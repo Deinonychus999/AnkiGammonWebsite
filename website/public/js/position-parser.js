@@ -12,6 +12,11 @@
  *   points[1-24] = board points (1 = O's home, 24 = X's home)
  *   points[25]   = O's bar (bottom player)
  *   Positive = X checkers, Negative = O checkers
+ *
+ * Parsers mirror the model so the player on roll is always O, which the board
+ * renderer draws at the bottom. metadata._bottom remembers which player the
+ * source ID wrote as XG's bottom player (OpenGammon's White) and _gnuPlayer1
+ * which one was gnubg's player 1, so re-encoding keeps the source's labelling.
  */
 (function () {
     'use strict';
@@ -34,6 +39,36 @@
         }
         pos.xOff = 15 - totalX;
         pos.oOff = 15 - totalO;
+    }
+
+    function other(player) {
+        return player === 'X' ? 'O' : 'X';
+    }
+
+    function ownerIs(meta, player) {
+        return meta.cubeOwner === (player === 'X' ? 'x_owns' : 'o_owns');
+    }
+
+    function scoreOf(meta, player) {
+        return (player === 'X' ? meta.scoreX : meta.scoreO) || 0;
+    }
+
+    function putOnRollAtBottom(result) {
+        var pos = result.position, meta = result.metadata;
+        if (meta.onRoll !== 'X') return result;
+
+        var points = new Array(26);
+        for (var i = 0; i < 26; i++) points[25 - i] = -pos.points[i];
+        pos.points = points;
+        var off = pos.xOff; pos.xOff = pos.oOff; pos.oOff = off;
+
+        var score = meta.scoreX; meta.scoreX = meta.scoreO; meta.scoreO = score;
+        if (meta.cubeOwner === 'x_owns') meta.cubeOwner = 'o_owns';
+        else if (meta.cubeOwner === 'o_owns') meta.cubeOwner = 'x_owns';
+        meta.onRoll = 'O';
+        meta._bottom = other(meta._bottom);
+        if (meta._gnuPlayer1) meta._gnuPlayer1 = other(meta._gnuPlayer1);
+        return result;
     }
 
     function log2(v) {
@@ -65,18 +100,11 @@
         }
     }
 
-    function encodeCheckerCount(count, turn) {
+    function encodeCheckerCount(count, bottom) {
         if (count === 0) return '-';
         var abs = Math.min(Math.abs(count), 16);
-        if (turn === 1) {
-            return count > 0
-                ? String.fromCharCode(96 + abs)    // lowercase = X
-                : String.fromCharCode(64 + abs);   // uppercase = O
-        } else {
-            return count > 0
-                ? String.fromCharCode(64 + abs)    // uppercase = X
-                : String.fromCharCode(96 + abs);   // lowercase = O
-        }
+        var upper = (count > 0) === (bottom === 'X');
+        return String.fromCharCode((upper ? 64 : 96) + abs);
     }
 
     function parseXGID(input) {
@@ -99,6 +127,7 @@
         var scoreX    = parseInt(parts[6], 10);
         var cj        = parts.length > 7 ? parseInt(parts[7], 10) : 0;
         var ml        = parts.length > 8 ? parseInt(parts[8], 10) : 0;
+        var maxCube   = parts.length > 9 ? parseInt(parts[9], 10) : NaN;
 
         // Parse position (perspective-dependent)
         var pos = makePosition();
@@ -129,9 +158,10 @@
             cubeValue:   cubeLog >= 0 ? Math.pow(2, cubeLog) : 1,
             cubeOwner:   cubePos === 0 ? 'centered' : (cubePos === -1 ? 'x_owns' : 'o_owns'),
             onRoll:      'O',
-            _xgidTurn:   turn,
+            _bottom:     turn === 1 ? 'O' : 'X',
             _xgidRules:  cj,
             dice:        null,
+            cubeAction:  null,
             scoreX:      scoreX,
             scoreO:      scoreO,
             matchLength: ml,
@@ -139,9 +169,12 @@
             jacoby:      ml === 0 && (cj & 1) !== 0,
             beaversAllowed: ml === 0 && (cj & 2) !== 0
         };
+        if (!isNaN(maxCube)) meta._xgidMaxCube = maxCube;
 
         diceStr = diceStr.toUpperCase().trim();
-        if (diceStr !== '00' && diceStr !== 'D' && diceStr !== 'B' && diceStr !== 'R') {
+        if (diceStr === 'D' || diceStr === 'B' || diceStr === 'R') {
+            meta.cubeAction = diceStr;
+        } else if (diceStr !== '00') {
             if (diceStr.length === 2 && /^\d\d$/.test(diceStr)) {
                 var d1 = parseInt(diceStr[0], 10);
                 var d2 = parseInt(diceStr[1], 10);
@@ -155,43 +188,29 @@
     }
 
     function encodeXGID(pos, meta) {
-        var turn = meta._xgidTurn !== undefined ? meta._xgidTurn : (meta.onRoll === 'O' ? 1 : -1);
+        var bottom = meta._bottom || 'O';
+        var turn = meta.onRoll === bottom ? 1 : -1;
         var chars = new Array(26);
 
-        if (turn === 1) {
-            for (var i = 0; i < 26; i++) {
-                chars[i] = encodeCheckerCount(pos.points[i], turn);
-            }
-        } else {
-            chars[0]  = encodeCheckerCount(pos.points[25], turn);
-            chars[25] = encodeCheckerCount(pos.points[0], turn);
-            for (var j = 1; j < 25; j++) {
-                chars[25 - j] = encodeCheckerCount(pos.points[j], turn);
-            }
+        for (var i = 0; i < 26; i++) {
+            chars[bottom === 'O' ? i : 25 - i] = encodeCheckerCount(pos.points[i], bottom);
         }
 
         var cubeLog = log2(meta.cubeValue || 1);
-        var cubePos = meta.cubeOwner === 'centered' ? 0 :
-                      meta.cubeOwner === 'x_owns'   ? -1 : 1;
-        var diceStr = meta.dice ? '' + meta.dice[0] + meta.dice[1] : '00';
+        var cubePos = meta.cubeOwner === 'centered' ? 0 : (ownerIs(meta, bottom) ? 1 : -1);
+        var diceStr = meta.cubeAction ? meta.cubeAction :
+                      meta.dice ? '' + meta.dice[0] + meta.dice[1] : '00';
         var cj = meta._xgidRules !== undefined
             ? meta._xgidRules
             : ((meta.matchLength || 0) > 0
                 ? (meta.crawford ? 1 : 0)
                 : ((meta.jacoby ? 1 : 0) | (meta.beaversAllowed ? 2 : 0)));
-
-        // For turn=-1, reverse the normalization done in parseXGID
-        var scoreOOut = meta.scoreO || 0;
-        var scoreXOut = meta.scoreX || 0;
-        if (turn === -1) {
-            cubePos = -cubePos;
-            var tmp = scoreOOut; scoreOOut = scoreXOut; scoreXOut = tmp;
-        }
+        var maxCube = meta._xgidMaxCube !== undefined ? meta._xgidMaxCube : log2(256);
 
         return 'XGID=' + chars.join('') + ':' +
             cubeLog + ':' + cubePos + ':' + turn + ':' + diceStr + ':' +
-            scoreOOut + ':' + scoreXOut + ':' +
-            cj + ':' + (meta.matchLength || 0) + ':' + log2(256);
+            scoreOf(meta, bottom) + ':' + scoreOf(meta, other(bottom)) + ':' +
+            cj + ':' + (meta.matchLength || 0) + ':' + maxCube;
     }
 
     // ── GNUID ───────────────────────────────────────────────────────────
@@ -247,14 +266,13 @@
         }
     }
 
-    function decodePositionId(posId) {
+    function decodePositionId(posId, first) {
         var bytes = b64ToBytes(posId);
         if (bytes.length !== 10)
             throw new Error('Invalid GNUID Position ID: expected 10 bytes');
 
         var bits = bytesToBits(bytes);
 
-        // Decode TanBoard: [player0 25pts][player1 25pts]
         var anBoard = [new Array(25), new Array(25)];
         for (var p = 0; p < 2; p++)
             for (var q = 0; q < 25; q++)
@@ -273,49 +291,45 @@
             if (point >= 25) { player++; point = 0; }
         }
 
-        // TanBoard → Position
-        var pos = makePosition();
-        // Player X: anBoard[0][0-23] → points 24..1 (reversed)
-        for (var i = 0; i < 24; i++) {
-            pos.points[24 - i] += anBoard[0][i];
-        }
-        pos.points[0] = anBoard[0][24]; // X bar
+        var xBoard = first === 'X' ? anBoard[0] : anBoard[1];
+        var oBoard = first === 'X' ? anBoard[1] : anBoard[0];
 
-        // Player O: anBoard[1][0-23] → points 1..24 (direct)
-        for (var k = 0; k < 24; k++) {
-            pos.points[k + 1] -= anBoard[1][k];
+        var pos = makePosition();
+        for (var i = 0; i < 24; i++) {
+            pos.points[24 - i] += xBoard[i];
         }
-        pos.points[25] = -anBoard[1][24]; // O bar
+        pos.points[0] = xBoard[24];
+
+        for (var k = 0; k < 24; k++) {
+            pos.points[k + 1] -= oBoard[k];
+        }
+        pos.points[25] = -oBoard[24];
 
         calcBorneOff(pos);
         return pos;
     }
 
-    function encodePositionId(pos) {
-        // Position → TanBoard
-        var anBoard = [new Array(25), new Array(25)];
-        for (var p = 0; p < 2; p++)
-            for (var q = 0; q < 25; q++)
-                anBoard[p][q] = 0;
+    function encodePositionId(pos, first) {
+        var xBoard = new Array(25), oBoard = new Array(25);
+        for (var q = 0; q < 25; q++) {
+            xBoard[q] = 0;
+            oBoard[q] = 0;
+        }
 
-        // Player X: reverse mapping
         for (var pt = 1; pt < 25; pt++) {
-            if (pos.points[pt] > 0) anBoard[0][24 - pt] = pos.points[pt];
+            if (pos.points[pt] > 0) xBoard[24 - pt] = pos.points[pt];
+            if (pos.points[pt] < 0) oBoard[pt - 1] = -pos.points[pt];
         }
-        anBoard[0][24] = pos.points[0]; // X bar
+        xBoard[24] = pos.points[0] > 0 ? pos.points[0] : 0;
+        oBoard[24] = pos.points[25] < 0 ? -pos.points[25] : 0;
 
-        // Player O: direct mapping
-        for (var pt2 = 1; pt2 < 25; pt2++) {
-            if (pos.points[pt2] < 0) anBoard[1][pt2 - 1] = -pos.points[pt2];
-        }
-        anBoard[1][24] = pos.points[25] < 0 ? -pos.points[25] : 0; // O bar
+        var anBoard = first === 'X' ? [xBoard, oBoard] : [oBoard, xBoard];
 
-        // TanBoard → bits
         var bits = [];
         for (var pl = 0; pl < 2; pl++) {
             for (var pp = 0; pp < 25; pp++) {
                 for (var c = 0; c < anBoard[pl][pp]; c++) bits.push(1);
-                bits.push(0); // separator
+                bits.push(0);
             }
         }
         while (bits.length < 80) bits.push(0);
@@ -333,55 +347,67 @@
 
         var cubeLog = extractBits(bits, 0, 4);
         var cubeOwnerBits = extractBits(bits, 4, 2);
+        var diceOwner = bits[6];
         var crawford = bits[7] === 1;
-        var turnBit = bits[11];
+        var doubled = bits[12] === 1;
         var die0 = extractBits(bits, 15, 3);
         var die1 = extractBits(bits, 18, 3);
         var matchLength = extractBits(bits, 21, 15);
-        var scoreO = extractBits(bits, 36, 15);
-        var scoreX = extractBits(bits, 51, 15);
+        var score0 = extractBits(bits, 36, 15);
+        var score1 = extractBits(bits, 51, 15);
+        var noJacoby = bits[66] === 1;
 
-        var cubeOwner = cubeOwnerBits === 3 ? 'centered' :
-                        cubeOwnerBits === 0 ? 'o_owns' : 'x_owns';
+        var cubeOwner = cubeOwnerBits === 0 ? 'x_owns' :
+                        cubeOwnerBits === 1 ? 'o_owns' : 'centered';
 
-        var meta = {
+        return {
             cubeValue:   cubeLog < 15 ? Math.pow(2, cubeLog) : 1,
             cubeOwner:   cubeOwner,
-            onRoll:      turnBit === 0 ? 'O' : 'X',
-            dice:        (die0 > 0 && die1 > 0) ? [die0, die1] : null,
-            scoreX:      scoreX,
-            scoreO:      scoreO,
+            onRoll:      diceOwner === 1 ? 'O' : 'X',
+            _bottom:     'O',
+            _gnuPlayer1: 'O',
+            dice:        (!doubled && die0 > 0 && die1 > 0) ? [die0, die1] : null,
+            cubeAction:  doubled ? 'D' : null,
+            scoreX:      score0,
+            scoreO:      score1,
             matchLength: matchLength,
-            crawford:    crawford
+            crawford:    crawford,
+            jacoby:      matchLength === 0 && !noJacoby
         };
-        return meta;
     }
 
     function encodeMatchId(meta) {
         var bits = new Array(72);
         for (var i = 0; i < 72; i++) bits[i] = 0;
 
+        var player1 = meta._gnuPlayer1 || meta.onRoll;
+        var diceOwner = meta.onRoll === player1 ? 1 : 0;
+        var doubled = meta.cubeAction === 'D';
+
         setBits(bits, 0, 4, log2(meta.cubeValue || 1));
 
-        var ownerVal = meta.cubeOwner === 'centered' ? 3 :
-                       meta.cubeOwner === 'o_owns'   ? 0 : 1;
+        var ownerVal = meta.cubeOwner === 'centered' ? 3 : (ownerIs(meta, player1) ? 1 : 0);
         setBits(bits, 4, 2, ownerVal);
 
+        bits[6] = diceOwner;
         bits[7] = meta.crawford ? 1 : 0;
 
         // Game state = 1 (playing)
         setBits(bits, 8, 3, 1);
 
-        bits[11] = meta.onRoll === 'O' ? 0 : 1;
+        bits[11] = doubled ? 1 - diceOwner : diceOwner;
+        bits[12] = doubled ? 1 : 0;
 
-        if (meta.dice) {
+        if (meta.dice && !doubled) {
             setBits(bits, 15, 3, meta.dice[0]);
             setBits(bits, 18, 3, meta.dice[1]);
         }
 
         setBits(bits, 21, 15, meta.matchLength || 0);
-        setBits(bits, 36, 15, meta.scoreO || 0);
-        setBits(bits, 51, 15, meta.scoreX || 0);
+        setBits(bits, 36, 15, scoreOf(meta, other(player1)));
+        setBits(bits, 51, 15, scoreOf(meta, player1));
+        // gnubg 1.08 stores "Jacoby off" in bit 67; a clear bit reads as Jacoby on.
+        bits[66] = (meta.matchLength || 0) === 0 && meta.jacoby ? 0 : 1;
 
         var bytes = bitsToBytes(bits, 9);
         return bytesToB64(bytes);
@@ -400,17 +426,17 @@
         if (posId.length !== 14)
             throw new Error('Invalid GNUID: Position ID must be 14 characters, got ' + posId.length);
 
-        var pos = decodePositionId(posId);
         var meta = matchIdStr ? decodeMatchId(matchIdStr) : {
-            cubeValue: 1, cubeOwner: 'centered', onRoll: 'X',
-            dice: null, scoreX: 0, scoreO: 0, matchLength: 0, crawford: false
+            cubeValue: 1, cubeOwner: 'centered', onRoll: 'O', _bottom: 'O',
+            dice: null, cubeAction: null, scoreX: 0, scoreO: 0, matchLength: 0, crawford: false
         };
+        var pos = decodePositionId(posId, other(meta.onRoll));
 
-        return { position: pos, metadata: meta };
+        return putOnRollAtBottom({ position: pos, metadata: meta });
     }
 
     function encodeGNUID(pos, meta) {
-        var posId = encodePositionId(pos);
+        var posId = encodePositionId(pos, other(meta.onRoll));
         var matchId = encodeMatchId(meta);
         return posId + ':' + matchId;
     }
@@ -430,6 +456,10 @@
         throw new Error('Invalid point number: ' + pt);
     }
 
+    var OGID_CUBE = /^([WBND?])(\d+)([OTPN])$/;
+
+    // OGID's color field names the player who acted last, so the side to move
+    // is normally the opponent; see BoardState.playerToAct() in OpenGammon.
     function parseOGID(input) {
         var s = input;
         if (s.toUpperCase().indexOf('OGID=') === 0) s = s.substring(5);
@@ -442,7 +472,6 @@
         var blackStr = parts[1]; // O checkers
         var cubeStr  = parts[2];
 
-        // Parse position
         var pos = makePosition();
         for (var i = 0; i < whiteStr.length; i++) {
             pos.points[charToPoint(whiteStr[i])] += 1;
@@ -452,21 +481,19 @@
         }
         calcBorneOff(pos);
 
-        // Parse metadata
         var meta = {
-            cubeValue: 1, cubeOwner: 'centered', onRoll: null,
-            dice: null, scoreX: 0, scoreO: 0, matchLength: 0, crawford: false
+            cubeValue: 1, cubeOwner: 'centered', onRoll: null, _bottom: 'X',
+            dice: null, cubeAction: null, scoreX: 0, scoreO: 0, matchLength: 0, crawford: false
         };
 
-        if (cubeStr.length === 3) {
-            var ownerCh = cubeStr[0];
-            var valLog  = parseInt(cubeStr[1], 10);
-            meta.cubeValue = Math.pow(2, valLog);
-            meta.cubeOwner = ownerCh === 'W' ? 'x_owns' :
-                             ownerCh === 'B' ? 'o_owns' : 'centered';
+        var cube = cubeStr.match(OGID_CUBE);
+        if (cube) {
+            meta.cubeValue = Math.pow(2, parseInt(cube[2], 10));
+            meta.cubeOwner = cube[1] === 'W' ? 'x_owns' :
+                             cube[1] === 'B' ? 'o_owns' : 'centered';
+            if (cube[1] === 'D' || cube[1] === '?') meta._ogidCentre = cube[1];
         }
 
-        // Optional fields
         if (parts.length > 3 && parts[3]) {
             var ds = parts[3];
             if (ds.length === 2 && /^\d\d$/.test(ds)) {
@@ -474,57 +501,83 @@
                 if (d1 >= 1 && d1 <= 6 && d2 >= 1 && d2 <= 6) meta.dice = [d1, d2];
             }
         }
-        if (parts.length > 4 && parts[4]) {
-            var t = parts[4].toUpperCase();
-            if (t === 'W') meta.onRoll = 'X';
-            else if (t === 'B') meta.onRoll = 'O';
+
+        var color = parts.length > 4 ? parts[4].toUpperCase() : '';
+        var state = parts.length > 5 && parts[5] ? parts[5] : 'IW';
+        if (color === 'W' || color === 'B') {
+            var toAct;
+            if (state === 'D') toAct = color;
+            else if (state === 'IW' && !meta.dice) toAct = 'W';
+            else toAct = color === 'W' ? 'B' : 'W';
+            meta.onRoll = toAct === 'W' ? 'X' : 'O';
+            if (parts.length > 5 && parts[5]) {
+                meta._ogidColor = color;
+                meta._ogidState = state;
+            }
         }
+        if (state === 'D') {
+            meta.cubeAction = 'D';
+            meta.dice = null;
+        }
+
         if (parts.length > 6 && parts[6]) meta.scoreX = parseInt(parts[6], 10) || 0;
         if (parts.length > 7 && parts[7]) meta.scoreO = parseInt(parts[7], 10) || 0;
         if (parts.length > 8 && parts[8]) {
-            var mlMatch = parts[8].match(/^(\d+)/);
-            if (mlMatch) meta.matchLength = parseInt(mlMatch[1], 10);
-            if (parts[8].indexOf('C') !== -1) meta.crawford = true;
+            var mlMatch = parts[8].match(/^(\d+)([LCG]?)(\d*)$/);
+            if (mlMatch) {
+                meta.matchLength = parseInt(mlMatch[1], 10);
+                meta.crawford = mlMatch[2] === 'C';
+                meta._ogidMatch = parts[8];
+            }
         }
+        if (parts.length > 9 && /^\d+$/.test(parts[9])) meta._ogidMoveId = parts[9];
 
-        return { position: pos, metadata: meta };
+        return putOnRollAtBottom({ position: pos, metadata: meta });
     }
 
     function encodeOGID(pos, meta) {
+        var bottom = meta._bottom || 'O';
         var whiteCh = [], blackCh = [];
         for (var i = 0; i < 26; i++) {
             var c = pos.points[i];
-            if (c > 0) {
-                for (var w = 0; w < c; w++) whiteCh.push(pointToChar(i));
-            } else if (c < 0) {
-                for (var b = 0; b < Math.abs(c); b++) blackCh.push(pointToChar(i));
-            }
+            var ch = pointToChar(bottom === 'X' ? i : 25 - i);
+            var list = (c > 0) === (bottom === 'X') ? whiteCh : blackCh;
+            for (var n = 0; n < Math.abs(c); n++) list.push(ch);
         }
 
-        var ownerCh = meta.cubeOwner === 'x_owns' ? 'W' :
-                      meta.cubeOwner === 'o_owns' ? 'B' : 'N';
-        var cubeLog = log2(meta.cubeValue || 1);
-        var cubeStr = ownerCh + cubeLog + 'N';
+        var doubled = meta.cubeAction === 'D';
+        var ownerCh = meta.cubeOwner === 'centered' ? (meta._ogidCentre || 'N') :
+                      (ownerIs(meta, bottom) ? 'W' : 'B');
+        var cubeStr = ownerCh + log2(meta.cubeValue || 1) + (doubled ? 'O' : 'N');
 
-        var ogidParts = [whiteCh.sort().join(''), blackCh.sort().join(''), cubeStr];
+        var toAct = meta.onRoll === bottom ? 'W' : 'B';
+        var state, color;
+        if (meta._ogidState !== undefined) {
+            state = meta._ogidState;
+            color = meta._ogidColor;
+        } else if (doubled) {
+            state = 'D';
+            color = toAct;
+        } else {
+            state = meta.dice ? 'R' : 'C';
+            color = toAct === 'W' ? 'B' : 'W';
+        }
 
-        // Dice
-        ogidParts.push(meta.dice ? '' + meta.dice[0] + meta.dice[1] : '');
-        // Turn
-        ogidParts.push(meta.onRoll === 'X' ? 'W' : (meta.onRoll === 'O' ? 'B' : ''));
-        // Game state
-        ogidParts.push('');
-        // Scores
-        ogidParts.push('' + (meta.scoreX || 0));
-        ogidParts.push('' + (meta.scoreO || 0));
-        // Match length
-        var mlStr = '' + (meta.matchLength || 0);
-        if (meta.crawford) mlStr += 'C';
-        ogidParts.push(mlStr);
-        // Move ID
-        ogidParts.push('');
+        var mlStr = meta._ogidMatch !== undefined ? meta._ogidMatch :
+            (meta.matchLength || 0) + (meta.crawford ? 'C' : '');
 
-        return ogidParts.join(':');
+        return [
+            whiteCh.sort().join(''),
+            blackCh.sort().join(''),
+            cubeStr,
+            meta.dice && !doubled ? '' + meta.dice[0] + meta.dice[1] : '',
+            color,
+            state,
+            scoreOf(meta, bottom),
+            scoreOf(meta, other(bottom)),
+            mlStr,
+            meta._ogidMoveId !== undefined ? meta._ogidMoveId : 0
+        ].join(':');
     }
 
     // ── Auto-detection ──────────────────────────────────────────────────
@@ -552,8 +605,8 @@
             }
         }
 
-        // OGID: 3+ parts, third is 3-char cube string [WBN][0-8][NOTP]
-        if (parts.length >= 3 && /^[WBN][0-8][NOTP]$/.test(parts[2])) {
+        // OGID: 3+ parts, third is the cube string <owner><log2 value><action>
+        if (parts.length >= 3 && OGID_CUBE.test(parts[2])) {
             return 'ogid';
         }
 

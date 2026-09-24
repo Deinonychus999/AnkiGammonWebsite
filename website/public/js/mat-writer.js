@@ -1,10 +1,8 @@
 /**
  * MAT Format Writer
  *
- * Converts a parsed XG match object into Jellyfish .mat text format,
- * compatible with GnuBG, Backgammon Studio, and other tools.
- *
- * .mat format reference: Jellyfish match format (plain text).
+ * Converts a parsed XG match object into .mat text format, the plain-text
+ * match format that GnuBG and online backgammon sites read and write.
  */
 (function () {
     'use strict';
@@ -88,7 +86,7 @@
         if (match.matchLength > 0) {
             lines.push(match.matchLength + ' point match');
         } else {
-            lines.push('Unlimited game');
+            lines.push('0 point match');
         }
         lines.push('');
 
@@ -198,9 +196,9 @@
             // Game result
             if (game.footer) {
                 var pts = game.footer.pointsWon;
-                var isLastGame = (g === games.length - 1);
+                var winnerScore = game.footer.winner === 1 ? hdr.score1 : hdr.score2;
                 var resultStr = '   Wins ' + pts + ' point' + (pts !== 1 ? 's' : '');
-                if (isLastGame && match.matchLength > 0) {
+                if (match.matchLength > 0 && winnerScore + pts >= match.matchLength) {
                     resultStr += ' and the match';
                 }
                 // Winner: XG winner=1 → right player won, winner≠1 → left player won
