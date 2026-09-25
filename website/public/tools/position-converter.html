@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Visualize an eXtreme Gammon .xgp file or convert between XGID, GNUID, and OGID backgammon position formats. Export the board as a PNG image.">
+    <meta name="description" content="Set up any backgammon position on the board, or paste an XGID, GNUID, or OGID and edit it. Convert between formats and download the board as a PNG image.">
     <meta name="author" content="AnkiGammon">
-    <title>Backgammon Position Converter & Visualizer - AnkiGammon Tools</title>
+    <title>Backgammon Position Editor & Converter - AnkiGammon Tools</title>
 
     <!-- PARTIAL:favicons -->
 
@@ -15,15 +15,15 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/tools/position-converter">
-    <meta property="og:title" content="Backgammon Position Converter & Visualizer - AnkiGammon Tools">
-    <meta property="og:description" content="Upload an .xgp position file or paste a position ID, visualize the board, and export it as a PNG image.">
+    <meta property="og:title" content="Backgammon Position Editor & Converter - AnkiGammon Tools">
+    <meta property="og:description" content="Set up or edit a backgammon position on the board, convert between XGID, GNUID, and OGID, and download the board as a PNG image.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
     <meta property="og:site_name" content="AnkiGammon">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Backgammon Position Converter & Visualizer - AnkiGammon Tools">
-    <meta name="twitter:description" content="Upload an .xgp position file or paste a position ID, visualize the board, and export it as a PNG image.">
+    <meta name="twitter:title" content="Backgammon Position Editor & Converter - AnkiGammon Tools">
+    <meta name="twitter:description" content="Set up or edit a backgammon position on the board, convert between XGID, GNUID, and OGID, and download the board as a PNG image.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
 
     <!-- SEO -->
@@ -34,8 +34,8 @@
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Backgammon Position Converter & Visualizer",
-      "description": "Upload an eXtreme Gammon .xgp position file or convert between XGID, GNUID, and OGID formats, then visualize and export the board as a PNG image.",
+      "name": "Backgammon Position Editor & Converter",
+      "description": "Set up or edit any backgammon position on an interactive board, or load it from an XGID, GNUID, OGID, or eXtreme Gammon .xgp file. Convert between the three ID formats and export the board as a PNG image.",
       "url": "https://ankigammon.com/tools/position-converter",
       "applicationCategory": "UtilityApplication",
       "operatingSystem": "Any (browser-based)",
@@ -43,6 +43,8 @@
         "Converts between XGID, GNUID, and OGID formats",
         "Reads eXtreme Gammon .xgp position files",
         "Interactive SVG board visualization",
+        "Backgammon position editor with eXtreme Gammon-style click and drag setup",
+        "Sets the cube, dice, turn, match score, and Crawford rule",
         "PNG image download and clipboard copy",
         "7 color schemes",
         "Auto-detects input format",
@@ -68,7 +70,7 @@
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ankigammon.com/" },
         { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://ankigammon.com/tools/" },
-        { "@type": "ListItem", "position": 3, "name": "Position Converter & Visualizer" }
+        { "@type": "ListItem", "position": 3, "name": "Position Editor & Converter" }
       ]
     }
     </script>
@@ -84,17 +86,17 @@
         <ol class="breadcrumb__list">
             <li class="breadcrumb__item"><a href="../" class="breadcrumb__link">Home</a></li>
             <li class="breadcrumb__item"><a href="./" class="breadcrumb__link">Tools</a></li>
-            <li class="breadcrumb__item"><span class="breadcrumb__current">Position Converter</span></li>
+            <li class="breadcrumb__item"><span class="breadcrumb__current">Position Editor</span></li>
         </ol>
     </nav>
 
     <!-- Tool Hero -->
     <section class="tool-hero section">
         <div class="container">
-            <h1>Position Converter & Visualizer</h1>
+            <h1>Position Editor & Converter</h1>
             <p class="hero-subtitle">
-                Paste a position ID or upload an eXtreme Gammon .xgp file.
-                Visualize, convert, and export the position as an image in your browser.
+                Set up any backgammon position on the board, or start from an XGID, GNUID, OGID, or .xgp file.
+                Edit it, convert it, and download the board as an image, all in your browser.
             </p>
         </div>
     </section>
@@ -128,6 +130,11 @@
                     </div>
                     <input type="file" id="xgp-file-input" accept=".xgp" hidden>
                 </div>
+
+                <p class="input-area__setup">
+                    No ID to paste?
+                    <button class="xgp-upload__browse" id="setup-btn" type="button">Set up a position on the board</button>
+                </p>
             </div>
 
             <!-- Processing -->
@@ -154,6 +161,7 @@
                             <span class="on-roll-indicator" id="on-roll-indicator"></span>
                         </div>
                         <div class="board-section__actions">
+                            <button class="btn btn-secondary btn-sm" id="edit-toggle-btn" type="button" aria-pressed="false" aria-controls="board-editor">Edit Position</button>
                             <button class="btn btn-secondary btn-sm" id="swap-colors-btn" type="button" title="Swap checker colors">Swap Colors</button>
                             <button class="btn btn-secondary btn-sm" id="swap-direction-btn" type="button" title="Switch between clockwise and counter-clockwise board layout">Swap Direction</button>
                             <button class="btn btn-secondary btn-sm" id="copy-image-btn" type="button" title="Copy board as PNG image">Copy as Image</button>
@@ -170,7 +178,72 @@
                         </div>
                     </div>
                     <p class="board-section__status" id="image-action-status" role="status" aria-live="polite" hidden></p>
+
+                    <div class="board-editor" id="board-editor" hidden>
+                        <div class="board-editor__row">
+                            <button class="btn btn-secondary btn-sm" id="edit-switch-btn" type="button" title="Give the turn to the other player">Change Player</button>
+                            <button class="btn btn-secondary btn-sm" id="edit-clear-btn" type="button">Clear Board</button>
+                            <button class="btn btn-secondary btn-sm" id="edit-undo-btn" type="button" title="Undo (Ctrl+Z)" disabled>Undo</button>
+                            <span class="board-editor__tap" role="group" aria-label="Color for empty points">
+                                <button class="btn btn-secondary btn-sm board-editor__tap-btn" type="button" data-player="O" aria-pressed="true"><span class="board-editor__chip" data-player="O" aria-hidden="true"></span> Bottom</button>
+                                <button class="btn btn-secondary btn-sm board-editor__tap-btn" type="button" data-player="X" aria-pressed="false"><span class="board-editor__chip" data-player="X" aria-hidden="true"></span> Top</button>
+                            </span>
+                            <label class="board-editor__field">
+                                Position
+                                <select id="edit-position-type" class="scheme-select">
+                                    <option value="checker">Checker play</option>
+                                    <option value="double">Double / no double</option>
+                                    <option value="take">Take / pass</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="board-editor__row">
+                            <label class="board-editor__field">
+                                Game
+                                <select id="edit-game-type" class="scheme-select">
+                                    <option value="money">Money</option>
+                                    <option value="match">Match</option>
+                                </select>
+                            </label>
+                            <span class="board-editor__group" id="edit-match-fields">
+                                <label class="board-editor__field">
+                                    Length
+                                    <input type="number" id="edit-match-length" class="board-editor__number" min="1" max="99" inputmode="numeric">
+                                </label>
+                                <label class="board-editor__field">
+                                    <span class="board-editor__chip" data-player="O" aria-hidden="true"></span>
+                                    Bottom score
+                                    <input type="number" id="edit-score-bottom" class="board-editor__number" min="0" inputmode="numeric">
+                                </label>
+                                <label class="board-editor__field">
+                                    <span class="board-editor__chip" data-player="X" aria-hidden="true"></span>
+                                    Top score
+                                    <input type="number" id="edit-score-top" class="board-editor__number" min="0" inputmode="numeric">
+                                </label>
+                                <label class="board-editor__check">
+                                    <input type="checkbox" id="edit-crawford"> Crawford
+                                </label>
+                            </span>
+                            <span class="board-editor__group" id="edit-money-fields">
+                                <label class="board-editor__check">
+                                    <input type="checkbox" id="edit-jacoby"> Jacoby
+                                </label>
+                                <label class="board-editor__check">
+                                    <input type="checkbox" id="edit-beavers"> Beavers
+                                </label>
+                            </span>
+                        </div>
+                        <p class="board-editor__help board-editor__help--mouse">
+                            Left-click bottom player, right-click top. Click height sets the count.
+                            <kbd>Del</kbd> clear &middot; <kbd>Ins</kbd> reset &middot; <kbd>Ctrl+Z</kbd> undo
+                        </p>
+                        <p class="board-editor__help board-editor__help--touch">
+                            Tap a point at the height you want. Tapping a stack changes that player; empty points get the color picked above. Tap below a point to empty it.
+                        </p>
+                    </div>
+
                     <div class="board-container" id="board-container"></div>
+                    <p class="board-editor__status" id="edit-status" role="status" aria-live="polite"></p>
                 </div>
 
                 <!-- Format Outputs -->
@@ -207,6 +280,19 @@
     <!-- Guide -->
     <section class="tool-info section">
         <div class="container tool-guide">
+            <h2>Setting up a backgammon position</h2>
+            <p>Click <strong>Set up a position on the board</strong> to start from the opening position, or load an ID or .xgp file and click <strong>Edit Position</strong>. Editing works like eXtreme Gammon's setup mode, so a whole position takes a few seconds:</p>
+            <ul>
+                <li><strong>Checkers:</strong> left-click a point for the bottom player, right-click for the top player. Where you click sets the count: the second checker's spot for two, the top of the point for five. Click the fifth checker again to add more.</li>
+                <li><strong>Several points at once:</strong> hold the button and drag up or down to adjust a point, or across points to fill them all to the same height.</li>
+                <li><strong>Empty a point:</strong> click just below it, on its number. On a touchscreen, <strong>Tap adds</strong> chooses which player you place.</li>
+                <li><strong>Cube:</strong> left-click moves it one step toward the bottom player (centered, then 2, 4, 8&hellip;), right-click toward the top player.</li>
+                <li><strong>Dice:</strong> set <strong>Position</strong> to checker play, then left-click a die to raise it or right-click to lower it.</li>
+                <li><strong>Turn, score, and rules:</strong> <strong>Change Player</strong> gives the other side the roll. Choose money or match, then set the match length, both scores, Crawford, Jacoby, and beavers.</li>
+                <li><strong>Keyboard:</strong> over a point, <kbd>0</kbd>&ndash;<kbd>9</kbd> set the count and <kbd>+</kbd>/<kbd>&minus;</kbd> add or remove a checker. <kbd>Del</kbd> clears the board, <kbd>Ins</kbd> sets up the opening position, and <kbd>Ctrl+Z</kbd> undoes.</li>
+            </ul>
+            <p>The XGID, GNUID, and OGID update as you edit, ready to paste into eXtreme Gammon, GNU Backgammon, or OpenGammon, and the page address holds the current position for sharing. Download the board as a PNG to use it as a diagram in an article, a forum post, or a flashcard.</p>
+
             <h2>Backgammon position IDs explained</h2>
             <p>A position ID is a short string that describes a whole backgammon position: the checkers, cube, dice, score, and match length. Paste one into analysis software, a forum post, or a flashcard and anyone can load the exact position. The three common formats don't read each other, so this tool reads all three, detects which one you pasted, and converts between them.</p>
 
@@ -262,6 +348,10 @@
                     <p>Programs differ in which player sits at the bottom and which way the board runs. The position is the same; use <strong>Swap Colors</strong> or <strong>Swap Direction</strong> above to match the layout you're used to.</p>
                 </details>
                 <details class="faq-details__item">
+                    <summary>Can I make a backgammon diagram of my own position?</summary>
+                    <p>Yes. Click <strong>Set up a position on the board</strong>, place the checkers, cube, and dice, then choose <strong>Download PNG</strong> or <strong>Copy as Image</strong>. Pick one of 7 color schemes and either board direction first. No account or software is needed.</p>
+                </details>
+                <details class="faq-details__item">
                     <summary>What is an .xgp file?</summary>
                     <p>A single position saved from eXtreme Gammon with <strong>File &rarr; Export &rarr; Position as XGP</strong>. The tool reads its checkers, cube, dice or pending cube decision, score, match length, and Crawford status, then shows the position with all three IDs.</p>
                 </details>
@@ -271,7 +361,7 @@
                 </details>
                 <details class="faq-details__item">
                     <summary>How do I share a position?</summary>
-                    <p>After you convert a position, the page address contains it, so you can send the link. You can also download the board or copy it as a PNG image, 1760 pixels wide.</p>
+                    <p>After you convert or edit a position, the page address contains it, so you can send the link. You can also download the board or copy it as a PNG image, 1760 pixels wide.</p>
                 </details>
                 <details class="faq-details__item">
                     <summary>Which format should I use?</summary>
@@ -307,6 +397,7 @@
     <script src="../js/position-parser.js"></script>
     <script src="../js/board-renderer.js"></script>
     <script src="../js/board-image-exporter.js"></script>
+    <script src="../js/position-editor.js"></script>
     <script src="../js/position-converter-app.js"></script>
 
     <!-- PARTIAL:kofi -->

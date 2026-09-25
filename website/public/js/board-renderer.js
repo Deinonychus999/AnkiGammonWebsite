@@ -101,6 +101,12 @@
     var CR = Math.min(POINT_W * 0.45, 25); // checker radius
     var BY = MARGIN;
     var BEAROFF_W = BEAROFF_AREA - 20;
+    var STACK_STEP = CR * 2 + 2;
+    var BAR_GAP = CR * 2 + 10;
+    var POINT_SLOTS = 5;
+    var BAR_SLOTS = 3;
+    var DIE_SIZE = 50, DIE_GAP = 15;
+    var CUBE_SIZE = 50;
 
     // Orientation-dependent layout (set per render call)
     var boardX, bearoffX, cubeCX, isCW;
@@ -126,21 +132,26 @@
         return pn - 1;
     }
 
+    function pointAtVisualIndex(vi) {
+        if (isCW) return vi < 12 ? 12 - vi : 36 - vi;
+        return vi + 1;
+    }
+
     function render(position, metadata, schemeName, swapped, orientation) {
-        var s = SCHEMES[schemeName] || SCHEMES.classic;
+        var base = SCHEMES[schemeName] || SCHEMES.classic;
+        var meta = metadata || {};
+        var s = Object.assign({}, base);
         if (swapped) {
-            var origCheckerX = s.checkerX;
-            var origDiceColor = s.diceColor;
-            s = Object.assign({}, s);
-            s.checkerX = s.checkerO;
-            s.checkerO = origCheckerX;
-            s.diceColor = origCheckerX;
-            s.dicePipColor = origDiceColor;
+            s.checkerX = base.checkerO;
+            s.checkerO = base.checkerX;
+        }
+        // Dice take the colour of the checkers on roll: the scheme's pale dice
+        // for the pale checker, dark dice with pale pips for the dark one.
+        if ((meta.onRoll === 'X') !== !!swapped) {
+            s.diceColor = base.checkerX;
+            s.dicePipColor = base.diceColor;
         }
         setLayout(orientation === 'cw');
-        var meta = metadata || {};
-        var onRoll = meta.onRoll || 'O';
-        var flipped = (onRoll === 'X');
         var parts = [];
 
         parts.push('<svg viewBox="0 0 ' + WIDTH + ' ' + HEIGHT + '" xmlns="http://www.w3.org/2000/svg" class="backgammon-board">');
@@ -158,31 +169,23 @@
         parts.push(drawPoints(s));
 
         // Checkers
-        parts.push(drawCheckers(position, s, flipped));
+        parts.push(drawCheckers(position, s));
 
         // Bear-off
         parts.push(drawBearoff(position, s));
 
         // Dice
-        if (meta.dice) parts.push(drawDice(meta.dice, s));
+        if (meta.dice) parts.push(drawDice(meta.dice, meta.onRoll, s));
 
         // Cube
-        parts.push(drawCube(meta.cubeValue || 1, meta.cubeOwner || 'centered', s, flipped));
+        parts.push(drawCube(meta.cubeValue || 1, meta.cubeOwner || 'centered', s));
 
         // Pip counts
         parts.push(drawPipCounts(position, s));
 
         // Scores
         if (meta.matchLength > 0) {
-            var topScore, bottomScore;
-            if (onRoll === 'X') {
-                topScore = meta.scoreO || 0;
-                bottomScore = meta.scoreX || 0;
-            } else {
-                topScore = meta.scoreX || 0;
-                bottomScore = meta.scoreO || 0;
-            }
-            parts.push(drawScores(topScore, bottomScore, meta.matchLength, s));
+            parts.push(drawScores(meta.scoreX || 0, meta.scoreO || 0, meta.matchLength, s));
         }
 
         parts.push('</svg>');
@@ -278,7 +281,7 @@
                '<text class="checker-text" x="' + cx + '" y="' + cy + '" font-size="' + (CR * 1.2) + '" fill="' + textColor + '">' + num + '</text>';
     }
 
-    function drawCheckers(pos, s, flipped) {
+    function drawCheckers(pos, s) {
         var out = ['<g class="checkers">'];
 
         for (var pi = 1; pi <= 24; pi++) {
@@ -290,18 +293,18 @@
             var pp = getPointPosition(pi);
             var cx = pp.x + POINT_W / 2;
 
-            var visible = Math.min(absCount, 5);
+            var visible = Math.min(absCount, POINT_SLOTS);
             for (var ci = 0; ci < visible; ci++) {
                 var cy = pp.isTop
-                    ? pp.yBase + CR + ci * (CR * 2 + 2)
-                    : pp.yBase - CR - ci * (CR * 2 + 2);
+                    ? pp.yBase + CR + ci * STACK_STEP
+                    : pp.yBase - CR - ci * STACK_STEP;
                 out.push(checkerSvg(cx, cy, pClass));
             }
 
-            if (absCount > 5) {
+            if (absCount > POINT_SLOTS) {
                 var lastY = pp.isTop
-                    ? pp.yBase + CR + 4 * (CR * 2 + 2)
-                    : pp.yBase - CR - 4 * (CR * 2 + 2);
+                    ? pp.yBase + CR + (POINT_SLOTS - 1) * STACK_STEP
+                    : pp.yBase - CR - (POINT_SLOTS - 1) * STACK_STEP;
                 var tc = count > 0 ? s.checkerO : s.checkerX;
                 out.push(checkerWithNum(cx, lastY, pClass, absCount, tc));
             }
@@ -310,15 +313,14 @@
         // Bar checkers
         var barCX = boardX + HALF_W + BAR_W / 2;
         var boardCenterY = BY + BOARD_H / 2;
-        var sepOff = CR * 2 + 10;
 
         // X bar (bottom half of bar)
         var xBarCount = Math.max(pos.points[0], 0);
         if (xBarCount > 0) {
-            var xVis = Math.min(xBarCount, 3);
+            var xVis = Math.min(xBarCount, BAR_SLOTS);
             for (var xi = 0; xi < xVis; xi++) {
-                var xy = boardCenterY + sepOff + xi * (CR * 2 + 2);
-                if (xi === xVis - 1 && xBarCount > 3) {
+                var xy = boardCenterY + BAR_GAP + xi * STACK_STEP;
+                if (xi === xVis - 1 && xBarCount > BAR_SLOTS) {
                     out.push(checkerWithNum(barCX, xy, 'checker-x', xBarCount, s.checkerO));
                 } else {
                     out.push(checkerSvg(barCX, xy, 'checker-x'));
@@ -329,10 +331,10 @@
         // O bar (top half of bar)
         var oBarCount = Math.max(-pos.points[25], 0);
         if (oBarCount > 0) {
-            var oVis = Math.min(oBarCount, 3);
+            var oVis = Math.min(oBarCount, BAR_SLOTS);
             for (var oi = 0; oi < oVis; oi++) {
-                var oy = boardCenterY - sepOff - oi * (CR * 2 + 2);
-                if (oi === oVis - 1 && oBarCount > 3) {
+                var oy = boardCenterY - BAR_GAP - oi * STACK_STEP;
+                if (oi === oVis - 1 && oBarCount > BAR_SLOTS) {
                     out.push(checkerWithNum(barCX, oy, 'checker-o', oBarCount, s.checkerX));
                 } else {
                     out.push(checkerSvg(barCX, oy, 'checker-o'));
@@ -409,39 +411,37 @@
         return out;
     }
 
-    function drawDice(dice, s) {
-        var sz = 50, sp = 15;
-        var total = 2 * sz + sp;
-        var dx;
-        if (isCW) {
-            // Clockwise: home board is bottom-left, dice in left half
-            dx = boardX + (HALF_W - total) / 2;
-        } else {
-            // Counter-clockwise: home board is bottom-right, dice in right half
-            dx = boardX + HALF_W + BAR_W + (HALF_W - total) / 2;
-        }
-        var dy = BY + (BOARD_H - sz) / 2;
+    // The bottom player's dice sit on their home-board side (right when
+    // counter-clockwise, left when clockwise); the top player's on the other.
+    function diceOrigin(onRoll) {
+        var total = 2 * DIE_SIZE + DIE_GAP;
+        var leftHalf = isCW !== (onRoll === 'X');
+        var dx = leftHalf
+            ? boardX + (HALF_W - total) / 2
+            : boardX + HALF_W + BAR_W + (HALF_W - total) / 2;
+        return { x: dx, y: BY + (BOARD_H - DIE_SIZE) / 2 };
+    }
 
+    function drawDice(dice, onRoll, s) {
+        var o = diceOrigin(onRoll);
         return '<g class="dice">' +
-            drawDie(dx, dy, sz, dice[0]) +
-            drawDie(dx + sz + sp, dy, sz, dice[1]) +
+            drawDie(o.x, o.y, DIE_SIZE, dice[0]) +
+            drawDie(o.x + DIE_SIZE + DIE_GAP, o.y, DIE_SIZE, dice[1]) +
             '</g>';
     }
 
     // ── Cube ────────────────────────────────────────────────────────────
 
-    function drawCube(cubeValue, cubeOwner, s, flipped) {
-        var sz = 50;
-        var cx = cubeCX - sz / 2;
-        var cy;
+    function cubeTop(cubeOwner) {
+        if (cubeOwner === 'centered') return BY + (BOARD_H - CUBE_SIZE) / 2;
+        if (cubeOwner === 'o_owns') return BY + BOARD_H - CUBE_SIZE - 10;
+        return BY + 10;
+    }
 
-        if (cubeOwner === 'centered') {
-            cy = BY + (BOARD_H - sz) / 2;
-        } else if (cubeOwner === 'o_owns') {
-            cy = flipped ? BY + 10 : BY + BOARD_H - sz - 10;
-        } else { // x_owns
-            cy = flipped ? BY + BOARD_H - sz - 10 : BY + 10;
-        }
+    function drawCube(cubeValue, cubeOwner, s) {
+        var sz = CUBE_SIZE;
+        var cx = cubeCX - sz / 2;
+        var cy = cubeTop(cubeOwner);
 
         var text = cubeOwner === 'centered' ? '64' : '' + cubeValue;
 
@@ -484,10 +484,75 @@
             '</g>';
     }
 
+    // ── Hit testing ─────────────────────────────────────────────────────
+
+    // Slots count checkers out from the board edge (points) or the bar's
+    // centre, so a click on the Nth checker position reads as slot N and a
+    // click in the margin beyond a point's base reads as slot 0.
+    function stackSlot(distance, firstEdge, maxSlots) {
+        if (distance < firstEdge) return 0;
+        return Math.min(maxSlots, Math.floor((distance - firstEdge) / STACK_STEP) + 1);
+    }
+
+    function pointAt(col, isTop, orientation) {
+        setLayout(orientation === 'cw');
+        return pointAtVisualIndex(isTop ? 12 + col : 11 - col);
+    }
+
+    // Maps a point in SVG coordinates to the board element under it:
+    //   { kind: 'point', point, slot, col, isTop }  col 0-11 from the left
+    //   { kind: 'bar', player: 'X'|'O', slot }
+    //   { kind: 'cube' } or { kind: 'die', index }
+    function hitTest(x, y, orientation, metadata) {
+        setLayout(orientation === 'cw');
+        var meta = metadata || {};
+        var inBoard = y >= BY && y <= BY + BOARD_H;
+        var centerY = BY + BOARD_H / 2;
+
+        if (inBoard && Math.abs(x - cubeCX) <= CUBE_AREA / 2) return { kind: 'cube' };
+
+        if (meta.dice) {
+            var d = diceOrigin(meta.onRoll);
+            if (y >= d.y && y <= d.y + DIE_SIZE) {
+                if (x >= d.x && x <= d.x + DIE_SIZE) return { kind: 'die', index: 0 };
+                var d2 = d.x + DIE_SIZE + DIE_GAP;
+                if (x >= d2 && x <= d2 + DIE_SIZE) return { kind: 'die', index: 1 };
+            }
+        }
+
+        var barX = boardX + HALF_W;
+        if (inBoard && x >= barX && x < barX + BAR_W) {
+            return {
+                kind: 'bar',
+                player: y < centerY ? 'O' : 'X',
+                slot: stackSlot(Math.abs(y - centerY), BAR_GAP - CR, BAR_SLOTS)
+            };
+        }
+
+        var col;
+        if (x >= boardX && x < barX) col = Math.floor((x - boardX) / POINT_W);
+        else if (x >= barX + BAR_W && x < boardX + PLAYING_W) col = 6 + Math.floor((x - barX - BAR_W) / POINT_W);
+        else return null;
+        col = Math.min(col, 11);
+
+        var isTop = y < centerY;
+        return {
+            kind: 'point',
+            point: pointAtVisualIndex(isTop ? 12 + col : 11 - col),
+            slot: stackSlot(isTop ? y - BY : BY + BOARD_H - y, 0, POINT_SLOTS),
+            col: col,
+            isTop: isTop
+        };
+    }
+
     // ── Public API ──────────────────────────────────────────────────────
 
     window.BoardRenderer = {
         render: render,
+        hitTest: hitTest,
+        pointAt: pointAt,
+        POINT_SLOTS: POINT_SLOTS,
+        BAR_SLOTS: BAR_SLOTS,
         SCHEMES: SCHEMES
     };
 })();

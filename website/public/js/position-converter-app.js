@@ -1,8 +1,8 @@
 /**
- * Position Converter & Visualizer — UI Controller
+ * Position Editor & Converter — UI Controller
  *
  * Handles position IDs and XGP file input, orchestrates parsing/rendering,
- * and manages the four-state tool UI.
+ * the on-board position editor, and the four-state tool UI.
  * States: IDLE, PROCESSING, RESULT, and ERROR.
  */
 (function () {
@@ -35,6 +35,25 @@
     var copyImageBtn  = document.getElementById('copy-image-btn');
     var downloadImageBtn = document.getElementById('download-image-btn');
 
+    var setupBtn         = document.getElementById('setup-btn');
+    var editToggleBtn    = document.getElementById('edit-toggle-btn');
+    var editorPanel      = document.getElementById('board-editor');
+    var switchTurnBtn    = document.getElementById('edit-switch-btn');
+    var clearBoardBtn    = document.getElementById('edit-clear-btn');
+    var undoBtn          = document.getElementById('edit-undo-btn');
+    var tapButtons       = document.querySelectorAll('.board-editor__tap-btn');
+    var positionTypeSelect = document.getElementById('edit-position-type');
+    var gameTypeSelect   = document.getElementById('edit-game-type');
+    var matchFields      = document.getElementById('edit-match-fields');
+    var moneyFields      = document.getElementById('edit-money-fields');
+    var matchLengthInput = document.getElementById('edit-match-length');
+    var scoreBottomInput = document.getElementById('edit-score-bottom');
+    var scoreTopInput    = document.getElementById('edit-score-top');
+    var crawfordInput    = document.getElementById('edit-crawford');
+    var jacobyInput      = document.getElementById('edit-jacoby');
+    var beaversInput     = document.getElementById('edit-beavers');
+    var editStatus       = document.getElementById('edit-status');
+
     var currentPosition = null;
     var currentMetadata = null;
     var currentFormat = null;
@@ -42,6 +61,16 @@
     var colorsSwapped = false;
     var boardDirection = 'ccw';
     var MAX_XGP_FILE_SIZE = 2 * 1024 * 1024;
+
+    var editing = false;
+    var undoStack = [];
+    var MAX_UNDO = 100;
+    var tapPlayer = 'O';
+    var lastDice = [3, 1];
+    var hoverTarget = null;
+    var drag = null;
+    var hashTimer = null;
+    var statusTimer = null;
 
     // ── State management ───────────────────────────────────────────────
 
@@ -64,14 +93,9 @@
         currentPosition = result.position;
         currentMetadata = result.metadata;
         currentFormat = result.format;
+        undoStack = [];
 
-        // Encode all three formats
-        xgidOutput.textContent  = window.PositionParser.encodeXGID(currentPosition, currentMetadata);
-        gnuidOutput.textContent = window.PositionParser.encodeGNUID(currentPosition, currentMetadata);
-        ogidOutput.textContent  = window.PositionParser.encodeOGID(currentPosition, currentMetadata);
-
-        renderBoard();
-        updateOnRoll();
+        updateOutputs();
         updateHash(shareValue);
         imageActionStatus.textContent = '';
         imageActionStatus.hidden = true;
@@ -133,23 +157,38 @@
         reader.readAsArrayBuffer(file);
     }
 
+    function updateOutputs() {
+        xgidOutput.textContent  = window.PositionParser.encodeXGID(currentPosition, currentMetadata);
+        gnuidOutput.textContent = window.PositionParser.encodeGNUID(currentPosition, currentMetadata);
+        ogidOutput.textContent  = window.PositionParser.encodeOGID(currentPosition, currentMetadata);
+
+        renderBoard();
+        updateOnRoll();
+        if (editing) syncEditor();
+    }
+
     function renderBoard() {
         var scheme = schemeSelect.value;
         var svg = window.BoardRenderer.render(currentPosition, currentMetadata, scheme, colorsSwapped, boardDirection);
         boardContainer.innerHTML = svg;
     }
 
-    function updateOnRoll() {
-        if (!currentMetadata) { onRollIndicator.innerHTML = ''; return; }
+    function checkerChip(player) {
         var scheme = window.BoardRenderer.SCHEMES[schemeSelect.value] || window.BoardRenderer.SCHEMES.classic;
-        var onRoll = currentMetadata.onRoll === 'X' ? 'X' : 'O';
-        var useX = onRoll === 'X';
+        var useX = player === 'X';
         if (colorsSwapped) useX = !useX;
         var fill = useX ? scheme.checkerX : scheme.checkerO;
-        var border = scheme.checkerBorder;
-        onRollIndicator.innerHTML = 'On Roll ' +
-            '<svg width="14" height="14" style="vertical-align:middle" aria-hidden="true" focusable="false">' +
-            '<circle cx="7" cy="7" r="6" fill="' + fill + '" stroke="' + border + '" stroke-width="1.5"/></svg>';
+        return '<svg width="14" height="14" style="vertical-align:middle" aria-hidden="true" focusable="false">' +
+            '<circle cx="7" cy="7" r="6" fill="' + fill + '" stroke="' + scheme.checkerBorder + '" stroke-width="1.5"/></svg>';
+    }
+
+    function updateOnRoll() {
+        if (!currentMetadata) { onRollIndicator.innerHTML = ''; return; }
+        onRollIndicator.innerHTML = 'On Roll ' + checkerChip(currentMetadata.onRoll === 'X' ? 'X' : 'O');
+        var chips = editorPanel.querySelectorAll('.board-editor__chip');
+        for (var i = 0; i < chips.length; i++) {
+            chips[i].innerHTML = checkerChip(chips[i].getAttribute('data-player'));
+        }
     }
 
     // ── URL hash for sharing ───────────────────────────────────────────
@@ -247,6 +286,9 @@
     document.addEventListener('drop', function (e) { e.preventDefault(); });
 
     resetBtn.addEventListener('click', function () {
+        setEditing(false);
+        window.clearTimeout(hashTimer);
+        undoStack = [];
         currentPosition = null;
         currentMetadata = null;
         currentFormat = null;
@@ -364,6 +406,325 @@
             var targetEl = document.getElementById(targetId);
             if (targetEl) copyToClipboard(targetEl.textContent, e.target);
         }
+    });
+
+    // ── Position editing ───────────────────────────────────────────────
+
+    function other(player) {
+        return player === 'X' ? 'O' : 'X';
+    }
+
+    function playerName(player) {
+        return player === 'O' ? 'bottom' : 'top';
+    }
+
+    function snapshot() {
+        return JSON.stringify({ position: currentPosition, metadata: currentMetadata });
+    }
+
+    function pushUndo(before) {
+        if (before === snapshot()) return;
+        undoStack.push(before);
+        if (undoStack.length > MAX_UNDO) undoStack.shift();
+    }
+
+    // Safari throws after 100 history.replaceState calls in 30 seconds,
+    // which a single drag across the board can exceed.
+    function refresh() {
+        updateOutputs();
+        window.clearTimeout(hashTimer);
+        hashTimer = window.setTimeout(function () {
+            updateHash(xgidOutput.textContent);
+        }, 300);
+    }
+
+    function edited() {
+        window.PositionEditor.forgetSourceFormat(currentMetadata);
+        refresh();
+    }
+
+    function checkersMessage(complete, player) {
+        return complete ? '' : 'All 15 ' + playerName(player) + ' checkers are on the board.';
+    }
+
+    function flashStatus(message) {
+        if (!message) return;
+        editStatus.textContent = message;
+        window.clearTimeout(statusTimer);
+        statusTimer = window.setTimeout(clearStatus, 2500);
+    }
+
+    function clearStatus() {
+        window.clearTimeout(statusTimer);
+        editStatus.textContent = '';
+    }
+
+    // Runs a discrete edit (button, key, form field) as one undo step.
+    function edit(mutate) {
+        var before = snapshot();
+        flashStatus(mutate());
+        if (snapshot() !== before) {
+            pushUndo(before);
+            edited();
+        } else {
+            syncEditor();
+        }
+    }
+
+    function undo() {
+        if (!undoStack.length) return;
+        var state = JSON.parse(undoStack.pop());
+        currentPosition = state.position;
+        currentMetadata = state.metadata;
+        refresh();
+    }
+
+    function syncEditor() {
+        var E = window.PositionEditor;
+        var meta = currentMetadata;
+        var ml = meta.matchLength || 0;
+
+        positionTypeSelect.value = E.positionType(meta);
+        gameTypeSelect.value = ml ? 'match' : 'money';
+        matchFields.hidden = !ml;
+        moneyFields.hidden = !!ml;
+        matchLengthInput.value = ml || '';
+        scoreBottomInput.value = meta.scoreO || 0;
+        scoreTopInput.value = meta.scoreX || 0;
+        scoreBottomInput.max = scoreTopInput.max = Math.max(ml - 1, 0);
+        crawfordInput.checked = !!meta.crawford;
+        crawfordInput.disabled = !E.canCrawford(meta);
+        jacobyInput.checked = !!meta.jacoby;
+        beaversInput.checked = !!meta.beaversAllowed;
+
+        var empty = E.isEmpty(currentPosition);
+        clearBoardBtn.textContent = empty ? 'Starting Position' : 'Clear Board';
+        clearBoardBtn.title = empty ? 'Set up the starting position (Ins)' : 'Remove all checkers (Del)';
+        undoBtn.disabled = !undoStack.length;
+    }
+
+    function setEditing(on) {
+        editing = on;
+        drag = null;
+        hoverTarget = null;
+        editToggleBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        editToggleBtn.textContent = on ? 'Done Editing' : 'Edit Position';
+        editorPanel.hidden = !on;
+        boardContainer.classList.toggle('board-container--editing', on);
+        clearStatus();
+        if (on) syncEditor();
+    }
+
+    function hitFromEvent(e) {
+        var svg = boardContainer.querySelector('svg');
+        var ctm = svg && svg.getScreenCTM();
+        if (!ctm) return null;
+        var pt = svg.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        pt = pt.matrixTransform(ctm.inverse());
+        return window.BoardRenderer.hitTest(pt.x, pt.y, boardDirection, currentMetadata);
+    }
+
+    function applyHit(hit, player, repeat) {
+        var E = window.PositionEditor;
+        var R = window.BoardRenderer;
+        if (hit.kind === 'point') {
+            return checkersMessage(E.applySlot(currentPosition, hit.point, player, hit.slot, R.POINT_SLOTS, repeat), player);
+        }
+        if (hit.kind === 'bar') {
+            return checkersMessage(E.applySlot(currentPosition, E.barIndex(hit.player), hit.player, hit.slot, R.BAR_SLOTS, repeat), hit.player);
+        }
+        if (hit.kind === 'cube') E.stepCube(currentMetadata, player === 'O');
+        else if (hit.kind === 'die') E.cycleDie(currentMetadata, hit.index, player === 'O' ? 1 : -1);
+        return '';
+    }
+
+    function hoveredIndex() {
+        if (!hoverTarget) return -1;
+        return hoverTarget.kind === 'bar'
+            ? window.PositionEditor.barIndex(hoverTarget.player)
+            : hoverTarget.point;
+    }
+
+    boardContainer.addEventListener('pointerdown', function (e) {
+        if (!editing || (e.button !== 0 && e.button !== 2)) return;
+        var hit = hitFromEvent(e);
+        if (!hit) return;
+        e.preventDefault();
+
+        // macOS sends Ctrl+click as a right click
+        var player = e.button === 2 || e.ctrlKey ? other(tapPlayer) : tapPlayer;
+        // Touch has no right button, so a tap on a stack edits that stack's player
+        if (e.pointerType !== 'mouse' && hit.kind === 'point') {
+            player = window.PositionEditor.occupant(currentPosition, hit.point) || tapPlayer;
+        }
+        var before = snapshot();
+        flashStatus(applyHit(hit, player, true));
+        if (snapshot() !== before) edited();
+
+        if (hit.kind === 'point') {
+            drag = { before: before, player: player, pointerId: e.pointerId, hit: hit };
+            boardContainer.setPointerCapture(e.pointerId);
+        } else {
+            pushUndo(before);
+            syncEditor();
+        }
+    });
+
+    boardContainer.addEventListener('pointermove', function (e) {
+        if (!editing) return;
+        var hit = hitFromEvent(e);
+        hoverTarget = hit && (hit.kind === 'point' || hit.kind === 'bar') ? hit : null;
+        if (!drag || e.pointerId !== drag.pointerId || !hit || hit.kind !== 'point') return;
+
+        var last = drag.hit;
+        if (hit.point === last.point && hit.slot === last.slot) return;
+
+        // Fill any points a fast drag skipped between two move events
+        var cols = [hit.col];
+        if (last.isTop === hit.isTop) {
+            var step = Math.sign(hit.col - last.col);
+            for (var c = last.col + step; c !== hit.col; c += step) cols.push(c);
+        }
+
+        var before = snapshot();
+        var message = '';
+        for (var i = 0; i < cols.length; i++) {
+            var point = window.BoardRenderer.pointAt(cols[i], hit.isTop, boardDirection);
+            message = applyHit({ kind: 'point', point: point, slot: hit.slot }, drag.player, false) || message;
+        }
+        flashStatus(message);
+        drag.hit = hit;
+        if (snapshot() !== before) edited();
+    });
+
+    function endDrag(e) {
+        if (!drag || e.pointerId !== drag.pointerId) return;
+        pushUndo(drag.before);
+        drag = null;
+        syncEditor();
+    }
+
+    boardContainer.addEventListener('pointerup', endDrag);
+    boardContainer.addEventListener('pointercancel', endDrag);
+    boardContainer.addEventListener('pointerleave', function () { hoverTarget = null; });
+
+    boardContainer.addEventListener('contextmenu', function (e) {
+        if (editing) e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (!editing || results.hidden || e.altKey) return;
+        if (e.target.closest && e.target.closest('input, select, textarea')) return;
+
+        var E = window.PositionEditor;
+        var key = e.key;
+        if (e.ctrlKey || e.metaKey) {
+            if (key === 'z' || key === 'Z') {
+                e.preventDefault();
+                undo();
+            }
+            return;
+        }
+
+        var index = hoveredIndex();
+        var owner = hoverTarget && hoverTarget.kind === 'bar' ? hoverTarget.player : 'O';
+        if (key === 'Delete') {
+            edit(function () { E.clearBoard(currentPosition); });
+        } else if (key === 'Insert') {
+            edit(function () { E.setStartingPosition(currentPosition); });
+        } else if (index >= 0 && /^[0-9]$/.test(key)) {
+            edit(function () {
+                return checkersMessage(E.setCount(currentPosition, index, owner, parseInt(key, 10)), owner);
+            });
+        } else if (index >= 0 && (key === '+' || key === '=')) {
+            edit(function () {
+                var p = E.occupant(currentPosition, index) || owner;
+                return checkersMessage(E.addOne(currentPosition, index, p), p);
+            });
+        } else if (index >= 0 && key === '-') {
+            edit(function () { E.removeOne(currentPosition, index); });
+        } else {
+            return;
+        }
+        e.preventDefault();
+    });
+
+    editToggleBtn.addEventListener('click', function () {
+        setEditing(!editing);
+    });
+
+    setupBtn.addEventListener('click', function () {
+        currentImageFilename = 'backgammon-position.png';
+        var xgid = window.PositionEditor.STARTING_XGID;
+        showPosition(window.PositionParser.parse(xgid), xgid);
+        setEditing(true);
+    });
+
+    switchTurnBtn.addEventListener('click', function () {
+        edit(function () {
+            window.PositionEditor.switchTurn(currentMetadata);
+        });
+    });
+
+    clearBoardBtn.addEventListener('click', function () {
+        edit(function () {
+            var E = window.PositionEditor;
+            if (E.isEmpty(currentPosition)) E.setStartingPosition(currentPosition);
+            else E.clearBoard(currentPosition);
+        });
+    });
+
+    undoBtn.addEventListener('click', undo);
+
+    Array.prototype.forEach.call(tapButtons, function (btn) {
+        btn.addEventListener('click', function () {
+            tapPlayer = btn.getAttribute('data-player');
+            Array.prototype.forEach.call(tapButtons, function (b) {
+                b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+            });
+        });
+    });
+
+    positionTypeSelect.addEventListener('change', function () {
+        edit(function () {
+            if (currentMetadata.dice) lastDice = currentMetadata.dice.slice();
+            window.PositionEditor.setPositionType(currentMetadata, positionTypeSelect.value, lastDice);
+        });
+    });
+
+    gameTypeSelect.addEventListener('change', function () {
+        edit(function () {
+            var ml = gameTypeSelect.value === 'match' ? 7 : 0;
+            window.PositionEditor.setMatch(currentMetadata, ml, currentMetadata.scoreO, currentMetadata.scoreX);
+        });
+    });
+
+    function onMatchFieldChange() {
+        edit(function () {
+            window.PositionEditor.setMatch(currentMetadata,
+                parseInt(matchLengthInput.value, 10) || 1,
+                scoreBottomInput.value, scoreTopInput.value);
+        });
+    }
+
+    matchLengthInput.addEventListener('change', onMatchFieldChange);
+    scoreBottomInput.addEventListener('change', onMatchFieldChange);
+    scoreTopInput.addEventListener('change', onMatchFieldChange);
+
+    crawfordInput.addEventListener('change', function () {
+        edit(function () {
+            currentMetadata.crawford = crawfordInput.checked && window.PositionEditor.canCrawford(currentMetadata);
+        });
+    });
+
+    jacobyInput.addEventListener('change', function () {
+        edit(function () { currentMetadata.jacoby = jacobyInput.checked; });
+    });
+
+    beaversInput.addEventListener('change', function () {
+        edit(function () { currentMetadata.beaversAllowed = beaversInput.checked; });
     });
 
     // ── Init ───────────────────────────────────────────────────────────

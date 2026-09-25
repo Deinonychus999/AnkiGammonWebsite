@@ -63,6 +63,7 @@ website/
 │   ├── board-image-exporter.js  # Shared SVG-to-PNG download/clipboard helper
 │   ├── position-parser.js       # Position ID parser (XGID/GNUID/OGID)
 │   ├── position-converter-app.js # Position converter UI
+│   ├── position-editor.js       # XG-style position edit operations (checkers, cube, dice, match)
 │   ├── met-data.js              # Kazaross XG2 match equity table data
 │   └── met-calculator-app.js    # MET calculator UI
 ├── tools/               # Tool pages
@@ -118,7 +119,7 @@ Each JS file is self-contained and handles one feature. When adding new interact
 Browser-based backgammon utilities at [/tools/](website/public/tools/). Each tool runs entirely client-side with no server uploads.
 
 - **XG to MAT Converter** - Parses XG binary match files and converts to .mat text format via drag-and-drop
-- **Position Converter & Visualizer** - Accepts XGID, GNUID, OGID, and eXtreme Gammon .xgp position files with interactive SVG board visualization and PNG export
+- **Position Editor & Converter** - Accepts XGID, GNUID, OGID, and eXtreme Gammon .xgp position files with interactive SVG board visualization, an eXtreme Gammon-style on-board position editor, and PNG export
 - **Match Equity Table Calculator** - Looks up match winning chances (MWC) at any score using the Kazaross XG2 table, with interactive color-coded 25x25 grid and equity swing calculator
 
 Tool pages share the site's core CSS and add [tool.css](website/public/css/tool.css) for tool-specific styles. Each tool has a parser module and an app/UI module in `js/`.

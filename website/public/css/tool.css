@@ -624,6 +624,148 @@
     border-color: var(--accent-primary);
 }
 
+/* ===== Position Editor ===== */
+.input-area__setup {
+    margin-top: var(--space-md);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+#edit-toggle-btn[aria-pressed="true"] {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.board-editor {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.board-editor__row,
+.board-editor__group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+}
+
+.board-editor__field,
+.board-editor__check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    white-space: nowrap;
+}
+
+.board-editor__check {
+    cursor: pointer;
+}
+
+.board-editor__check:has(input:disabled) {
+    color: var(--text-dim);
+    cursor: default;
+}
+
+.board-editor__number {
+    width: 4.5em;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-xs) var(--space-sm);
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.board-editor__number:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.board-editor__chip {
+    display: inline-flex;
+}
+
+.board-editor__tap,
+.board-editor__help--touch {
+    display: none;
+}
+
+.board-editor__tap {
+    gap: var(--space-xs);
+}
+
+.board-editor__tap-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.board-editor__tap-btn[aria-pressed="true"] {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+@media (pointer: coarse) {
+    .board-editor__tap {
+        display: inline-flex;
+    }
+
+    .board-editor__help--touch {
+        display: block;
+    }
+
+    .board-editor__help--mouse {
+        display: none;
+    }
+}
+
+.board-editor__help {
+    margin: 0;
+    color: var(--text-dim);
+    line-height: 1.5;
+}
+
+.board-editor__help kbd,
+.tool-guide kbd {
+    font-family: var(--font-code);
+    font-size: 0.8em;
+    padding: 0 var(--space-xs);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+}
+
+/* The line keeps its height while editing so a message never moves the board */
+.board-editor__status {
+    display: none;
+    min-height: 1.5em;
+    margin: calc(-1 * var(--space-sm)) var(--space-md) var(--space-sm);
+    color: var(--accent-warning);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.board-container--editing + .board-editor__status {
+    display: block;
+}
+
+.board-container--editing svg {
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
 /* ===== Format Outputs ===== */
 .format-outputs {
     display: flex;
