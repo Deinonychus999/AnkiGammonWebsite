@@ -9,9 +9,14 @@ The community deck catalog is fetched at build time and prerendered into
 decks/index.html, one static page per deck is generated from
 _templates/deck.html, and the sitemap gains a URL per deck. Without network
 access the site still builds, just without deck data.
+
+The browser app (app/) runs the ankigammon Python package under Pyodide. Its
+wheels are downloaded from PyPI into app/wheels/ and checked against PyPI's
+sha256, so the page loads them from this site rather than from PyPI.
 """
 
 import datetime
+import hashlib
 import html
 import json
 import os
@@ -29,6 +34,19 @@ BUILD_DIR = os.path.join(SCRIPT_DIR, "build")
 SITE_URL = "https://ankigammon.com"
 DECKS_API = "https://ankigammon-decks.frankcool999.workers.dev"
 DECK_LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
+
+# ankigammon itself tracks the latest release, so the daily rebuild ships each
+# release; its dependencies stay pinned because genanki's output lands in users'
+# Anki collections. PyYAML comes with Pyodide.
+APP_WHEEL_PINS = {
+    "genanki": "0.13.1",
+    "frozendict": "2.4.7",
+    "cached-property": "2.0.1",
+    "chevron": "0.14.0",
+    "striprtf": "0.0.33",
+}
+# Releases before this module existed cannot run the app.
+APP_ENTRY_MODULE = "ankigammon/web.py"
 
 PARTIAL_RE = re.compile(r"^[ \t]*<!-- PARTIAL:(\w[\w-]*) -->[ \t]*$", re.MULTILINE)
 ICON_RE = re.compile(r"<!-- ICON:([a-z0-9-]+) -->")
@@ -55,6 +73,8 @@ def get_variables(rel_dir):
         "{{DECKS_HREF}}": base + "decks/",
         "{{DECKS_ACTIVE}}": active if section == "decks" else "",
         "{{DECKS_API}}": DECKS_API,
+        "{{APP_HREF}}": base + "app/",
+        "{{APP_ACTIVE}}": active if section == "app" else "",
     }
 
 
@@ -350,6 +370,70 @@ def update_sitemap(decks):
         f.write(xml)
 
 
+# ── Browser app wheels ─────────────────────────────────────────────────
+
+APP_WHEELS_DIR = os.path.join(BUILD_DIR, "app", "wheels")
+PYPI_HEADERS = {"User-Agent": "ankigammon-build/1.0 (+https://ankigammon.com)"}
+
+
+def pypi_wheel(name, version=None):
+    """(filename, url, sha256) of the pure-Python wheel of a release; the latest when version is None."""
+    path = f"{name}/{version}/json" if version else f"{name}/json"
+    req = urllib.request.Request(f"https://pypi.org/pypi/{path}", headers=PYPI_HEADERS)
+    with urllib.request.urlopen(req, timeout=20) as r:
+        release = json.load(r)
+    wheel = next(u for u in release["urls"] if u["filename"].endswith("-py3-none-any.whl"))
+    return wheel["filename"], wheel["url"], wheel["digests"]["sha256"]
+
+
+def download_verified(url, sha256, dest):
+    req = urllib.request.Request(url, headers=PYPI_HEADERS)
+    with urllib.request.urlopen(req, timeout=60) as r:
+        data = r.read()
+    if hashlib.sha256(data).hexdigest() != sha256:
+        raise ValueError(f"sha256 mismatch for {url}")
+    with open(dest, "wb") as f:
+        f.write(data)
+
+
+def wheel_has(path, member):
+    import zipfile
+    with zipfile.ZipFile(path) as zf:
+        return member in zf.namelist()
+
+
+def fetch_app_wheels():
+    """Wheel filenames for the browser app in install order, or [] when unavailable.
+
+    ANKIGAMMON_WHEEL=path/to/ankigammon-*.whl uses a local build of the package
+    (previews, tests, unreleased changes) instead of the latest PyPI release.
+    """
+    try:
+        os.makedirs(APP_WHEELS_DIR, exist_ok=True)
+        names = []
+        for name, version in APP_WHEEL_PINS.items():
+            filename, url, sha256 = pypi_wheel(name, version)
+            download_verified(url, sha256, os.path.join(APP_WHEELS_DIR, filename))
+            names.append(filename)
+
+        local = os.environ.get("ANKIGAMMON_WHEEL")
+        if local:
+            filename = os.path.basename(local)
+            shutil.copyfile(local, os.path.join(APP_WHEELS_DIR, filename))
+        else:
+            filename, url, sha256 = pypi_wheel("ankigammon")
+            download_verified(url, sha256, os.path.join(APP_WHEELS_DIR, filename))
+        if not wheel_has(os.path.join(APP_WHEELS_DIR, filename), APP_ENTRY_MODULE):
+            raise ValueError(f"{filename} predates {APP_ENTRY_MODULE}")
+        names.append(filename)
+    except Exception as e:  # network or PyPI trouble must not fail the site build
+        print(f"build.py: browser app wheels unavailable ({e}); the app page will say so")
+        shutil.rmtree(APP_WHEELS_DIR, ignore_errors=True)
+        return []
+    print(f"Browser app runs {names[-1]}")
+    return names
+
+
 # ── Build ──────────────────────────────────────────────────────────────
 
 MET_DATA_JS = os.path.join(SRC_DIR, "js", "met-data.js")
@@ -401,6 +485,8 @@ def build():
         with open(os.path.join(deck_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(render_deck_page(deck))
 
+    app_wheels = fetch_app_wheels()
+
     count = 0
     for root, _dirs, files in os.walk(BUILD_DIR):
         for filename in files:
@@ -426,6 +512,8 @@ def build():
                 content = inject_catalog(content, decks)
             if rel.replace(os.sep, "/") == "tools/met-calculator.html":
                 content = content.replace("<!-- MET:grid -->", render_met_grid())
+            if rel.replace(os.sep, "/") == "app/index.html":
+                content = content.replace("{{APP_WHEELS}}", html.escape(json.dumps(app_wheels)))
 
             if content != original:
                 with open(filepath, "w", encoding="utf-8") as f:

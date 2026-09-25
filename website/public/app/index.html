@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Turn eXtreme Gammon analysis into Anki flashcards in your browser. Drop an .xg or .xgp file or paste XG analysis, pick the mistakes, download an .apkg deck. Free, nothing uploaded.">
+    <meta name="author" content="AnkiGammon">
+    <title>AnkiGammon Web App - XG Analysis to Anki Flashcards in Your Browser</title>
+
+    <!-- PARTIAL:favicons -->
+
+    <link rel="canonical" href="https://ankigammon.com/app/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ankigammon.com/app/">
+    <meta property="og:title" content="AnkiGammon in your browser">
+    <meta property="og:description" content="Turn eXtreme Gammon analysis into Anki flashcards without installing anything. Free, and your files never leave your browser.">
+    <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+    <meta property="og:site_name" content="AnkiGammon">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="AnkiGammon in your browser">
+    <meta name="twitter:description" content="Turn eXtreme Gammon analysis into Anki flashcards without installing anything. Free, and your files never leave your browser.">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+
+    <meta name="robots" content="index, follow">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AnkiGammon Web App",
+      "description": "Turn eXtreme Gammon analysis into Anki flashcards in the browser: reads .xg and .xgp files and pasted XG analysis, filters mistakes by error and player, previews each card, and downloads an .apkg deck. Runs entirely in the browser.",
+      "url": "https://ankigammon.com/app/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any (browser-based)",
+      "featureList": [
+        "Reads eXtreme Gammon .xg match files and .xgp position files",
+        "Reads analysis copied from eXtreme Gammon with Ctrl+C",
+        "Filters mistakes by error threshold and player",
+        "Previews each flashcard, front and back",
+        "Downloads an .apkg deck for Anki, AnkiMobile and AnkiDroid",
+        "Runs in the browser with no upload"
+      ],
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "isPartOf": { "@type": "WebSite", "name": "AnkiGammon", "url": "https://ankigammon.com/" }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <!-- PARTIAL:css -->
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+    <!-- PARTIAL:nav -->
+
+    <main id="app" data-wheels="{{APP_WHEELS}}">
+    <section class="tool-hero section app-hero">
+        <div class="container">
+            <h1>AnkiGammon in your browser</h1>
+            <p class="hero-subtitle">
+                Turn eXtreme Gammon analysis into Anki flashcards. Nothing to install, and your files never leave this page.
+            </p>
+            <p class="app-hero__limits">
+                This version uses analysis you already have: <strong>.xg and .xgp files</strong>, or text copied from eXtreme Gammon.
+                To analyze position IDs or .mat files, add score matrices, or send cards straight into Anki, <a href="/#install">get the desktop app</a>.
+            </p>
+        </div>
+    </section>
+
+    <section class="section app-workspace">
+        <div class="container">
+            <p class="app-status" id="app-status" role="status" aria-live="polite">
+                <span class="app-status__dot" aria-hidden="true"></span>
+                <span id="app-status-text">Getting ready… the first visit downloads about 7&nbsp;MB, cached afterwards.</span>
+            </p>
+
+            <!-- Step 1 -->
+            <div class="app-step" id="step-source">
+                <h2 class="app-step__title"><span class="app-step__num">1</span> Add your analysis</h2>
+                <div class="app-source">
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="drop-zone__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <p class="drop-zone__text">
+                            Drag &amp; drop an .xg or .xgp file here, or
+                            <button class="drop-zone__browse" id="browse-btn" type="button">browse files</button>
+                        </p>
+                        <p class="drop-zone__hint">Match files keep only the mistakes above your thresholds. A position file becomes one card.</p>
+                        <input type="file" id="file-input" accept=".xg,.xgp" hidden>
+                    </div>
+
+                    <div class="app-source__alt">
+                        <details class="app-paste" id="paste-details">
+                            <summary>Paste analysis copied from eXtreme Gammon</summary>
+                            <label class="visually-hidden" for="paste-input">XG analysis text</label>
+                            <textarea id="paste-input" class="input-area__textarea app-paste__text" rows="8" spellcheck="false"
+                                placeholder="In eXtreme Gammon, analyze a position, press Ctrl+C and paste here. Several positions can go in one paste."></textarea>
+                            <button class="btn btn-secondary btn-sm" id="paste-btn" type="button">Make cards from this text</button>
+                        </details>
+                        <p class="app-sample">No XG file at hand? <button class="app-link-btn" id="sample-btn" type="button">Try a sample match</button></p>
+                    </div>
+                </div>
+
+                <div class="tool-error" id="error-display" hidden>
+                    <p class="tool-error__message" id="error-message"></p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="app-step" id="step-review" hidden>
+                <h2 class="app-step__title"><span class="app-step__num">2</span> Pick the positions</h2>
+                <p class="app-step__meta" id="source-meta"></p>
+
+                <fieldset class="app-filter" id="filter-panel" hidden>
+                    <legend class="visually-hidden">Which mistakes to keep</legend>
+                    <label class="app-field">
+                        <span>Checker error at least</span>
+                        <input id="checker-threshold" type="number" min="0" max="2" step="0.01" value="0.08" inputmode="decimal">
+                    </label>
+                    <label class="app-field">
+                        <span>Cube error at least</span>
+                        <input id="cube-threshold" type="number" min="0" max="2" step="0.01" value="0.08" inputmode="decimal">
+                    </label>
+                    <label class="app-check"><input id="include-o" type="checkbox" checked> <span id="name-o">Player O</span></label>
+                    <label class="app-check"><input id="include-x" type="checkbox" checked> <span id="name-x">Player X</span></label>
+                </fieldset>
+
+                <div class="app-review">
+                    <div class="app-list">
+                        <div class="app-list__head">
+                            <label class="app-check"><input id="select-all" type="checkbox" checked> All</label>
+                            <span id="pick-count" class="app-list__count"></span>
+                        </div>
+                        <div class="app-list__scroll">
+                            <table class="app-table">
+                                <thead class="visually-hidden">
+                                    <tr><th>Include</th><th>Decision</th><th>Game</th><th>On roll</th><th>Played</th><th>Error</th></tr>
+                                </thead>
+                                <tbody id="rows"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="app-preview">
+                        <div class="app-preview__bar">
+                            <div class="app-seg" role="group" aria-label="Card side">
+                                <button type="button" id="show-front" class="app-seg__btn app-seg__btn--on">Front</button>
+                                <button type="button" id="show-back" class="app-seg__btn">Back</button>
+                            </div>
+                            <div class="app-seg" role="group" aria-label="Anki theme">
+                                <button type="button" id="theme-light" class="app-seg__btn">Light</button>
+                                <button type="button" id="theme-dark" class="app-seg__btn">Dark</button>
+                            </div>
+                            <span class="app-preview__hint" id="preview-hint">Pick a move on the front to flip it, as in Anki.</span>
+                        </div>
+                        <iframe id="card-frame" class="app-preview__frame" title="Card preview"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="app-step" id="step-export" hidden>
+                <h2 class="app-step__title"><span class="app-step__num">3</span> Make the deck</h2>
+                <div class="app-export">
+                    <div class="app-options" role="group" aria-labelledby="card-options-title">
+                        <h3 class="app-options__title" id="card-options-title">Card options</h3>
+                        <label class="app-field">
+                            <span>Color scheme</span>
+                            <select id="opt-color_scheme">
+                                <option value="classic">Classic</option>
+                                <option value="forest">Forest</option>
+                                <option value="ocean">Ocean</option>
+                                <option value="desert">Desert</option>
+                                <option value="sunset">Sunset</option>
+                                <option value="midnight">Midnight</option>
+                                <option value="monochrome">Monochrome</option>
+                            </select>
+                        </label>
+                        <label class="app-field">
+                            <span>Board orientation</span>
+                            <select id="opt-board_orientation">
+                                <option value="counter-clockwise">Counter-clockwise</option>
+                                <option value="clockwise">Clockwise</option>
+                                <option value="random">Random</option>
+                            </select>
+                        </label>
+                        <label class="app-field">
+                            <span>Choices on the front</span>
+                            <select id="opt-max_moves">
+                                <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                                <option value="5" selected>5</option><option value="6">6</option><option value="7">7</option>
+                                <option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                            </select>
+                        </label>
+                        <label class="app-field">
+                            <span>Score format</span>
+                            <select id="opt-score_format">
+                                <option value="absolute">Absolute</option>
+                                <option value="away">Away</option>
+                            </select>
+                        </label>
+                        <label class="app-check"><input id="opt-show_options" type="checkbox" checked> Multiple choice on the front</label>
+                        <label class="app-check"><input id="opt-interactive_moves" type="checkbox" checked> Click a move to see it played</label>
+                        <label class="app-check"><input id="opt-show_pip_count" type="checkbox" checked> Show pip count</label>
+                        <label class="app-check"><input id="opt-swap_checker_colors" type="checkbox"> Swap checker colors</label>
+                        <label class="app-check"><input id="opt-split_cube_decisions" type="checkbox"> Split cube decisions by player</label>
+                    </div>
+
+                    <div class="app-download">
+                        <label class="app-field">
+                            <span>Deck name</span>
+                            <input id="deck-name" type="text" value="AnkiGammon" autocomplete="off">
+                        </label>
+                        <label class="app-check"><input id="use-subdecks" type="checkbox"> Checker and cube cards in subdecks</label>
+                        <button class="btn btn-primary app-download__btn" id="export-btn" type="button" disabled>Download .apkg</button>
+                        <p class="app-download__help" id="import-help">
+                            <strong>Anki on a computer:</strong> File &rarr; Import, or double-click the file.
+                            <strong>AnkiMobile and AnkiDroid:</strong> open the downloaded file and choose Anki.
+                            Importing a deck from this page again updates its cards instead of duplicating them.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tool-info section">
+        <div class="container tool-guide">
+            <h2>Browser or desktop?</h2>
+            <p>Both make the same cards. The browser version needs no install and works on a phone or tablet, but it has no analysis engine, so it only takes positions eXtreme Gammon has already analyzed.</p>
+            <div class="tool-guide__scroll">
+                <table class="app-compare">
+                    <thead>
+                        <tr><th scope="col"></th><th scope="col">Browser</th><th scope="col">Desktop app</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Install</th><td>None</td><td>Download for Windows, macOS or Linux</td></tr>
+                        <tr><th scope="row">eXtreme Gammon .xg and .xgp files</th><td>Yes</td><td>Yes</td></tr>
+                        <tr><th scope="row">Analysis copied from eXtreme Gammon</th><td>Yes</td><td>Yes</td></tr>
+                        <tr><th scope="row">Position IDs (XGID, GNUID, OGID)</th><td>No</td><td>Yes, analyzed with GNU Backgammon or eXtreme Gammon</td></tr>
+                        <tr><th scope="row">.mat, .sgf and .txt match files</th><td>No</td><td>Yes</td></tr>
+                        <tr><th scope="row">Score matrix and cube comparisons</th><td>No</td><td>Yes</td></tr>
+                        <tr><th scope="row">Your own notes on cards</th><td>Notes written in XG</td><td>Notes written in XG, or add your own</td></tr>
+                        <tr><th scope="row">Getting cards into Anki</th><td>Download an .apkg and import it</td><td>.apkg, or straight into Anki with AnkiConnect</td></tr>
+                        <tr><th scope="row">Decks organized in a tree, saved collections</th><td>No</td><td>Yes</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><a href="/#install">Download the desktop app</a>: it is free, and GNU Backgammon, which it uses to analyze positions, is free too.</p>
+
+            <h2>Getting analysis out of eXtreme Gammon</h2>
+            <ul>
+                <li><strong>A whole match:</strong> analyze it in XG, save it, and drop the .xg file above. Pick the error thresholds and which player's mistakes to keep.</li>
+                <li><strong>One position:</strong> save it as an .xgp file, or analyze it, press <kbd>Ctrl</kbd>+<kbd>C</kbd> in XG and paste the text above.</li>
+                <li><strong>Comments</strong> you typed in XG come along and appear on the back of the card.</li>
+            </ul>
+
+            <h2>Frequently asked questions</h2>
+            <div class="faq-details">
+                <details class="faq-details__item">
+                    <summary>Is my file uploaded anywhere?</summary>
+                    <p>No. The page downloads Python and AnkiGammon into your browser once, then reads your file and builds the deck on your device.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Why can't it analyze a position ID?</summary>
+                    <p>Analysis needs an engine such as GNU Backgammon, and neither it nor eXtreme Gammon runs in a browser. The desktop app runs GNU Backgammon for you.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Are these the same cards as the desktop app makes?</summary>
+                    <p>Yes. The browser runs the same AnkiGammon code as the desktop app, so the cards look and work the same.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>Why does the first visit take a few seconds?</summary>
+                    <p>The page downloads about 7&nbsp;MB: Python compiled for the browser, plus AnkiGammon. Your browser keeps it, so later visits start faster.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- PARTIAL:footer -->
+
+    <script src="../js/app.js"></script>
+
+    <!-- PARTIAL:kofi -->
+</body>
+</html>

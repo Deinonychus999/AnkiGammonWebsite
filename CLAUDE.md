@@ -124,6 +124,17 @@ Browser-based backgammon utilities at [/tools/](website/public/tools/). Each too
 
 Tool pages share the site's core CSS and add [tool.css](website/public/css/tool.css) for tool-specific styles. Each tool has a parser module and an app/UI module in `js/`.
 
+### Browser app (`/app/`)
+
+A limited AnkiGammon in the browser, linked from the homepage hero next to the desktop download (deliberately not under Tools). It runs the real `ankigammon` Python package under Pyodide, so cards are identical to the desktop app's; there is no analysis engine, so it only accepts analyzed XG input (.xg, .xgp, XG text export) and exports .apkg.
+
+- [app/index.html](website/public/app/index.html) + [js/app.js](website/public/js/app.js) (UI, IIFE) + [js/app-worker.js](website/public/js/app-worker.js) (module worker; Pyodide 314 requires one) + [css/app.css](website/public/css/app.css). `app/sample-match.xg` is `tests/data/sample_match.xg` from the app repo.
+- The worker only calls `ankigammon.web` (app repo `ankigammon/web.py`); change both sides together.
+- `build.py` downloads the wheels into `build/app/wheels/`, verifies PyPI's sha256, and writes their names into the page's `data-wheels` attribute. ankigammon is the latest PyPI release that contains `ankigammon/web.py` (older ones leave the page showing "not available"); genanki and its pure-Python deps are pinned in `APP_WHEEL_PINS`. Pyodide itself loads from cdn.jsdelivr.net.
+- Preview a local, unreleased app build: `pip wheel ../xg2anki --no-deps -w /tmp/w` then `ANKIGAMMON_WHEEL=/tmp/w/ankigammon-<ver>-py3-none-any.whl python website/build.py`.
+- The card preview iframe mimics Anki 25.9's reviewer (theme variables, night-mode classes, `pycmd('ans')`); card CSS depends on those.
+- `serve.py`'s default port 8765 is AnkiConnect's; pass another port when Anki is running.
+
 ### SEO & Structured Data
 
 The site includes extensive SEO optimization in [index.html](website/public/index.html:1-100):

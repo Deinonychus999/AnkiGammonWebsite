@@ -96,6 +96,14 @@
         },
         {
           "@type": "Question",
+          "name": "Is there a web version?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes: the AnkiGammon web app at ankigammon.com/app/ runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app. It has no analysis engine, so it reads positions eXtreme Gammon has already analyzed: .xg and .xgp files, or analysis copied from XG with Ctrl+C. It downloads an .apkg file to import into Anki. To analyze position IDs or .mat and .sgf files with GNU Backgammon, add score matrices, or send cards straight into Anki, use the desktop app."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "What's the difference between AnkiConnect and APKG export?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -257,9 +265,30 @@
                 Drag match files or paste position IDs. Filter blunders, export in one click.
             </p>
 
-            <div class="cta-buttons">
-                <a href="#install" class="btn btn-primary">Download AnkiGammon</a>
-                <a href="https://github.com/Deinonychus999/AnkiGammon" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+            <div class="start-paths" id="start">
+                <article class="start-path start-path--main">
+                    <h2 class="start-path__title">Desktop app</h2>
+                    <p class="start-path__lead">The full version for Windows, macOS and Linux.</p>
+                    <ul class="start-path__list">
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Paste a position ID and get it analyzed with GNU Backgammon</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp, .mat, .sgf and .txt files, and text copied from eXtreme Gammon</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Score matrices and cube comparisons</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Cards go straight into Anki with AnkiConnect</li>
+                    </ul>
+                    <a href="#install" class="btn btn-primary start-path__cta">Download AnkiGammon</a>
+                </article>
+
+                <article class="start-path">
+                    <h2 class="start-path__title">In your browser</h2>
+                    <p class="start-path__lead">Nothing to install, works on phones and tablets.</p>
+                    <ul class="start-path__list">
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> eXtreme Gammon .xg and .xgp files, and text copied from XG</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> The same cards as the desktop app</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Downloads an .apkg file to import into Anki</li>
+                        <li class="start-path__no"><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Needs analysis already done in XG: no position IDs or .mat files</li>
+                    </ul>
+                    <a href="app/" class="btn btn-secondary start-path__cta">Open the web app</a>
+                </article>
             </div>
 
             <div class="quick-stats">
@@ -273,7 +302,7 @@
                     <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                         <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                    Windows, macOS & Linux
+                    Windows, macOS, Linux & your browser
                 </span>
             </div>
         </div>
@@ -676,6 +705,23 @@
                                 <li><strong>eXtreme Gammon:</strong> Windows only, drives your installed copy of XG2 via UI automation. Currently experimental, so fall back to GnuBG if it doesn't work on your setup.</li>
                             </ul>
                             <p>The engine you pick needs to be installed separately and configured in AnkiGammon settings. For cube decisions, either engine can generate full score matrices showing equity at different match scores.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Is there a web version?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes: the <a href="app/">AnkiGammon web app</a> runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app.</p>
+                            <p>It has no analysis engine, so it reads positions eXtreme Gammon has already analyzed: .xg and .xgp files, or analysis copied from XG with Ctrl+C. It downloads an .apkg file to import into Anki. To analyze position IDs or .mat and .sgf files with GNU Backgammon, add score matrices, or send cards straight into Anki, use the desktop app.</p>
                         </div>
                     </div>
                 </div>
