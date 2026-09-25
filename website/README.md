@@ -13,7 +13,7 @@ website/
 │   ├── tools/          # Browser-based backgammon tools
 │   │   ├── index.html              # Tools landing page
 │   │   ├── xg-to-mat.html          # XG to MAT converter
-│   │   ├── position-converter.html # Position ID converter & visualizer
+│   │   ├── position-editor.html    # Position editor & converter
 │   │   └── met-calculator.html     # Match equity table calculator
 │   └── assets/         # Images, fonts, etc.
 └── README.md           # This file

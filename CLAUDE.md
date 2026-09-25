@@ -69,7 +69,7 @@ website/
 ├── tools/               # Tool pages
 │   ├── index.html              # Tools landing page
 │   ├── xg-to-mat.html          # XG to MAT converter tool
-│   ├── position-converter.html # Position converter & visualizer
+│   ├── position-editor.html    # Position editor & converter (old /position-converter URL redirects here)
 │   └── met-calculator.html     # Match equity table calculator
     └── assets/
         └── images/      # WebP screenshots (13 files)
