@@ -2,23 +2,20 @@
  * Position Editor & Converter — UI Controller
  *
  * Handles position IDs and XGP file input, orchestrates parsing/rendering,
- * the on-board position editor, and the four-state tool UI.
- * States: IDLE, PROCESSING, RESULT, and ERROR.
+ * and the on-board position editor. The board is always shown: a fresh visit
+ * opens the starting position in edit mode, and loads replace it.
  */
 (function () {
     'use strict';
 
     // ── DOM references ─────────────────────────────────────────────────
-    var inputArea    = document.getElementById('input-area');
     var posInput     = document.getElementById('position-input');
-    var convertBtn   = document.getElementById('convert-btn');
     var xgpDropZone  = document.getElementById('xgp-drop-zone');
     var xgpFileInput = document.getElementById('xgp-file-input');
     var xgpBrowseBtn = document.getElementById('xgp-browse-btn');
     var processing   = document.getElementById('processing');
     var errorDisplay = document.getElementById('error-display');
     var errorMessage = document.getElementById('error-message');
-    var results      = document.getElementById('results');
     var resultsHeading = document.getElementById('results-heading');
     var boardContainer = document.getElementById('board-container');
     var onRollIndicator = document.getElementById('on-roll-indicator');
@@ -27,7 +24,6 @@
     var gnuidOutput  = document.getElementById('gnuid-output');
     var ogidOutput   = document.getElementById('ogid-output');
     var schemeSelect = document.getElementById('scheme-select');
-    var resetBtn     = document.getElementById('reset-btn');
     var errorRetry   = document.getElementById('error-retry');
 
     var swapColorsBtn = document.getElementById('swap-colors-btn');
@@ -35,12 +31,12 @@
     var copyImageBtn  = document.getElementById('copy-image-btn');
     var downloadImageBtn = document.getElementById('download-image-btn');
 
-    var setupBtn         = document.getElementById('setup-btn');
     var editToggleBtn    = document.getElementById('edit-toggle-btn');
     var editorPanel      = document.getElementById('board-editor');
     var switchTurnBtn    = document.getElementById('edit-switch-btn');
     var clearBoardBtn    = document.getElementById('edit-clear-btn');
     var undoBtn          = document.getElementById('edit-undo-btn');
+    var redoBtn          = document.getElementById('edit-redo-btn');
     var tapButtons       = document.querySelectorAll('.board-editor__tap-btn');
     var positionTypeSelect = document.getElementById('edit-position-type');
     var gameTypeSelect   = document.getElementById('edit-game-type');
@@ -64,6 +60,7 @@
 
     var editing = false;
     var undoStack = [];
+    var redoStack = [];
     var MAX_UNDO = 100;
     var tapPlayer = 'O';
     var lastDice = [3, 1];
@@ -72,49 +69,61 @@
     var hashTimer = null;
     var statusTimer = null;
 
-    // ── State management ───────────────────────────────────────────────
-
-    function setState(state) {
-        inputArea.hidden    = state !== 'idle';
-        processing.hidden   = state !== 'processing';
-        errorDisplay.hidden = state !== 'error';
-        results.hidden      = state !== 'result';
-    }
+    // ── Load feedback ──────────────────────────────────────────────────
 
     function showError(message) {
+        processing.hidden = true;
         errorMessage.textContent = message;
-        setState('error');
+        errorDisplay.hidden = false;
         errorDisplay.focus();
+    }
+
+    function clearError() {
+        errorDisplay.hidden = true;
     }
 
     // ── Core conversion ────────────────────────────────────────────────
 
+    // shareValue is omitted for the default starting position, which needs
+    // neither a share link nor focus moved to the board.
     function showPosition(result, shareValue) {
         currentPosition = result.position;
         currentMetadata = result.metadata;
         currentFormat = result.format;
         undoStack = [];
+        redoStack = [];
+        window.clearTimeout(hashTimer);
 
         updateOutputs();
-        updateHash(shareValue);
         imageActionStatus.textContent = '';
         imageActionStatus.hidden = true;
-        setState('result');
-        resultsHeading.focus();
+        processing.hidden = true;
+        if (shareValue) {
+            clearError();
+            updateHash(shareValue);
+            resultsHeading.focus();
+        }
+    }
+
+    function showStartingPosition() {
+        currentImageFilename = 'backgammon-position.png';
+        showPosition(window.PositionParser.parse(window.PositionEditor.STARTING_XGID));
     }
 
     function convert(input) {
         if (!input.trim()) {
-            showError('Please paste a position ID or upload an .xgp file.');
-            return;
+            showError('Please paste a position ID or open an .xgp file.');
+            return false;
         }
 
         try {
             currentImageFilename = 'backgammon-position.png';
             showPosition(window.PositionParser.parse(input), input.trim());
+            return true;
         } catch (err) {
             console.error('Position parsing error:', err);
             showError(err.message);
+            return false;
         }
     }
 
@@ -132,7 +141,8 @@
             return;
         }
 
-        setState('processing');
+        clearError();
+        processing.hidden = false;
         var reader = new FileReader();
 
         reader.onload = function (event) {
@@ -201,11 +211,10 @@
 
     function loadFromHash() {
         var hash = window.location.hash;
-        if (hash && hash.length > 1) {
-            var input = decodeURIComponent(hash.substring(1));
-            posInput.value = input;
-            convert(input);
-        }
+        if (!hash || hash.length < 2) return false;
+        var input = decodeURIComponent(hash.substring(1));
+        posInput.value = input;
+        return convert(input);
     }
 
     // ── Copy to clipboard ──────────────────────────────────────────────
@@ -233,10 +242,6 @@
 
     // ── Event handlers ─────────────────────────────────────────────────
 
-    convertBtn.addEventListener('click', function () {
-        convert(posInput.value);
-    });
-
     posInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -249,11 +254,6 @@
         xgpFileInput.click();
     });
 
-    xgpDropZone.addEventListener('click', function (e) {
-        if (e.target === xgpFileInput) return;
-        xgpFileInput.click();
-    });
-
     xgpFileInput.addEventListener('change', function (e) {
         if (e.target.files.length > 0) {
             processXgpFile(e.target.files[0]);
@@ -262,16 +262,16 @@
 
     xgpDropZone.addEventListener('dragover', function (e) {
         e.preventDefault();
-        xgpDropZone.classList.add('xgp-upload--active');
+        xgpDropZone.classList.add('load-bar--active');
     });
 
     xgpDropZone.addEventListener('dragleave', function () {
-        xgpDropZone.classList.remove('xgp-upload--active');
+        xgpDropZone.classList.remove('load-bar--active');
     });
 
     xgpDropZone.addEventListener('drop', function (e) {
         e.preventDefault();
-        xgpDropZone.classList.remove('xgp-upload--active');
+        xgpDropZone.classList.remove('load-bar--active');
 
         if (e.dataTransfer.files.length > 1) {
             showError('Please upload one .xgp position file at a time.');
@@ -280,34 +280,31 @@
         }
     });
 
+    // A position ID pasted anywhere loads at once. Pastes into other fields,
+    // and text that isn't an ID, keep the browser's normal behaviour.
+    document.addEventListener('paste', function (e) {
+        var target = e.target;
+        if (target !== posInput && target.closest && target.closest('input, textarea, select, [contenteditable]')) return;
+        var text = ((e.clipboardData || window.clipboardData).getData('text') || '').trim();
+        if (!text) return;
+        try {
+            window.PositionParser.detect(text);
+        } catch (err) {
+            return;
+        }
+        e.preventDefault();
+        posInput.value = text;
+        convert(text);
+    });
+
     // Prevent the browser from navigating away when a file is dropped outside
     // the highlighted upload target.
     document.addEventListener('dragover', function (e) { e.preventDefault(); });
     document.addEventListener('drop', function (e) { e.preventDefault(); });
 
-    resetBtn.addEventListener('click', function () {
-        setEditing(false);
-        window.clearTimeout(hashTimer);
-        undoStack = [];
-        currentPosition = null;
-        currentMetadata = null;
-        currentFormat = null;
-        currentImageFilename = 'backgammon-position.png';
-        colorsSwapped = false;
-        imageActionStatus.textContent = '';
-        imageActionStatus.hidden = true;
-        posInput.value = '';
-        xgpFileInput.value = '';
-        if (history.replaceState) {
-            history.replaceState(null, '', window.location.pathname);
-        }
-        setState('idle');
-        posInput.focus();
-    });
-
     errorRetry.addEventListener('click', function () {
         xgpFileInput.value = '';
-        setState('idle');
+        clearError();
         posInput.focus();
     });
 
@@ -426,6 +423,7 @@
         if (before === snapshot()) return;
         undoStack.push(before);
         if (undoStack.length > MAX_UNDO) undoStack.shift();
+        redoStack = [];
     }
 
     // Safari throws after 100 history.replaceState calls in 30 seconds,
@@ -471,12 +469,21 @@
         }
     }
 
-    function undo() {
-        if (!undoStack.length) return;
-        var state = JSON.parse(undoStack.pop());
+    function restore(from, to) {
+        if (!from.length) return;
+        to.push(snapshot());
+        var state = JSON.parse(from.pop());
         currentPosition = state.position;
         currentMetadata = state.metadata;
         refresh();
+    }
+
+    function undo() {
+        restore(undoStack, redoStack);
+    }
+
+    function redo() {
+        restore(redoStack, undoStack);
     }
 
     function syncEditor() {
@@ -501,6 +508,7 @@
         clearBoardBtn.textContent = empty ? 'Starting Position' : 'Clear Board';
         clearBoardBtn.title = empty ? 'Set up the starting position (Ins)' : 'Remove all checkers (Del)';
         undoBtn.disabled = !undoStack.length;
+        redoBtn.disabled = !redoStack.length;
     }
 
     function setEditing(on) {
@@ -615,7 +623,7 @@
     });
 
     document.addEventListener('keydown', function (e) {
-        if (!editing || results.hidden || e.altKey) return;
+        if (!editing || e.altKey) return;
         if (e.target.closest && e.target.closest('input, select, textarea')) return;
 
         var E = window.PositionEditor;
@@ -623,7 +631,11 @@
         if (e.ctrlKey || e.metaKey) {
             if (key === 'z' || key === 'Z') {
                 e.preventDefault();
-                undo();
+                if (e.shiftKey) redo();
+                else undo();
+            } else if (key === 'y' || key === 'Y') {
+                e.preventDefault();
+                redo();
             }
             return;
         }
@@ -655,13 +667,6 @@
         setEditing(!editing);
     });
 
-    setupBtn.addEventListener('click', function () {
-        currentImageFilename = 'backgammon-position.png';
-        var xgid = window.PositionEditor.STARTING_XGID;
-        showPosition(window.PositionParser.parse(xgid), xgid);
-        setEditing(true);
-    });
-
     switchTurnBtn.addEventListener('click', function () {
         edit(function () {
             window.PositionEditor.switchTurn(currentMetadata);
@@ -677,6 +682,7 @@
     });
 
     undoBtn.addEventListener('click', undo);
+    redoBtn.addEventListener('click', redo);
 
     Array.prototype.forEach.call(tapButtons, function (btn) {
         btn.addEventListener('click', function () {
@@ -740,6 +746,9 @@
         if (savedDir === 'cw' || savedDir === 'ccw') boardDirection = savedDir;
     } catch (e) {}
 
-    setState('idle');
-    loadFromHash();
+    // A shared link opens for viewing; a fresh visit opens the editor
+    if (!loadFromHash()) {
+        showStartingPosition();
+        setEditing(true);
+    }
 })();
