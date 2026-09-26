@@ -1,0 +1,685 @@
+/* ===== Trainer (train/) ===== */
+
+.trainer-container {
+    max-width: 880px;
+}
+
+.trainer-home {
+    padding-top: var(--space-2xl);
+}
+
+.trainer-intro h1 {
+    font-size: 2.25rem;
+    margin-bottom: var(--space-md);
+}
+
+.trainer-intro__lead {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    max-width: 640px;
+}
+
+.trainer-h2 {
+    font-size: 1.35rem;
+    margin: var(--space-2xl) 0 var(--space-md);
+}
+
+.trainer-h3 {
+    font-size: 1rem;
+    margin-bottom: var(--space-md);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.trainer-notice {
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+}
+
+.trainer-notice--ok {
+    border-color: var(--accent-success);
+    color: var(--text-primary);
+}
+
+.trainer-notice--error {
+    border-color: var(--accent-warning);
+    color: var(--text-primary);
+}
+
+.trainer-install {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    border: 1px solid var(--accent-primary);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.trainer-install p {
+    margin: 0;
+    flex: 1 1 280px;
+    color: var(--text-secondary);
+}
+
+.trainer-install strong {
+    color: var(--text-primary);
+}
+
+.trainer-today {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+}
+
+.trainer-today__summary {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.btn:disabled,
+.btn:disabled:hover {
+    opacity: 0.45;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Deck list */
+.trainer-decks,
+.trainer-community {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.trainer-deck {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.trainer-deck__main {
+    min-width: 0;
+}
+
+.trainer-deck__title {
+    font-size: 1.05rem;
+    margin: 0 0 2px;
+    overflow-wrap: anywhere;
+}
+
+.trainer-deck__meta {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.trainer-deck__counts {
+    display: flex;
+    gap: var(--space-md);
+    margin: var(--space-xs) 0 0;
+    font-size: 0.9rem;
+}
+
+.trainer-count--due {
+    color: var(--accent-success);
+}
+
+.trainer-count--new {
+    color: var(--accent-primary);
+}
+
+.trainer-deck__actions {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-xs);
+}
+
+.trainer-deck__remove {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.trainer-empty {
+    color: var(--text-secondary);
+}
+
+/* Adding decks */
+.trainer-add {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-lg);
+}
+
+.trainer-add__panel {
+    padding: var(--space-lg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.trainer-add__alt {
+    margin: var(--space-md) 0 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.trainer-add__alt a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.trainer-community {
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.trainer-community__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.trainer-community__row:last-child {
+    border-bottom: none;
+}
+
+.trainer-community__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.trainer-community__title {
+    overflow-wrap: anywhere;
+}
+
+.trainer-community__meta,
+.trainer-community__empty {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+/* Settings and backup */
+.trainer-details {
+    margin-top: var(--space-lg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.trainer-details summary {
+    padding: var(--space-md) var(--space-lg);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.trainer-settings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    align-items: end;
+    gap: var(--space-md);
+    padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.trainer-backup {
+    padding: 0 var(--space-lg) var(--space-lg);
+    color: var(--text-secondary);
+}
+
+.trainer-backup__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.trainer-guide {
+    margin-top: var(--space-2xl);
+}
+
+/* ===== Study view ===== */
+
+body.is-studying .nav,
+body.is-studying .footer {
+    display: none;
+}
+
+.trainer-study {
+    padding: 0 0 var(--space-2xl);
+}
+
+.study-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    padding-top: max(var(--space-sm), env(safe-area-inset-top));
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9em;
+}
+
+.study-bar__back {
+    background: none;
+    border: none;
+    color: var(--accent-primary);
+    font: inherit;
+    cursor: pointer;
+    padding: var(--space-xs) 0;
+}
+
+.study-bar__deck {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-secondary);
+}
+
+.study-bar__left {
+    flex: none;
+    color: var(--text-dim);
+}
+
+/* The board takes all the width it can while staying fully in view: its
+   height is capped at the window height minus the study bar and padding,
+   and 880/600 is the board SVG's aspect ratio. */
+.study-layout {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-xl);
+    padding: var(--space-lg) var(--space-xl);
+}
+
+.study-board {
+    position: sticky;
+    top: 64px;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: calc((100vh - 7rem) * 880 / 600);
+    max-width: calc((100dvh - 7rem) * 880 / 600);
+}
+
+.study-panel {
+    flex: 0 0 clamp(300px, 28vw, 560px);
+    min-width: 0;
+    font-size: clamp(1rem, 0.55rem + 0.45vw, 1.3rem);
+}
+
+.study-board svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+.study-context {
+    margin: 0 0 var(--space-xs);
+    color: var(--text-dim);
+    font-size: 0.85em;
+}
+
+.study-prompt {
+    font-size: 1.25em;
+    margin-bottom: var(--space-md);
+}
+
+.study-choices {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.study-choice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+    min-height: 48px;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    font-family: var(--font-code);
+    font-size: 1em;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.study-choice:hover:not(:disabled) {
+    border-color: var(--accent-primary);
+}
+
+.study-choice:disabled {
+    cursor: default;
+    color: var(--text-secondary);
+}
+
+.study-choice__key {
+    flex: none;
+    width: 1.75em;
+    height: 1.75em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: var(--bg-surface);
+    font-family: var(--font-primary);
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.study-choice.is-answer {
+    border-color: var(--accent-success);
+    color: var(--text-primary);
+    background: rgba(95, 184, 120, 0.12);
+}
+
+.study-choice.is-close {
+    border-color: var(--accent-warning);
+    color: var(--text-primary);
+}
+
+.study-choice.is-wrong {
+    border-color: var(--accent-danger);
+    color: var(--text-primary);
+}
+
+.study-skip {
+    margin-top: var(--space-md);
+    color: var(--text-dim);
+    font-size: 0.9em;
+}
+
+.study-answer {
+    margin-top: var(--space-lg);
+}
+
+.study-verdict {
+    padding: var(--space-md);
+    border-left: 3px solid var(--accent-danger);
+    background: var(--bg-elevated);
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.study-verdict[data-verdict="best"] {
+    border-left-color: var(--accent-success);
+}
+
+.study-verdict[data-verdict="close"] {
+    border-left-color: var(--accent-warning);
+}
+
+.study-analysis {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.study-analysis th {
+    padding: var(--space-xs) var(--space-sm);
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 0.9em;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.study-analysis th + th {
+    text-align: right;
+}
+
+.study-analysis td {
+    padding: var(--space-sm);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+
+.study-analysis__move {
+    font-family: var(--font-code);
+}
+
+.study-analysis__num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.study-analysis tr.is-best td:first-child {
+    box-shadow: inset 3px 0 0 var(--accent-success);
+}
+
+.study-analysis tr.is-picked {
+    background: var(--bg-surface);
+}
+
+.study-analysis tr[data-severity="small"] td:last-child {
+    color: var(--text-secondary);
+}
+
+.study-analysis tr[data-severity="mid"] td:last-child {
+    color: var(--accent-warning);
+}
+
+.study-analysis tr[data-severity="big"] td:last-child {
+    color: var(--accent-danger);
+}
+
+.study-tag,
+.study-level {
+    display: inline-block;
+    margin-left: var(--space-sm);
+    padding: 0 6px;
+    border-radius: 4px;
+    font-family: var(--font-primary);
+    font-size: 0.78em;
+    line-height: 1.6;
+    vertical-align: 1px;
+}
+
+.study-tag {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.study-level {
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+}
+
+.study-more {
+    margin-top: var(--space-sm);
+    font-size: 0.85em;
+}
+
+.study-chances {
+    margin-top: var(--space-lg);
+}
+
+.study-chances__label {
+    margin-bottom: var(--space-xs);
+    color: var(--text-dim);
+    font-size: 0.8em;
+}
+
+.study-chances__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85em;
+    font-variant-numeric: tabular-nums;
+}
+
+.study-chances__table th,
+.study-chances__table td {
+    padding: 2px var(--space-sm);
+    text-align: right;
+}
+
+.study-chances__table th {
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.study-chances__table tr > th:first-child {
+    text-align: left;
+}
+
+.study-note {
+    margin-top: var(--space-lg);
+    padding: var(--space-md);
+    border-radius: 6px;
+    background: var(--bg-elevated);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.9em;
+}
+
+.study-note a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.study-source {
+    margin-top: var(--space-md);
+    color: var(--text-dim);
+    font-size: 0.8em;
+}
+
+.study-grades {
+    position: sticky;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding: var(--space-sm) 0;
+    padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
+    background: var(--bg-primary);
+}
+
+.study-grade {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-height: 52px;
+    padding: var(--space-sm) var(--space-xs);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.study-grade__name {
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.study-grade__when {
+    color: var(--text-dim);
+    font-size: 0.75em;
+}
+
+.study-grade:hover {
+    border-color: var(--text-dim);
+}
+
+.study-grade.is-suggested {
+    border-width: 2px;
+}
+
+.study-grade--again.is-suggested { border-color: var(--accent-danger); }
+.study-grade--hard.is-suggested { border-color: var(--accent-warning); }
+.study-grade--good.is-suggested { border-color: var(--accent-success); }
+.study-grade--easy.is-suggested { border-color: var(--accent-primary); }
+
+.study-grade:focus-visible,
+.study-choice:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+.trainer-done {
+    text-align: center;
+}
+
+.trainer-done__next {
+    color: var(--text-secondary);
+}
+
+/* Installed app: the site's navigation would leave the app */
+@media (display-mode: standalone) {
+    .nav,
+    .footer,
+    .trainer-guide {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .trainer-home {
+        padding-top: var(--space-lg);
+    }
+
+    .trainer-intro h1 {
+        font-size: 1.75rem;
+    }
+
+    .trainer-add {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .study-layout {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-md);
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .study-board {
+        position: static;
+        flex: none;
+        max-width: none;
+    }
+
+    .study-panel {
+        flex: none;
+    }
+
+    .study-prompt {
+        font-size: 1.1em;
+    }
+}

@@ -272,6 +272,7 @@
         $('export-btn').disabled = picked === 0 || !ready;
         $('export-btn').textContent = picked ? 'Download .apkg (' + plural(picked, 'card') + ')' : 'Download .apkg';
         $('send-btn').disabled = picked === 0 || !ready || sending;
+        $('train-btn').disabled = picked === 0 || !ready;
     }
 
     // ── Card preview ───────────────────────────────────────────────────
@@ -466,15 +467,10 @@
         });
     }
 
-    function exportDeck() {
-        var picked = positions.filter(function (p) { return p.picked; });
-        if (!picked.length) return;
-        var deckName = $('deck-name').value.trim() || 'AnkiGammon';
+    function buildDeck(picked, deckName) {
         var opts = cardOptions();
-        var button = $('export-btn');
-        button.disabled = true;
         setStatus('Building ' + plural(picked.length, 'card') + '…', 'busy');
-        call('configure', { settings: cardSettings() }).then(function () {
+        return call('configure', { settings: cardSettings() }).then(function () {
             return call('exportDeck', {
                 indices: picked.map(function (p) { return p.index; }),
                 deckName: deckName,
@@ -482,7 +478,33 @@
                 interactiveMoves: opts.interactive_moves,
                 useSubdecks: $('use-subdecks').checked
             });
-        }).then(function (buffer) {
+        });
+    }
+
+    // The trainer reads the positions' analysis out of the same .apkg the
+    // download makes, handed over through its IndexedDB inbox.
+    function studyInTrainer() {
+        var picked = positions.filter(function (p) { return p.picked; });
+        if (!picked.length) return;
+        var deckName = $('deck-name').value.trim() || 'AnkiGammon';
+        $('train-btn').disabled = true;
+        buildDeck(picked, deckName).then(function (buffer) {
+            return window.TrainStore.putInbox('app', { name: deckName.split('::').pop(), bytes: buffer });
+        }).then(function () {
+            location.href = '../train/#inbox';
+        }).catch(function (e) {
+            setStatus('Ready', 'ready');
+            showError('The cards could not be opened in the trainer: ' + e.message);
+            renderCounts();
+        });
+    }
+
+    function exportDeck() {
+        var picked = positions.filter(function (p) { return p.picked; });
+        if (!picked.length) return;
+        var deckName = $('deck-name').value.trim() || 'AnkiGammon';
+        $('export-btn').disabled = true;
+        buildDeck(picked, deckName).then(function (buffer) {
             var a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([buffer], { type: 'application/octet-stream' }));
             a.download = deckName.replace(/::/g, ' - ').replace(/[\\/:*?"<>|]+/g, '_') + '.apkg';
@@ -605,6 +627,7 @@
     $('show-back').addEventListener('click', function () { showSide('back'); });
     $('export-btn').addEventListener('click', exportDeck);
     $('send-btn').addEventListener('click', sendToAnki);
+    $('train-btn').addEventListener('click', studyInTrainer);
     $('anki-url').addEventListener('change', savePrefs);
 
     // ── Start ──────────────────────────────────────────────────────────

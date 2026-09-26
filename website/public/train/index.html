@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Study backgammon positions with spaced repetition on your phone or computer. Free, works offline, no Anki and no account needed.">
+    <meta name="author" content="AnkiGammon">
+    <title>Backgammon Trainer - Spaced Repetition in Your Browser | AnkiGammon</title>
+
+    <!-- PARTIAL:favicons -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#121212">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Trainer">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="canonical" href="https://ankigammon.com/train/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ankigammon.com/train/">
+    <meta property="og:title" content="Backgammon trainer - AnkiGammon">
+    <meta property="og:description" content="Study backgammon positions with spaced repetition on any device. Free, offline, no account.">
+    <meta property="og:image" content="https://ankigammon.com/assets/images/app-og.png">
+    <meta property="og:site_name" content="AnkiGammon">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="robots" content="index, follow">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AnkiGammon Trainer",
+      "description": "Spaced-repetition trainer for backgammon positions: add community decks or your own AnkiGammon decks, answer checker plays and cube decisions, and review them on a schedule. Runs in the browser, offline, with no account.",
+      "url": "https://ankigammon.com/train/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any (browser-based)",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "isPartOf": { "@type": "WebSite", "name": "AnkiGammon", "url": "https://ankigammon.com/" }
+    }
+    </script>
+
+    <!-- PARTIAL:css -->
+    <link rel="stylesheet" href="../css/app.css">
+    <link rel="stylesheet" href="../css/train.css">
+</head>
+<body>
+    <!-- PARTIAL:nav -->
+
+    <main id="trainer" class="trainer">
+
+    <!-- Home -->
+    <section class="section trainer-home" id="view-home">
+        <div class="container trainer-container">
+            <header class="trainer-intro">
+                <h1>Backgammon trainer</h1>
+                <p class="trainer-intro__lead">Answer positions, see the analysis, and get each one back just before you would forget it. Works offline on your phone or computer, with no Anki and no account.</p>
+            </header>
+
+            <p class="app-status" id="trainer-status" role="status" aria-live="polite">
+                <span class="app-status__dot" aria-hidden="true"></span>
+                <span id="trainer-status-text">Opening your decks…</span>
+            </p>
+
+            <div class="trainer-notice" id="trainer-notice" role="alert" hidden></div>
+
+            <div class="trainer-install" id="install-ios" hidden>
+                <p><strong>On iPhone and iPad, add the trainer to your Home Screen first:</strong> tap Share, then <em>Add to Home Screen</em>, and add decks from there. Safari deletes a website's data after 7 days without a visit; the Home Screen app keeps it.</p>
+            </div>
+            <div class="trainer-install" id="install-app" hidden>
+                <p>Install the trainer as an app to study offline from your home screen.</p>
+                <button class="btn btn-secondary btn-sm" id="install-btn" type="button">Install</button>
+            </div>
+
+            <div class="trainer-today">
+                <p class="trainer-today__summary" id="today-summary"></p>
+                <button class="btn btn-primary" id="study-all" type="button" disabled>Study now</button>
+            </div>
+
+            <h2 class="trainer-h2" id="decks-heading" hidden>Your decks</h2>
+            <ul class="trainer-decks" id="deck-list"></ul>
+            <p class="trainer-empty" id="deck-empty" hidden>No decks on this device yet. Add a community deck below, or open a deck you made with AnkiGammon.</p>
+
+            <h2 class="trainer-h2">Add a deck</h2>
+            <div class="trainer-add">
+                <div class="trainer-add__panel">
+                    <h3 class="trainer-h3">Community decks</h3>
+                    <ul class="trainer-community" id="community-list">
+                        <li class="trainer-community__empty">Loading…</li>
+                    </ul>
+                </div>
+                <div class="trainer-add__panel">
+                    <h3 class="trainer-h3">Your own positions</h3>
+                    <div class="drop-zone drop-zone--compact" id="drop-zone">
+                        <p class="drop-zone__text">
+                            Drop an AnkiGammon <strong>.apkg</strong> deck here, or
+                            <button class="drop-zone__browse" id="file-btn" type="button">choose a file</button>
+                        </p>
+                        <p class="drop-zone__hint">Decks made by the AnkiGammon desktop app or web app. Adding the same deck again adds its new positions and keeps your progress.</p>
+                        <input type="file" id="file-input" accept=".apkg,.json,application/json" hidden>
+                    </div>
+                    <p class="trainer-add__alt">No deck yet? <a href="../app/">Make one from an eXtreme Gammon file</a>, then choose <em>Study in the trainer</em>.</p>
+                </div>
+            </div>
+
+            <details class="trainer-details">
+                <summary>Settings</summary>
+                <div class="trainer-settings">
+                    <label class="app-field">
+                        <span>Color scheme</span>
+                        <select id="set-scheme">
+                            <option value="classic">Classic</option>
+                            <option value="forest">Forest</option>
+                            <option value="ocean">Ocean</option>
+                            <option value="desert">Desert</option>
+                            <option value="sunset">Sunset</option>
+                            <option value="midnight">Midnight</option>
+                            <option value="monochrome">Monochrome</option>
+                        </select>
+                    </label>
+                    <label class="app-field">
+                        <span>Board orientation</span>
+                        <select id="set-orientation">
+                            <option value="ccw">Counter-clockwise</option>
+                            <option value="cw">Clockwise</option>
+                            <option value="random">Random</option>
+                        </select>
+                    </label>
+                    <label class="app-field">
+                        <span>New positions per day</span>
+                        <input id="set-new" type="number" min="0" max="9999" step="1" value="20" inputmode="numeric">
+                    </label>
+                    <label class="app-check"><input id="set-swap" type="checkbox"> Swap checker colors</label>
+                </div>
+            </details>
+
+            <details class="trainer-details">
+                <summary>Backup and other devices</summary>
+                <div class="trainer-backup">
+                    <p>Your decks and progress are stored only in this browser. To move them to another device, or keep a copy, download a backup and open it in the trainer there. Restoring never replaces newer progress with older.</p>
+                    <div class="trainer-backup__actions">
+                        <button class="btn btn-secondary btn-sm" id="backup-btn" type="button">Download backup</button>
+                        <button class="btn btn-secondary btn-sm" id="restore-btn" type="button">Restore a backup</button>
+                    </div>
+                </div>
+            </details>
+
+            <div class="tool-guide trainer-guide">
+                <h2>How it works</h2>
+                <ul>
+                    <li><strong>Pick the play.</strong> Each position asks for the best move or cube action, like the AnkiGammon Anki cards.</li>
+                    <li><strong>See the analysis.</strong> The answer shows every candidate with its equity, the winning chances and any notes.</li>
+                    <li><strong>The trainer grades you.</strong> The best play counts as <em>Good</em>, a checker play within 0.020 as <em>Hard</em>, anything else as <em>Again</em>. Change the grade before moving on if you disagree.</li>
+                    <li><strong>It schedules the reviews.</strong> The trainer uses FSRS, the same scheduler modern Anki uses, so positions you know come back less and less often.</li>
+                </ul>
+                <p>Already use Anki? Keep using it: the same decks import into Anki from the <a href="../app/">web app</a> or the <a href="/#install">desktop app</a>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Study -->
+    <section class="trainer-study" id="view-study" hidden>
+        <div class="study-bar">
+            <button class="study-bar__back" id="study-back" type="button" aria-label="Back to decks">&larr; Decks</button>
+            <span class="study-bar__deck" id="study-deck"></span>
+            <span class="study-bar__left" id="study-left"></span>
+        </div>
+        <div class="study-layout">
+            <div class="study-board" id="study-board"></div>
+            <div class="study-panel">
+                <p class="study-context" id="study-context"></p>
+                <h2 class="study-prompt" id="study-prompt"></h2>
+                <div class="study-choices" id="study-choices"></div>
+                <button class="app-link-btn study-skip" id="study-skip" type="button">I don't know, show the answer</button>
+
+                <div class="study-answer" id="study-answer" hidden>
+                    <p class="study-verdict" id="study-verdict" role="status"></p>
+                    <table class="study-analysis" id="study-analysis"></table>
+                    <button class="app-link-btn study-more" id="study-all-moves" type="button" hidden></button>
+                    <div class="study-chances" id="study-chances"></div>
+                    <div class="study-note" id="study-note"></div>
+                    <p class="study-source" id="study-source"></p>
+                    <div class="study-grades" id="study-grades" role="group" aria-label="How well did you know it?">
+                        <button class="study-grade study-grade--again" type="button" data-rating="1"><span class="study-grade__name">Again</span><span class="study-grade__when"></span></button>
+                        <button class="study-grade study-grade--hard" type="button" data-rating="2"><span class="study-grade__name">Hard</span><span class="study-grade__when"></span></button>
+                        <button class="study-grade study-grade--good" type="button" data-rating="3"><span class="study-grade__name">Good</span><span class="study-grade__when"></span></button>
+                        <button class="study-grade study-grade--easy" type="button" data-rating="4"><span class="study-grade__name">Easy</span><span class="study-grade__when"></span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Session done -->
+    <section class="section trainer-done" id="view-done" hidden>
+        <div class="container trainer-container">
+            <h2 class="trainer-h2">Session done</h2>
+            <p id="done-summary"></p>
+            <p class="trainer-done__next" id="done-next"></p>
+            <button class="btn btn-primary" id="done-back" type="button">Back to decks</button>
+        </div>
+    </section>
+
+    </main>
+
+    <!-- PARTIAL:footer -->
+
+    <script>window.ANKIGAMMON_DECKS_API = "{{DECKS_API}}";</script>
+    <script src="../js/position-parser.js"></script>
+    <script src="../js/board-renderer.js"></script>
+    <script src="../js/apkg-reader.js"></script>
+    <script src="../js/vendor/ts-fsrs.umd.js"></script>
+    <script src="../js/train-deck.js"></script>
+    <script src="../js/train-store.js"></script>
+    <script src="../js/train-app.js"></script>
+</body>
+</html>

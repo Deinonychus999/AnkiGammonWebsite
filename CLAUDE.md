@@ -138,6 +138,19 @@ A limited AnkiGammon in the browser, linked from the homepage hero next to the d
 - The card preview iframe mimics Anki 25.9's reviewer (theme variables, night-mode classes, `pycmd('ans')`); card CSS depends on those.
 - `serve.py`'s default port 8765 is AnkiConnect's; pass another port when Anki is running.
 
+### Trainer (`/train/`)
+
+A spaced-repetition trainer that needs neither Anki nor Pyodide: it quizzes positions straight from their analysis data and draws its own screens, so it is not tied to the Anki card HTML. Installable as an app (PWA) and works offline.
+
+- [train/index.html](website/public/train/index.html) + [js/train-app.js](website/public/js/train-app.js) (UI) + [js/train-deck.js](website/public/js/train-deck.js) (pack import, questions, grading; no DOM, loads in Node for quick checks) + [js/train-store.js](website/public/js/train-store.js) (IndexedDB) + [css/train.css](website/public/css/train.css). Boards come from `board-renderer.js` and `position-parser.js`.
+- Input is the `ankigammon-position-pack` (see `worker/README.md`): each position's XGID plus the Decision JSON from the app repo's `ankigammon/anki/decision_serialize.py`. Community decks load from the API's `pack.json`; an `.apkg` goes through `apkg-reader.js` (`buildPack`), which needs the `AnalysisData` field (AnkiGammon 1.3.0+). Questions and grading mirror the Anki card: the first 5 checker plays shuffled, or the 5 cube actions in order; a checker play within 0.020 of the best is "close".
+- Scheduling is FSRS via the vendored [js/vendor/ts-fsrs.umd.js](website/public/js/vendor/ts-fsrs.umd.js) (ts-fsrs 5.4.2, MIT, global `FSRS`). Best play suggests Good, close suggests Hard, anything else Again; the player can change the grade before moving on.
+- Storage (IndexedDB `ankigammon-trainer`): `decks`, `items` (id = `<deckId>|<xgid>`), `progress` (FSRS card + review log per item), `meta` (settings, new-positions-per-day counter), `inbox`. Deck ids: `deck:<catalog id>` for community decks, `app:<name>` from the web app, `file:<slug>` for files. Community decks replace their items on update; app and file decks merge, so decks sent under one name add up. Removing items never removes progress.
+- Entry points: `/train/#deck=<id>` (the "Practice in the browser" button in `_templates/deck.html`) and `/train/#inbox` ("Study in the trainer" in the web app, which builds the `.apkg` as for a download and hands it over through the `inbox` store).
+- Backups (`ankigammon-trainer-backup` JSON) carry decks, items, progress and settings; restoring keeps whichever progress has more reviews.
+- [train/sw.js](website/public/train/sw.js) serves the page, CSS, JS and icons from the cache and refreshes them in the background (so a deploy reaches the installed app on its second launch), and caches the unpkg/cdnjs libraries the `.apkg` importer loads. Deck API requests are not cached. Keep its `SHELL` list in step with the scripts and stylesheets `train/index.html` loads: a missing file makes the install fail.
+- The decks API only allows `https://ankigammon.com` and `http://localhost:8765` (`ALLOWED_ORIGINS` in `worker/wrangler.jsonc`), so community decks don't load when previewing on another port.
+
 ### SEO & Structured Data
 
 The site includes extensive SEO optimization in [index.html](website/public/index.html:1-100):

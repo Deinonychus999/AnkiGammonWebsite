@@ -85,6 +85,8 @@ def get_variables(rel_dir):
         "{{DECKS_API}}": DECKS_API,
         "{{APP_HREF}}": base + "app/",
         "{{APP_ACTIVE}}": active if section == "app" else "",
+        "{{TRAIN_HREF}}": base + "train/",
+        "{{TRAIN_ACTIVE}}": active if section == "train" else "",
     }
 
 
@@ -230,7 +232,10 @@ def render_deck_row(deck):
         f'<p class="deck-row__stats">{stats_html}</p>'
         f'<p class="deck-row__desc">{e(deck.get("description", ""))}</p>'
         "</div>"
+        '<div class="deck-row__actions">'
         f'<a class="btn btn-primary deck-row__download" href="{e(DECKS_API + deck["apkg_url"])}" title="Download {e(deck["title"])} (.apkg)">Download</a>'
+        f'<a class="btn btn-secondary deck-row__practice" href="../train/#deck={e(deck["id"])}" title="Practice {e(deck["title"])} in the browser trainer">Practice</a>'
+        "</div>"
         "</article>"
     )
 

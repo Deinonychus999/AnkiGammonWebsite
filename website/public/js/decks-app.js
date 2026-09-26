@@ -188,10 +188,16 @@
             board.innerHTML = window.BoardRenderer.render(previews[0].position, previews[0].metadata, 'classic', false, 'ccw');
             row.appendChild(board);
         }
+        var actions = el('div', 'deck-row__actions');
         var dl = el('a', 'btn btn-primary deck-row__download', 'Download');
         dl.href = API + deck.apkg_url;
         dl.title = 'Download ' + deck.title + ' (.apkg)';
-        row.appendChild(dl);
+        actions.appendChild(dl);
+        var practice = el('a', 'btn btn-secondary deck-row__practice', 'Practice');
+        practice.href = '../train/#deck=' + encodeURIComponent(deck.id);
+        practice.title = 'Practice ' + deck.title + ' in the browser trainer';
+        actions.appendChild(practice);
+        row.appendChild(actions);
         return row;
     }
 

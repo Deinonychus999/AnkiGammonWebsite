@@ -243,6 +243,13 @@
                         </p>
 
                         <div class="app-send">
+                            <button class="btn btn-secondary app-download__btn" id="train-btn" type="button" disabled>Study in the trainer</button>
+                            <p class="app-download__help">
+                                Opens the cards in the <a href="../train/">browser trainer</a>, with spaced repetition and no Anki needed. They stay in this browser.
+                            </p>
+                        </div>
+
+                        <div class="app-send">
                             <button class="btn btn-secondary app-download__btn" id="send-btn" type="button" disabled>Send to Anki</button>
                             <p class="app-download__help">
                                 Adds the cards to Anki running on this computer, through the AnkiConnect add-on, and updates ones you sent before.
@@ -339,6 +346,7 @@
 
     <!-- PARTIAL:footer -->
 
+    <script src="../js/train-store.js"></script>
     <script src="../js/app.js"></script>
 
     <!-- PARTIAL:kofi -->

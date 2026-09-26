@@ -1495,9 +1495,15 @@
     max-width: 640px;
     line-height: 1.6;
 }
-.deck-header__cta {
+.deck-header__ctas {
     flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
     margin-top: var(--space-xs);
+}
+.deck-header__cta {
+    text-align: center;
 }
 
 /* Share panel */
@@ -1896,8 +1902,14 @@
     width: 100%;
     height: auto;
 }
-.deck-row__download {
+.deck-row__actions {
     flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+.deck-row__download,
+.deck-row__practice {
     text-align: center;
 }
 .deck-list-status {
@@ -2141,9 +2153,8 @@
     .deck-header h1 {
         font-size: 1.6rem;
     }
-    .deck-header__cta {
+    .deck-header__ctas {
         width: 100%;
-        text-align: center;
     }
     .deck-form__grid {
         grid-template-columns: 1fr;
@@ -2165,7 +2176,7 @@
     .deck-row__board {
         flex: 0 0 160px;
     }
-    .deck-row__download {
+    .deck-row__actions {
         flex: 1;
     }
     .deck-preview,

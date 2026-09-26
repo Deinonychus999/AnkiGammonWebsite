@@ -63,7 +63,10 @@
                         <h1 class="deck-detail__title">{{DECK_TITLE}}</h1>
                         <p class="deck-header__lead">Backgammon Anki deck by {{DECK_AUTHOR}} &middot; <time datetime="{{DECK_DATE_ISO}}">{{DECK_DATE}}</time></p>
                     </div>
-                    <a class="btn btn-primary deck-header__cta" href="{{DECK_DOWNLOAD_URL}}">Download .apkg</a>
+                    <div class="deck-header__ctas">
+                        <a class="btn btn-primary deck-header__cta" href="{{DECK_DOWNLOAD_URL}}">Download .apkg</a>
+                        <a class="btn btn-secondary deck-header__cta" href="../../train/#deck={{DECK_ID}}">Practice in the browser</a>
+                    </div>
                 </header>
 
                 <p class="deck-detail__stats">{{DECK_STATS}}<span id="deck-downloads">{{DECK_DOWNLOADS_HTML}}</span></p>
@@ -83,7 +86,7 @@
                 <div class="deck-preview deck-preview--strip" id="deck-detail-preview" aria-label="First positions in the deck"></div>
 
                 <p class="deck-list-note">
-                    Import the downloaded <code>.apkg</code> into Anki with <strong>File &rarr; Import</strong>. Published under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>, credited to {{DECK_AUTHOR}}. Made with <a href="../../">AnkiGammon</a>.
+                    Import the downloaded <code>.apkg</code> into Anki with <strong>File &rarr; Import</strong>, or practice it in the <a href="../../train/">browser trainer</a> with no Anki needed. Published under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>, credited to {{DECK_AUTHOR}}. Made with <a href="../../">AnkiGammon</a>.
                     <a href="../">All community decks</a>
                 </p>
             </article>
