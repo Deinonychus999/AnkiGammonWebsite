@@ -717,6 +717,14 @@
     color: var(--text-secondary);
 }
 
+/* Links in running text need more than color to stand out (WCAG 1.4.1). */
+.feature-card p a,
+.faq-answer-content p a,
+.faq-answer-content li a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 .faq-answer-content ul {
     margin-left: 1.5rem;
     margin-top: 0.5rem;

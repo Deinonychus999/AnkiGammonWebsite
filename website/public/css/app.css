@@ -33,15 +33,11 @@
 }
 
 /* Links inside running text need more than color to stand out (WCAG 1.4.1). */
-.app-hero__limits a,
-#app .tool-guide p a {
+.app-hero__limits a {
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
-.app-source .drop-zone__hint {
-    color: var(--text-secondary);
-}
 
 .app-workspace {
     padding-top: 0;

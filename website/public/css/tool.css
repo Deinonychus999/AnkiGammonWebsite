@@ -400,6 +400,13 @@
     color: var(--accent-primary);
 }
 
+/* Links in running text need more than color to stand out (WCAG 1.4.1). */
+.tool-guide p a,
+.tool-guide li a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 .tool-guide__scroll {
     overflow-x: auto;
 }
