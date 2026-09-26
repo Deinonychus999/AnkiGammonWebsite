@@ -1,10 +1,15 @@
 /**
- * Offline support for the trainer. The page and its files are served from
- * the cache and refreshed in the background, so a change reaches the
- * installed app on its second launch. Deck and catalog requests to the decks
- * API go straight to the network; the trainer keeps decks in IndexedDB.
+ * Offline support for the trainer. Its own page, scripts and styles come
+ * from the network when it answers, revalidated so they are never older than
+ * the web app page that hands the trainer decks (a cached trainer once got a
+ * handoff format it did not know). The cache answers when offline or when
+ * the network is too slow. The .apkg importer's CDN libraries have
+ * versioned URLs, so they are served from the cache first. Deck and catalog
+ * requests to the decks API go straight to the network; the trainer keeps
+ * decks in IndexedDB.
  */
-var CACHE = 'ankigammon-trainer-v1';
+var CACHE = 'ankigammon-trainer-v2';
+var NETWORK_TIMEOUT_MS = 4000;
 
 var SHELL = [
     './',
@@ -30,7 +35,6 @@ var SHELL = [
     '../assets/images/icon-192.png'
 ];
 
-// The .apkg importer's libraries, cached the first time they are used.
 var CDN_HOSTS = ['unpkg.com', 'cdnjs.cloudflare.com'];
 
 self.addEventListener('install', function (event) {
@@ -44,25 +48,50 @@ self.addEventListener('activate', function (event) {
     }).then(function () { return self.clients.claim(); }));
 });
 
-function cacheable(url) {
-    if (url.origin === self.location.origin) return /^\/(train|css|js|assets)\//.test(url.pathname);
-    return CDN_HOSTS.indexOf(url.host) >= 0;
+function ownFile(url) {
+    return url.origin === self.location.origin && /^\/(train|css|js|assets)\//.test(url.pathname);
+}
+
+// The page asks for its files with a ?v= content hash; the cache keeps one
+// copy per file, stored without it.
+function cacheKey(url) {
+    return url.origin + url.pathname;
+}
+
+function networkFirst(request, url) {
+    return caches.open(CACHE).then(function (cache) {
+        // By URL: a navigation Request can't be copied with new options.
+        var network = fetch(request.url, { cache: 'no-cache' }).then(function (response) {
+            if (response.ok) cache.put(cacheKey(url), response.clone());
+            return response;
+        });
+        network.catch(function () {});
+        var timeout = new Promise(function (resolve) { setTimeout(resolve, NETWORK_TIMEOUT_MS); });
+        var cached = function () { return cache.match(cacheKey(url)); };
+        return Promise.race([network, timeout.then(cached)]).then(function (response) {
+            return response || network;
+        }).catch(function () {
+            return cached().then(function (hit) { return hit || Promise.reject(new Error('offline')); });
+        });
+    });
+}
+
+function cacheFirst(request) {
+    return caches.open(CACHE).then(function (cache) {
+        return cache.match(request).then(function (hit) {
+            return hit || fetch(request).then(function (response) {
+                // <script> loads are no-cors, so their responses are opaque (status 0).
+                if (response.ok || response.type === 'opaque') cache.put(request, response.clone());
+                return response;
+            });
+        });
+    });
 }
 
 self.addEventListener('fetch', function (event) {
     var request = event.request;
     if (request.method !== 'GET') return;
     var url = new URL(request.url);
-    if (!cacheable(url)) return;
-    event.respondWith(caches.open(CACHE).then(function (cache) {
-        return cache.match(request, { ignoreSearch: true }).then(function (hit) {
-            var fresh = fetch(request).then(function (response) {
-                if (response.ok) cache.put(request, response.clone());
-                return response;
-            });
-            if (!hit) return fresh;
-            event.waitUntil(fresh.catch(function () {}));
-            return hit;
-        });
-    }));
+    if (ownFile(url)) event.respondWith(networkFirst(request, url));
+    else if (CDN_HOSTS.indexOf(url.host) >= 0) event.respondWith(cacheFirst(request));
 });

@@ -114,16 +114,14 @@
         return tx(['inbox'], 'readwrite', function (t) { t.objectStore('inbox').put({ key: key, value: value }); });
     }
 
-    /** Reads and removes an inbox entry, so a reload doesn't import it twice. */
-    function takeInbox(key) {
-        var found;
-        return tx(['inbox'], 'readwrite', function (t) {
-            var s = t.objectStore('inbox');
-            s.get(key).onsuccess = function (e) {
-                found = e.target.result;
-                if (found) s.delete(key);
-            };
-        }).then(function () { return found ? found.value : null; });
+    function readInbox(key) {
+        return open().then(function (db) {
+            return request(db.transaction('inbox').objectStore('inbox').get(key));
+        }).then(function (row) { return row ? row.value : null; });
+    }
+
+    function clearInbox(key) {
+        return tx(['inbox'], 'readwrite', function (t) { t.objectStore('inbox').delete(key); });
     }
 
     function exportAll() {
@@ -180,7 +178,8 @@
         getMeta: getMeta,
         setMeta: setMeta,
         putInbox: putInbox,
-        takeInbox: takeInbox,
+        readInbox: readInbox,
+        clearInbox: clearInbox,
         exportAll: exportAll,
         importAll: importAll
     };

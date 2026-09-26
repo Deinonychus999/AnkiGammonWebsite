@@ -716,12 +716,17 @@
                 return addCommunityDeck(id, (catalog || []).filter(function (d) { return d.id === id; })[0]);
             });
         }
+        // The handoff is removed only once imported, so a trainer too old to
+        // read it can be reloaded and try again.
         if (hash === 'inbox') {
-            return Store.takeInbox('app').then(function (entry) {
+            return Store.readInbox('app').then(function (entry) {
                 if (!entry) return;
                 var info = { title: entry.name, id: 'app:' + D.slug(entry.name), source: 'app' };
-                if (entry.pack) return saveImported(D.fromPack(JSON.parse(entry.pack), info), false);
-                return importApkg(entry.bytes, entry.name + '.apkg', info);
+                var imported;
+                if (entry.pack) imported = saveImported(D.fromPack(JSON.parse(entry.pack), info), false);
+                else if (entry.bytes) imported = importApkg(entry.bytes, entry.name + '.apkg', info);
+                else throw new Error('The positions from the web app could not be read. Reload this page to update the trainer.');
+                return imported.then(function () { return Store.clearInbox('app'); });
             }).catch(function (e) { notify(e.message, 'error'); }).then(function () { setStatus('Ready', 'ready'); });
         }
         return Promise.resolve();

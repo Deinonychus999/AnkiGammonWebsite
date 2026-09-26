@@ -544,6 +544,23 @@ def render_met_grid():
     return "".join(out)
 
 
+LOCAL_ASSET_RE = re.compile(r'(src|href)="(\.\./(?:js|css)/[^"?]+\.(?:js|css))"')
+
+
+def version_asset_urls(content, page_dir):
+    """Add a content hash to the page's local scripts and stylesheets.
+
+    The trainer is an installable app whose service worker fetches it fresh,
+    but browsers still reuse scripts from memory for a few minutes, which can
+    pair a new page with old code. A changed file gets a new URL instead.
+    """
+    def versioned(m):
+        with open(os.path.normpath(os.path.join(page_dir, m.group(2))), "rb") as f:
+            digest = hashlib.sha256(f.read()).hexdigest()[:10]
+        return f'{m.group(1)}="{m.group(2)}?v={digest}"'
+    return LOCAL_ASSET_RE.sub(versioned, content)
+
+
 def build():
     # Clean and copy source to build directory
     if os.path.exists(BUILD_DIR):
@@ -586,6 +603,8 @@ def build():
                 content = content.replace("<!-- MET:grid -->", render_met_grid())
             if rel.replace(os.sep, "/") == "app/index.html":
                 content = content.replace("{{APP_WHEELS}}", html.escape(json.dumps(app_wheels)))
+            if rel.replace(os.sep, "/") == "train/index.html":
+                content = version_asset_urls(content, os.path.dirname(filepath))
 
             if content != original:
                 with open(filepath, "w", encoding="utf-8") as f:
