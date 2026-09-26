@@ -16,7 +16,8 @@
     var LEARN_AHEAD_MS = 20 * 60 * 1000;
     // Anki's default: a late-night session still counts toward the day before.
     var DAY_CUTOFF_HOURS = 4;
-    var DEFAULTS = { scheme: 'classic', orientation: 'ccw', swap: false, newPerDay: 20, answerMode: 'board' };
+    var DEFAULTS = { scheme: 'classic', orientation: 'ccw', swap: false, newPerDay: 20, answerMode: 'board',
+                     equity: 'cubeful', matrixValues: 'errors' };
     var STORM_MS = 3 * 60 * 1000;
     var STORM_PENALTY_MS = 10 * 1000;
     var MISSED_SHOWN = 20;
@@ -119,7 +120,7 @@
             seen++;
             if (isDue(p, now)) due++;
         });
-        return { due: due, fresh: Math.max(0, (deck.count || 0) - seen) };
+        return { due: due, seen: seen, fresh: Math.max(0, (deck.count || 0) - seen) };
     }
 
     function dueSoon(now) {
@@ -138,12 +139,13 @@
         var now = Date.now();
         var list = $('deck-list');
         list.textContent = '';
-        var totalDue = 0, totalNew = 0;
+        var totalDue = 0, totalNew = 0, totalSeen = 0;
         decks.sort(function (a, b) { return a.title.localeCompare(b.title); });
         decks.forEach(function (deck) {
             var c = deckCounts(deck, now);
             totalDue += c.due;
             totalNew += c.fresh;
+            totalSeen += c.seen;
 
             var row = el('li', 'trainer-deck');
             var main = el('div', 'trainer-deck__main');
@@ -158,10 +160,12 @@
             row.appendChild(main);
 
             var actions = el('div', 'trainer-deck__actions');
-            var study = el('button', 'btn btn-primary btn-sm', 'Study');
+            // With nothing due, positions already studied can be reviewed ahead.
+            var ready = c.due || (c.fresh && newLeftToday());
+            var study = el('button', 'btn btn-sm ' + (ready ? 'btn-primary' : 'btn-secondary'), ready ? 'Study' : 'Study ahead');
             study.type = 'button';
-            study.disabled = !c.due && !(c.fresh && newLeftToday());
-            study.addEventListener('click', function () { startSession(deck.id); });
+            study.disabled = !ready && !c.seen;
+            study.addEventListener('click', function () { startSession(deck.id, !ready); });
             var remove = el('button', 'app-link-btn trainer-deck__remove', 'Remove');
             remove.type = 'button';
             remove.addEventListener('click', function () { removeDeck(deck); });
@@ -191,7 +195,12 @@
         } else {
             summary.textContent = plural(totalDue, 'review') + ' due and ' + plural(newShown, 'new position') + ' for today.';
         }
-        $('study-all').disabled = !totalDue && !newShown;
+        var ahead = !totalDue && !newShown;
+        $('study-all').textContent = ahead && totalSeen ? 'Study ahead' : 'Study now';
+        $('study-all').classList.toggle('btn-primary', !ahead);
+        $('study-all').classList.toggle('btn-secondary', ahead);
+        $('study-all').dataset.ahead = ahead ? 'true' : '';
+        $('study-all').disabled = ahead && !totalSeen;
         renderDrills();
         renderCommunityState();
     }
@@ -358,22 +367,23 @@
 
     var session = null;
 
-    function buildQueue(items) {
+    // Ahead: every position already studied, due or not, soonest first.
+    function buildQueue(items, ahead) {
         var now = Date.now();
         var due = [], fresh = [];
         items.forEach(function (it) {
             var p = progressById[it.id];
             if (!p) fresh.push(it);
-            else if (isDue(p, now)) due.push(it);
+            else if (ahead || isDue(p, now)) due.push(it);
         });
         due.sort(function (a, b) { return new Date(progressById[a.id].card.due) - new Date(progressById[b.id].card.due); });
         return due.concat(fresh.slice(0, newLeftToday()));
     }
 
-    function startSession(deckId) {
+    function startSession(deckId, ahead) {
         notify('');
         Store.items(deckId || null).then(function (items) {
-            var queue = buildQueue(items);
+            var queue = buildQueue(items, ahead);
             if (!queue.length) {
                 notify('Nothing to study right now.');
                 return;
@@ -501,45 +511,90 @@
         return cur.picked.notation + ' loses ' + D.answerError(d, cur.picked).toFixed(3) + '. The best move is ' + best + '.';
     }
 
+    function saveView(patch) {
+        settings = Object.assign({}, settings, patch);
+        Store.setMeta('settings', settings).catch(function () { /* only a view preference */ });
+    }
+
     function renderAnalysis(d, all) {
+        var cur = session.current;
+        cur.allMoves = !!all;
         var table = $('study-analysis');
         table.textContent = '';
+        var rows = D.analysisRows(d, all, cur.picked);
+        var cubeless = rows.some(function (r) { return r.move.cubeless_equity !== null && r.move.cubeless_equity !== undefined; });
+        var showCubeless = cubeless && settings.equity === 'cubeless';
         var head = el('tr');
-        [D.isCube(d) ? 'Action' : 'Move', 'Equity', 'Error'].forEach(function (h) { head.appendChild(el('th', null, h)); });
+        head.appendChild(el('th', null, D.isCube(d) ? 'Action' : 'Move'));
+        var eqHead = el('th');
+        if (cubeless) {
+            var flip = el('button', 'study-eqtoggle', showCubeless ? 'Cubeless' : 'Equity');
+            flip.type = 'button';
+            flip.title = showCubeless ? 'Showing cubeless equities. Click for cubeful.' : 'Showing cubeful equities. Click for cubeless.';
+            flip.addEventListener('click', function () {
+                saveView({ equity: showCubeless ? 'cubeful' : 'cubeless' });
+                renderAnalysis(d, cur.allMoves);
+            });
+            eqHead.appendChild(flip);
+        } else {
+            eqHead.textContent = 'Equity';
+        }
+        head.appendChild(eqHead);
+        head.appendChild(el('th', null, 'Error'));
         var thead = el('thead');
         thead.appendChild(head);
         table.appendChild(thead);
         var body = el('tbody');
-        var picked = session.current.picked;
-        D.analysisRows(d, all, picked).forEach(function (row) {
+        var clickable = !!cur.display;
+        cur.rows = [];
+        rows.forEach(function (row) {
             var tr = el('tr');
             if (row.best) tr.classList.add('is-best');
-            if (row.move === picked) tr.classList.add('is-picked');
+            if (row.move === cur.picked) tr.classList.add('is-picked');
             var abs = Math.abs(row.error);
             tr.dataset.severity = abs < 0.0005 ? 'none' : abs < 0.02 ? 'small' : abs < 0.08 ? 'mid' : 'big';
             var name = el('td', 'study-analysis__move', row.label);
             if (row.move.was_played) name.appendChild(el('span', 'study-tag', 'Played'));
             if (row.move.analysis_level && !D.isCube(d)) name.appendChild(el('span', 'study-level', row.move.analysis_level));
             tr.appendChild(name);
-            tr.appendChild(el('td', 'study-analysis__num', fmtEquity(row.equity)));
+            tr.appendChild(el('td', 'study-analysis__num', fmtEquity(showCubeless ? row.move.cubeless_equity : row.equity)));
             tr.appendChild(el('td', 'study-analysis__num', fmtError(row.error)));
+            if (clickable) {
+                var toggle = function () { showMove(cur.shown === row.move ? null : row.move, true); };
+                tr.classList.add('is-clickable');
+                tr.tabIndex = 0;
+                tr.addEventListener('click', toggle);
+                tr.addEventListener('keydown', function (e) {
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault();
+                    toggle();
+                });
+            }
+            cur.rows.push({ tr: tr, move: row.move });
             body.appendChild(tr);
         });
         table.appendChild(body);
+        markShown();
         var more = d.candidate_moves.filter(function (m) { return m.from_xg_analysis !== false; }).length - body.rows.length;
         $('study-all-moves').hidden = all || more <= 0;
         $('study-all-moves').textContent = 'Show ' + plural(more, 'more move');
+        $('study-analysis-hint').hidden = !clickable;
     }
 
     function pct(n) {
         return n === null || n === undefined ? '–' : n.toFixed(1) + '%';
     }
 
-    function renderChances(d) {
-        var src = D.isCube(d) ? d : D.bestMove(d);
+    function hasChances(m) {
+        return !!m && m.player_win_pct !== null && m.player_win_pct !== undefined;
+    }
+
+    // For a checker play, after the move on the board, or else the best one.
+    function renderChances(d, move) {
+        var src = D.isCube(d) ? d : hasChances(move) ? move : D.bestMove(d);
         var box = $('study-chances');
         box.textContent = '';
-        if (src.player_win_pct === null || src.player_win_pct === undefined) {
+        if (!hasChances(src)) {
             box.hidden = true;
             return;
         }
@@ -554,8 +609,16 @@
             ['win', 'gammon', 'backgammon'].forEach(function (k) { tr.appendChild(el('td', null, pct(src[side[1] + '_' + k + '_pct']))); });
             table.appendChild(tr);
         });
-        box.appendChild(el('p', 'study-chances__label', D.isCube(d) ? 'Winning chances' : 'Winning chances after ' + src.notation));
+        box.appendChild(el('p', 'study-chances__label', D.isCube(d) ? 'Winning chances' : 'Winning chances after ' + (src.xg_notation || src.notation)));
         box.appendChild(table);
+        if (D.isCube(d) && d.cubeless_equity !== null && d.cubeless_equity !== undefined) {
+            var doubled = d.double_cubeless_equity;
+            // As the card: without a stored value, twice the cubeless equity, which holds for unlimited games only.
+            if ((doubled === null || doubled === undefined) && !session.current.parsed.metadata.matchLength) doubled = d.cubeless_equity * 2;
+            var line = 'Cubeless equity ' + fmtError(d.cubeless_equity);
+            if (doubled !== null && doubled !== undefined) line += ', doubled ' + fmtError(doubled);
+            box.appendChild(el('p', 'study-chances__cubeless', line));
+        }
     }
 
     function appendLinked(parent, text) {
@@ -571,6 +634,170 @@
             last = m.index + m[0].length;
         }
         parent.appendChild(document.createTextNode(text.slice(last)));
+    }
+
+    // ── Score matrices and cube comparison sent by the desktop app ─────
+
+    var ACTION_CLASS = { 'D/T': 'dt', 'D/P': 'dp', 'N/T': 'nd' };
+
+    function actionClass(action) {
+        var a = String(action || '').toUpperCase();
+        return ACTION_CLASS[a] || (a.indexOf('TG') === 0 ? 'tg' : 'none');
+    }
+
+    // The two errors a card cell shows, the best action's own left out, in
+    // thousandths (as score_matrix.ScoreMatrixCell.format_errors).
+    function cellErrors(c) {
+        var k = function (e) { return e === null || e === undefined ? null : Math.round(e * 1000); };
+        var a = String(c.best_action || '').toUpperCase();
+        var shown = a === 'D/T' ? [c.error_no_double, c.error_pass]
+            : a === 'D/P' ? [c.error_no_double, c.error_double]
+            : [c.error_double, c.error_pass];
+        if (shown[0] === null && shown[1] === null) return null;
+        return shown.map(function (e) { return k(e) || 0; });
+    }
+
+    function cellEquities(c) {
+        return c.equity_no_double !== null && c.equity_no_double !== undefined &&
+            c.equity_double_take !== null && c.equity_double_take !== undefined;
+    }
+
+    function matrixCell(c, current, equities) {
+        var errors = cellErrors(c);
+        var td = el('td', 'extra-cell extra-cell--' + actionClass(c.best_action));
+        if (errors && Math.min(errors[0], errors[1]) < 20) td.classList.add('is-close');
+        if (current) td.classList.add('is-current');
+        td.appendChild(el('span', 'extra-cell__action', c.best_action));
+        if (equities && cellEquities(c)) {
+            td.appendChild(el('span', 'extra-cell__errors', fmtError(c.equity_no_double)));
+            td.appendChild(el('span', 'extra-cell__errors', fmtError(c.equity_double_take)));
+        } else {
+            td.appendChild(el('span', 'extra-cell__errors', errors ? errors.join('/') : '—'));
+        }
+        if (cellEquities(c)) {
+            td.title = 'No double ' + fmtError(c.equity_no_double) + ', double/take ' + fmtError(c.equity_double_take);
+        }
+        return td;
+    }
+
+    function valueSwitch(on, onPick) {
+        var seg = el('div', 'app-seg study-extra__switch');
+        seg.setAttribute('role', 'group');
+        seg.setAttribute('aria-label', 'Cells show');
+        [['errors', 'Errors'], ['equities', 'Equities']].forEach(function (o) {
+            var b = el('button', 'app-seg__btn' + (o[0] === on ? ' app-seg__btn--on' : ''), o[1]);
+            b.type = 'button';
+            b.setAttribute('aria-pressed', o[0] === on);
+            b.addEventListener('click', function () { if (o[0] !== on) onPick(o[0]); });
+            seg.appendChild(b);
+        });
+        return seg;
+    }
+
+    function extraSection(title, analysis) {
+        var box = el('section', 'study-extra');
+        var h = el('h3', 'study-extra__title', title);
+        if (analysis) h.appendChild(el('span', 'study-extra__depth', analysis));
+        box.appendChild(h);
+        return box;
+    }
+
+    function renderScoreMatrix(m, d, item) {
+        var box = extraSection(d.cube_value > 1 ? 'Score matrix: redouble to ' + d.cube_value * 2 : 'Score matrix: initial double', m.analysis);
+        var cells = [].concat.apply([], m.cells);
+        if (m.unlimited) cells = cells.concat([m.unlimited.no_jacoby, m.unlimited.jacoby].filter(Boolean));
+        var canSwitch = cells.every(cellEquities);
+        var equities = canSwitch && settings.matrixValues === 'equities';
+        if (canSwitch) {
+            box.querySelector('.study-extra__title').appendChild(valueSwitch(equities ? 'equities' : 'errors', function (v) {
+                saveView({ matrixValues: v });
+                renderExtras(item);
+            }));
+        }
+        var scroll = el('div', 'study-extra__scroll');
+        var table = el('table', 'extra-matrix');
+        var head = el('tr');
+        head.appendChild(el('th', 'extra-matrix__corner'));
+        (m.cells[0] || []).forEach(function (c) { head.appendChild(el('th', null, c.opponent_away + 'a')); });
+        table.appendChild(head);
+        m.cells.forEach(function (row) {
+            var tr = el('tr');
+            tr.appendChild(el('th', null, row[0].player_away + 'a'));
+            row.forEach(function (c) {
+                var current = m.current && m.current.player_away === c.player_away && m.current.opponent_away === c.opponent_away;
+                tr.appendChild(matrixCell(c, current, equities));
+            });
+            table.appendChild(tr);
+        });
+        scroll.appendChild(table);
+        box.appendChild(scroll);
+        if (m.unlimited && m.unlimited.no_jacoby) {
+            var u = el('table', 'extra-matrix extra-matrix--unlimited');
+            var uh = el('tr');
+            uh.appendChild(el('th'));
+            uh.appendChild(el('th', null, m.unlimited.jacoby ? 'No Jacoby' : 'No beavers'));
+            if (m.unlimited.jacoby) uh.appendChild(el('th', null, 'Jacoby'));
+            u.appendChild(uh);
+            var ur = el('tr');
+            ur.appendChild(el('th', null, 'Unlimited'));
+            ur.appendChild(matrixCell(m.unlimited.no_jacoby, false, equities));
+            if (m.unlimited.jacoby) ur.appendChild(matrixCell(m.unlimited.jacoby, false, equities));
+            u.appendChild(ur);
+            box.appendChild(u);
+        }
+        var what = equities
+            ? 'Each cell has the best action, then the no-double and double/take equities.'
+            : 'Each cell has the best action and the errors of the other two, in thousandths; paler cells are close.';
+        box.appendChild(el('p', 'study-extra__note', m.projection
+            ? 'An unlimited game, shown as if it were a match at each score. ' + what
+            : 'Rows are your score, columns your opponent\'s, in points away. ' + what));
+        if (m.caption) box.appendChild(el('p', 'study-extra__note', m.caption));
+        return box;
+    }
+
+    var SCORE_TYPES = {
+        'Neutral': 'Neutral (7-point match, 0-0)',
+        'DMP': 'Double match point',
+        'G-Save': 'Gammon-save (ahead 2-1 to 3, Crawford)',
+        'G-Go': 'Gammon-go (behind 1-2 to 3, Crawford)',
+        'Player': 'You own the cube',
+        'Opponent': 'Opponent owns the cube'
+    };
+
+    function renderMoveColumns(title, columns, key, analysis, note) {
+        var box = extraSection(title, analysis);
+        var list = el('div', 'extra-moves');
+        columns.forEach(function (col) {
+            var name = col[key];
+            var card = el('div', 'extra-moves__col');
+            card.appendChild(el('h4', 'extra-moves__head', key === 'cube_type' && name === 'Neutral' ? 'Centered cube' : (SCORE_TYPES[name] || name)));
+            col.top_moves.forEach(function (m) {
+                var line = el('p', 'extra-moves__line' + (m.rank === 1 ? ' is-best' : ''));
+                line.appendChild(el('span', 'extra-moves__move', m.notation));
+                line.appendChild(el('span', 'extra-moves__err', m.rank === 1 ? '' : (-Math.abs(m.error)).toFixed(3)));
+                card.appendChild(line);
+            });
+            list.appendChild(card);
+        });
+        box.appendChild(list);
+        if (note) box.appendChild(el('p', 'study-extra__note', note));
+        return box;
+    }
+
+    function renderExtras(item) {
+        var box = $('study-extras');
+        box.textContent = '';
+        var x = item.extras || {};
+        var d = item.decision;
+        if (x.score_matrix && x.score_matrix.cells && x.score_matrix.cells.length) box.appendChild(renderScoreMatrix(x.score_matrix, d, item));
+        if (x.move_score_matrix && x.move_score_matrix.columns) {
+            box.appendChild(renderMoveColumns('Best moves by score', x.move_score_matrix.columns, 'score_type', x.move_score_matrix.analysis));
+        }
+        if (x.cube_matrix && x.cube_matrix.best_move_differs) {
+            box.appendChild(renderMoveColumns('The best move depends on the cube', x.cube_matrix.columns, 'cube_type', x.cube_matrix.analysis,
+                'With a 2-cube when one player owns it, or the position\'s own cube when it is already owned.'));
+        }
+        box.hidden = !box.childNodes.length;
     }
 
     function renderNote(d) {
@@ -638,28 +865,68 @@
             var after = Moves.applyNotation(cur.parsed.position, m.notation);
             return after && Moves.key(after) === played;
         })[0];
-        cur.result = { pos: play.pos, notation: Moves.formatPlay(play.paths) };
+        cur.result = { pos: play.pos, notation: Moves.formatPlay(play.paths), played: true };
         cur.picked = match || { notation: cur.result.notation, equity: null, error: null, rank: Infinity, unlisted: true };
         cur.verdict = match ? D.verdict(d, match) : 'wrong';
         if (session.mode === 'review') reveal();
         else drillAnswer();
     }
 
-    function showViews(which) {
+    function movePos(cur, move) {
+        if (move === cur.picked && cur.result) return cur.result.pos;
+        return Moves.applyNotation(cur.parsed.position, move.notation);
+    }
+
+    // Once answered, the board replays any move from the start position.
+    function startDisplay() {
         var cur = session.current;
         if (board) board.destroy();
         board = null;
-        var start = cur.parsed.position;
-        var best = Moves.applyNotation(start, cur.question.best.notation);
-        var views = { start: start, yours: cur.result && cur.result.pos, best: best };
+        var meta = cur.parsed.metadata;
+        if (meta.dice) {
+            board = window.TrainBoard.create($('study-board'), {
+                position: cur.parsed.position, metadata: meta, dice: meta.dice,
+                scheme: settings.scheme, swap: settings.swap, orientation: cur.orientation, display: true
+            });
+        }
+        cur.display = board;
         $('study-views').hidden = false;
         $('view-yours').hidden = !cur.result;
-        ['start', 'yours', 'best'].forEach(function (v) {
-            var btn = $('view-' + v);
-            btn.classList.toggle('app-seg__btn--on', v === which);
-            btn.setAttribute('aria-pressed', v === which);
+    }
+
+    function markShown() {
+        var cur = session.current;
+        (cur.rows || []).forEach(function (r) {
+            r.tr.classList.toggle('is-shown', r.move === cur.shown);
+            if (r.move === cur.shown) r.tr.setAttribute('aria-current', 'true');
+            else r.tr.removeAttribute('aria-current');
         });
-        drawBoard(views[which] || start);
+    }
+
+    // null shows the start position.
+    function showMove(move, animate) {
+        var cur = session.current;
+        cur.shown = move || null;
+        var pos = move ? movePos(cur, move) : null;
+        if (cur.display) cur.display.show(pos, animate);
+        else drawBoard(pos || cur.parsed.position);
+        var on = { start: !move, yours: !!move && move === cur.picked, best: !!move && move === cur.question.best };
+        ['start', 'yours', 'best'].forEach(function (v) {
+            $('view-' + v).classList.toggle('app-seg__btn--on', on[v]);
+            $('view-' + v).setAttribute('aria-pressed', on[v]);
+        });
+        markShown();
+        renderChances(cur.item.decision, move);
+    }
+
+    function stepShown(delta) {
+        var cur = session.current;
+        if (!cur.display || !cur.rows || !cur.rows.length) return false;
+        var i = -1;
+        cur.rows.forEach(function (r, n) { if (r.move === cur.shown) i = n; });
+        var next = i < 0 ? 0 : Math.max(0, Math.min(cur.rows.length - 1, i + delta));
+        showMove(cur.rows[next].move, true);
+        return true;
     }
 
     function markChoices(cur) {
@@ -676,13 +943,23 @@
         var d = cur.item.decision;
         markChoices(cur);
         $('study-play').hidden = true;
-        if (!cur.question.cube) showViews(cur.result ? 'yours' : 'best');
+        cur.display = null;
+        cur.shown = null;
+        if (!cur.question.cube) startDisplay();
         var verdict = $('study-verdict');
         verdict.textContent = verdictText(cur);
         verdict.dataset.verdict = cur.verdict;
         renderAnalysis(d);
-        renderChances(d);
+        if (cur.question.cube) {
+            renderChances(d);
+        } else {
+            // A move just made on the board is already there to see.
+            var justPlayed = cur.result && cur.result.played && session.mode !== 'missed';
+            showMove(cur.result ? cur.picked : cur.question.best, !justPlayed);
+        }
         renderNote(d);
+        $('study-editor').href = '/tools/position-editor#' + encodeURIComponent(cur.item.xgid);
+        renderExtras(cur.item);
         $('study-skip').hidden = true;
         $('study-answer').hidden = false;
         var review = session.mode === 'review';
@@ -1042,13 +1319,13 @@
 
     function saveSettings() {
         var n = parseInt($('set-new').value, 10);
-        settings = {
+        settings = Object.assign({}, settings, {
             scheme: $('set-scheme').value,
             orientation: $('set-orientation').value,
             swap: $('set-swap').checked,
             newPerDay: isFinite(n) && n >= 0 ? Math.min(n, 9999) : DEFAULTS.newPerDay,
             answerMode: $('set-answer').value
-        };
+        });
         Store.setMeta('settings', settings).then(refresh);
     }
 
@@ -1146,12 +1423,30 @@
 
     // ── Events ─────────────────────────────────────────────────────────
 
-    $('study-all').addEventListener('click', function () { startSession(null); });
+    $('study-all').addEventListener('click', function () { startSession(null, !!$('study-all').dataset.ahead); });
     $('drill-streak').addEventListener('click', function () { startDrill('streak', $('drill-deck').value); });
     $('drill-storm').addEventListener('click', function () { startDrill('storm', $('drill-deck').value); });
     $('study-drill-end').addEventListener('click', finishDrill);
     ['start', 'yours', 'best'].forEach(function (v) {
-        $('view-' + v).addEventListener('click', function () { if (session && session.current) showViews(v); });
+        $('view-' + v).addEventListener('click', function () {
+            var cur = session && session.current;
+            if (!cur || !cur.verdict) return;
+            showMove(v === 'start' ? null : v === 'yours' ? cur.picked : cur.question.best, v !== 'start');
+        });
+    });
+    $('study-copy').addEventListener('click', function () {
+        var cur = session && session.current;
+        if (!cur) return;
+        var btn = $('study-copy');
+        var say = function (text) {
+            btn.textContent = text;
+            setTimeout(function () { btn.textContent = 'Copy XGID'; }, 1500);
+        };
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            say('Copy failed');
+            return;
+        }
+        navigator.clipboard.writeText(cur.item.xgid).then(function () { say('Copied'); }, function () { say('Copy failed'); });
     });
     $('miss-prev').addEventListener('click', function () { if (session) openMiss(session.index - 1); });
     $('miss-next').addEventListener('click', function () { if (session) openMiss(session.index + 1); });
@@ -1188,6 +1483,10 @@
         }
         var cur = session.current;
         var key = e.key.toUpperCase();
+        if (cur.verdict && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) {
+            if (stepShown(e.key === 'ArrowDown' ? 1 : -1)) e.preventDefault();
+            return;
+        }
         if (cur.play && !cur.verdict) {
             if (e.key === ' ') { e.preventDefault(); if (board) board.dice(); }
             else if (e.key === 'Backspace' || key === 'X') { e.preventDefault(); if (board) board.undo(); }

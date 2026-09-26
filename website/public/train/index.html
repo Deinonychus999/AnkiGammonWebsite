@@ -163,11 +163,17 @@
 
                         <div class="study-answer" id="study-answer" hidden>
                             <p class="study-verdict" id="study-verdict" role="status"></p>
+                            <p class="study-analysis-hint" id="study-analysis-hint" hidden>Tap a move to see it on the board, or use the &uarr; and &darr; keys.</p>
                             <table class="study-analysis" id="study-analysis"></table>
                             <button class="app-link-btn study-more" id="study-all-moves" type="button" hidden></button>
                             <div class="study-chances" id="study-chances"></div>
+                            <div class="study-extras" id="study-extras" hidden></div>
                             <div class="study-note" id="study-note"></div>
                             <p class="study-source" id="study-source"></p>
+                            <p class="study-tools">
+                                <button class="app-link-btn" id="study-copy" type="button">Copy XGID</button>
+                                <a class="app-link-btn" id="study-editor" href="/tools/position-editor" target="_blank" rel="noopener">Open in the position editor</a>
+                            </p>
                             <button class="btn btn-primary study-drill-end" id="study-drill-end" type="button" hidden>See results</button>
                             <div class="study-miss-nav" id="study-miss-nav" hidden>
                                 <button class="btn btn-secondary btn-sm" id="miss-prev" type="button">&larr; Previous</button>
@@ -302,7 +308,7 @@
             <h2>How it works</h2>
             <ul>
                 <li><strong>Pick the play.</strong> Each position asks for the best move or cube action, like the AnkiGammon Anki cards.</li>
-                <li><strong>See the analysis.</strong> The answer shows every candidate with its equity, the winning chances and any notes.</li>
+                <li><strong>See the analysis.</strong> The answer shows every candidate with its equity, the winning chances and any notes. Tap a move to see it played on the board.</li>
                 <li><strong>The trainer grades you.</strong> The best play counts as <em>Good</em>, a checker play within 0.020 as <em>Hard</em>, anything else as <em>Again</em>. Change the grade before moving on if you disagree.</li>
                 <li><strong>It schedules the reviews.</strong> The trainer uses FSRS, the same scheduler modern Anki uses, so positions you know come back less and less often.</li>
                 <li><strong>Drills</strong> are for speed: Blunder Streak ends at your first miss, and Storm gives you three minutes. They don't change the review schedule.</li>

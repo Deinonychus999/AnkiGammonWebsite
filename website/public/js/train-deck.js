@@ -56,7 +56,10 @@
             var id = deck.id + '|' + xgid;
             if (seen[id]) return;
             seen[id] = true;
-            items.push({ id: id, deckId: deck.id, xgid: xgid, tags: p.tags || [], decision: decision });
+            var item = { id: id, deckId: deck.id, xgid: xgid, tags: p.tags || [], decision: decision };
+            // The desktop app's score matrices and cube comparison, when it sent them
+            if (p.extras && typeof p.extras === 'object') item.extras = p.extras;
+            items.push(item);
         });
         deck.count = items.length;
         return { deck: deck, items: items, skipped: skipped };

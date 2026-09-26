@@ -49,7 +49,8 @@
      * Makes `container` a board for playing `options.dice` in
      * `options.position` (position-parser.js's, with the player on roll as O).
      * options.onChange(state) runs after every move, options.onSubmit(state)
-     * when the player submits; state is { pos, paths, complete }.
+     * when the player submits; state is { pos, paths, complete }. With
+     * options.display the board takes no input and show() replays moves.
      */
     function create(container, options) {
         var start = options.position;
@@ -78,7 +79,7 @@
         // drawn without the checkers still in flight, which glide above it.
         var flights = [];
         var press = null;
-        var done = false;
+        var done = !!options.display;
 
         function hopsPlayed() {
             return state.paths.reduce(function (n, path) { return n + path.length; }, 0);
@@ -623,12 +624,39 @@
             if (press && press.dragging) e.preventDefault();
         }
 
-        container.addEventListener('pointerdown', onDown);
-        container.addEventListener('pointermove', onMove);
-        container.addEventListener('pointerup', onUp);
-        container.addEventListener('pointercancel', onCancel);
-        container.addEventListener('contextmenu', onContext);
-        container.addEventListener('touchmove', onTouchMove, { passive: false });
+        // Checker by checker: a hop that starts where an earlier one ended
+        // continues that checker's path.
+        function byChecker(hops) {
+            var paths = [];
+            hops.forEach(function (h) {
+                var path = paths.filter(function (p) { return p[p.length - 1].to === h.from; })[0];
+                if (path) path.push(h);
+                else paths.push([h]);
+            });
+            return paths;
+        }
+
+        // The start position, then the legal play that ends in `pos` played
+        // out on it.
+        function show(pos, animate) {
+            stopGlide();
+            state.pos = start;
+            state.remaining = M.diceList(dice);
+            state.paths = [];
+            state.history = [];
+            var line = pos && legal.filter(function (e) { return M.key(e.pos) === M.key(pos); })[0];
+            if (line) play(byChecker(line.hops), animate);
+            else render();
+        }
+
+        if (!options.display) {
+            container.addEventListener('pointerdown', onDown);
+            container.addEventListener('pointermove', onMove);
+            container.addEventListener('pointerup', onUp);
+            container.addEventListener('pointercancel', onCancel);
+            container.addEventListener('contextmenu', onContext);
+            container.addEventListener('touchmove', onTouchMove, { passive: false });
+        }
 
         render();
 
@@ -638,8 +666,10 @@
             // Space does what clicking the dice does.
             dice: function () { if (!done) tapDice(); },
             state: snapshot,
+            show: show,
             destroy: function () {
                 done = true;
+                flights.forEach(function (f) { f.alive = false; });
                 container.removeEventListener('pointerdown', onDown);
                 container.removeEventListener('pointermove', onMove);
                 container.removeEventListener('pointerup', onUp);

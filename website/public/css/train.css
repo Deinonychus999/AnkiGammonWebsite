@@ -552,6 +552,47 @@
     background: var(--bg-surface);
 }
 
+.study-analysis tr.is-clickable {
+    cursor: pointer;
+}
+
+.study-analysis tr.is-clickable:hover td {
+    background: var(--bg-elevated);
+}
+
+.study-analysis tr.is-clickable:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: -2px;
+}
+
+.study-analysis tr.is-shown td {
+    background: rgba(91, 157, 217, 0.16);
+}
+
+.study-analysis tr.is-shown td:first-child {
+    font-weight: 700;
+}
+
+.study-analysis-hint {
+    margin: var(--space-md) 0 var(--space-xs);
+    color: var(--text-dim);
+    font-size: 0.8em;
+}
+
+.study-eqtoggle {
+    padding: 0;
+    background: none;
+    border: none;
+    border-bottom: 1px dashed currentColor;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.study-eqtoggle:hover {
+    color: var(--text-primary);
+}
+
 .study-analysis tr[data-severity="small"] td:last-child {
     color: var(--text-secondary);
 }
@@ -601,26 +642,196 @@
     font-size: 0.8em;
 }
 
+/* Laid out like the move table above it */
 .study-chances__table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.85em;
+    font-size: 0.9em;
     font-variant-numeric: tabular-nums;
 }
 
 .study-chances__table th,
 .study-chances__table td {
-    padding: 2px var(--space-sm);
+    padding: var(--space-sm);
+    border-bottom: 1px solid var(--border);
     text-align: right;
 }
 
-.study-chances__table th {
+.study-chances__table tr:first-child th {
+    padding: var(--space-xs) var(--space-sm);
+    color: var(--text-dim);
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.study-chances__cubeless {
+    margin: var(--space-sm) 0 0;
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    font-variant-numeric: tabular-nums;
+}
+
+.study-chances__table tr > th:first-child {
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-align: left;
+}
+
+/* Score matrices and cube comparison from the desktop app, coloured like
+   the Anki card's */
+.study-extra {
+    margin-top: var(--space-lg);
+}
+
+.study-extra__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) 0;
+    margin: 0 0 var(--space-sm);
+    font-size: 0.95em;
+}
+
+.study-extra__depth {
+    margin-left: var(--space-sm);
+    color: var(--text-dim);
+    font-size: 0.85em;
+    font-weight: 400;
+}
+
+.study-extra__scroll {
+    overflow-x: auto;
+}
+
+.extra-matrix {
+    width: 100%;
+    max-width: 560px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 2px;
+    font-size: 0.78em;
+    font-variant-numeric: tabular-nums;
+}
+
+.extra-matrix th {
+    padding: 2px 0;
     color: var(--text-dim);
     font-weight: 500;
 }
 
-.study-chances__table tr > th:first-child {
-    text-align: left;
+.extra-matrix__corner {
+    width: 2.2em;
+}
+
+.extra-cell {
+    padding: 4px 1px;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.extra-cell__action {
+    display: block;
+    font-weight: 700;
+}
+
+.extra-cell__errors {
+    display: block;
+    font-size: 0.8em;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    opacity: 0.8;
+}
+
+.extra-cell--dt { background: rgba(76, 175, 80, 0.4); }
+.extra-cell--dp { background: rgba(255, 152, 0, 0.4); }
+.extra-cell--nd { background: rgba(33, 150, 243, 0.4); }
+.extra-cell--tg { background: rgba(156, 39, 176, 0.4); }
+.extra-cell--none { background: rgba(158, 158, 158, 0.25); color: var(--text-secondary); }
+.extra-cell--dt.is-close { background: rgba(76, 175, 80, 0.15); }
+.extra-cell--dp.is-close { background: rgba(255, 152, 0, 0.15); }
+.extra-cell--nd.is-close { background: rgba(33, 150, 243, 0.15); }
+.extra-cell--tg.is-close { background: rgba(156, 39, 176, 0.15); }
+
+.extra-cell.is-current {
+    outline: 2px solid var(--text-primary);
+    outline-offset: -2px;
+}
+
+.extra-matrix--unlimited {
+    width: auto;
+    table-layout: auto;
+    margin-top: var(--space-sm);
+}
+
+.extra-matrix--unlimited .extra-cell {
+    min-width: 72px;
+}
+
+.study-extra__switch {
+    margin-left: auto;
+}
+
+.study-extra__switch .app-seg__btn {
+    padding: 2px var(--space-sm);
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.study-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin: var(--space-sm) 0 0;
+    font-size: 0.85em;
+}
+
+.study-extra__note {
+    margin: var(--space-xs) 0 0;
+    color: var(--text-dim);
+    font-size: 0.78em;
+}
+
+.extra-moves {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-sm);
+}
+
+.extra-moves__col {
+    padding: var(--space-sm);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-elevated);
+}
+
+.extra-moves__head {
+    margin: 0 0 var(--space-xs);
+    color: var(--text-secondary);
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.extra-moves__line {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin: 0;
+    font-size: 0.82em;
+}
+
+.extra-moves__move {
+    font-family: var(--font-code);
+}
+
+.extra-moves__line.is-best .extra-moves__move {
+    font-weight: 700;
+}
+
+.extra-moves__err {
+    color: var(--accent-danger);
+    font-variant-numeric: tabular-nums;
 }
 
 .study-note {
