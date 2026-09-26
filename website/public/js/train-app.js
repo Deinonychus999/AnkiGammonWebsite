@@ -16,13 +16,14 @@
     var LEARN_AHEAD_MS = 20 * 60 * 1000;
     // Anki's default: a late-night session still counts toward the day before.
     var DAY_CUTOFF_HOURS = 4;
-    var DEFAULTS = { scheme: 'classic', orientation: 'ccw', swap: false, newPerDay: 20 };
+    var DEFAULTS = { scheme: 'classic', orientation: 'ccw', swap: false, newPerDay: 20, answerMode: 'board' };
     var STORM_MS = 3 * 60 * 1000;
     var STORM_PENALTY_MS = 10 * 1000;
     var MISSED_SHOWN = 20;
     var LETTERS = 'ABCDEFGHIJ';
 
     var D = window.TrainDeck;
+    var Moves = window.TrainMoves;
     var Store = window.TrainStore;
     var Rating = D.Rating;
     var scheduler = window.FSRS.fsrs({ enable_fuzz: true });
@@ -427,7 +428,23 @@
         var cur = session.current;
         var q = cur.question;
         var parsed = window.PositionParser.parse(cur.item.xgid);
-        $('study-board').innerHTML = window.BoardRenderer.render(parsed.position, parsed.metadata, settings.scheme, settings.swap, orientation());
+        cur.orientation = orientation();
+        cur.parsed = parsed;
+        if (board) board.destroy();
+        board = null;
+        if (!q.cube && settings.answerMode !== 'list' && session.mode !== 'missed' && parsed.metadata.dice) {
+            board = window.TrainBoard.create($('study-board'), {
+                position: parsed.position, metadata: parsed.metadata, dice: parsed.metadata.dice,
+                scheme: settings.scheme, swap: settings.swap, orientation: cur.orientation,
+                onChange: showPlayState, onSubmit: submitPlay
+            });
+        }
+        cur.play = !!board;
+        $('study-choices').hidden = cur.play || (session.mode === 'missed' && !!cur.result);
+        $('study-play').hidden = !cur.play;
+        $('study-views').hidden = true;
+        if (cur.play) showPlayState(board.state());
+        else drawBoard(parsed.position);
         $('study-context').textContent = contextLine(parsed.metadata);
         var dice = parsed.metadata.dice;
         $('study-prompt').textContent = q.cube || !dice ? q.prompt : 'You rolled ' + dice[0] + '-' + dice[1] + '. ' + q.prompt;
@@ -472,6 +489,10 @@
         var d = cur.item.decision;
         var best = q.best.notation;
         if (!cur.picked) return (q.cube ? 'The best action is ' : 'The best move is ') + best + '.';
+        if (cur.picked.unlisted) {
+            return cur.picked.notation + " isn't among the moves XG analysed, so it costs at least " +
+                unlistedFloor(d).toFixed(3) + '. The best move is ' + best + '.';
+        }
         if (cur.verdict === 'best') return q.cube ? 'Correct: ' + best + '.' : 'Best move.';
         if (cur.verdict === 'close') {
             return 'Close: ' + cur.picked.notation + ' is ' + D.answerError(d, cur.picked).toFixed(3) + ' behind ' + best + '.';
@@ -490,7 +511,7 @@
         table.appendChild(thead);
         var body = el('tbody');
         var picked = session.current.picked;
-        D.analysisRows(d, all).forEach(function (row) {
+        D.analysisRows(d, all, picked).forEach(function (row) {
             var tr = el('tr');
             if (row.best) tr.classList.add('is-best');
             if (row.move === picked) tr.classList.add('is-picked');
@@ -584,6 +605,63 @@
         if (focus) focus.focus({ preventScroll: true });
     }
 
+    // ── Playing the move on the board ──────────────────────────────────
+
+    function drawBoard(pos, overlay) {
+        var cur = session.current;
+        var svg = window.BoardRenderer.render(pos, cur.parsed.metadata, settings.scheme, settings.swap, cur.orientation);
+        $('study-board').innerHTML = overlay ? svg.replace(/<\/svg>\s*$/, overlay + '</svg>') : svg;
+    }
+
+    var board = null;
+
+    function showPlayState(play) {
+        $('study-play-move').textContent = play.paths.length ? Moves.formatPlay(play.paths) : '';
+        $('study-play-hint').textContent = play.complete
+            ? 'Move complete: tap the dice (or press Space) to submit it, or Undo.'
+            : 'Tap a checker to play a die, or drag it. Tap the dice to swap their order.';
+    }
+
+    // A move the candidates don't include ranks below every one of them.
+    function unlistedFloor(decision) {
+        return decision.candidate_moves.reduce(function (worst, m) {
+            return Math.max(worst, Math.abs(m.error || 0));
+        }, 0);
+    }
+
+    function submitPlay(play) {
+        var cur = session && session.current;
+        if (!cur || !cur.play || cur.verdict || !play.complete) return;
+        var d = cur.item.decision;
+        var played = Moves.key(play.pos);
+        var match = d.candidate_moves.filter(function (m) {
+            var after = Moves.applyNotation(cur.parsed.position, m.notation);
+            return after && Moves.key(after) === played;
+        })[0];
+        cur.result = { pos: play.pos, notation: Moves.formatPlay(play.paths) };
+        cur.picked = match || { notation: cur.result.notation, equity: null, error: null, rank: Infinity, unlisted: true };
+        cur.verdict = match ? D.verdict(d, match) : 'wrong';
+        if (session.mode === 'review') reveal();
+        else drillAnswer();
+    }
+
+    function showViews(which) {
+        var cur = session.current;
+        if (board) board.destroy();
+        board = null;
+        var start = cur.parsed.position;
+        var best = Moves.applyNotation(start, cur.question.best.notation);
+        var views = { start: start, yours: cur.result && cur.result.pos, best: best };
+        $('study-views').hidden = false;
+        $('view-yours').hidden = !cur.result;
+        ['start', 'yours', 'best'].forEach(function (v) {
+            var btn = $('view-' + v);
+            btn.classList.toggle('app-seg__btn--on', v === which);
+            btn.setAttribute('aria-pressed', v === which);
+        });
+        drawBoard(views[which] || start);
+    }
+
     function markChoices(cur) {
         var bestIndex = cur.question.choices.indexOf(cur.question.best);
         Array.prototype.forEach.call(document.querySelectorAll('#study-choices .study-choice'), function (btn, i) {
@@ -597,6 +675,8 @@
         var cur = session.current;
         var d = cur.item.decision;
         markChoices(cur);
+        $('study-play').hidden = true;
+        if (!cur.question.cube) showViews(cur.result ? 'yours' : 'best');
         var verdict = $('study-verdict');
         verdict.textContent = verdictText(cur);
         verdict.dataset.verdict = cur.verdict;
@@ -620,6 +700,10 @@
         if (!cur || cur.verdict) return;
         cur.picked = cur.question.choices[i];
         cur.verdict = D.verdict(cur.item.decision, cur.picked);
+        if (!cur.question.cube) {
+            var after = Moves.applyNotation(cur.parsed.position, cur.picked.notation);
+            if (after) cur.result = { pos: after, notation: cur.picked.notation };
+        }
         if (session.mode === 'review') reveal();
         else drillAnswer();
     }
@@ -780,6 +864,7 @@
     // Cube actions have no "close" answer, so their loss is the picked
     // action's error as the analysis gives it.
     function equityLost(cur) {
+        if (cur.picked.unlisted) return unlistedFloor(cur.item.decision);
         var err = D.answerError(cur.item.decision, cur.picked);
         return err !== null ? err : Math.abs(cur.picked.error || 0);
     }
@@ -793,7 +878,7 @@
         s.lost += lost;
         if (kept) s.score++;
         if (cur.verdict === 'best') s.best++;
-        if (!kept) s.missed.push({ item: cur.item, question: cur.question, picked: cur.picked, verdict: cur.verdict, lost: lost });
+        if (!kept) s.missed.push({ item: cur.item, question: cur.question, picked: cur.picked, verdict: cur.verdict, lost: lost, result: cur.result });
         markChoices(cur);
         renderDrillStatus();
         if (s.mode === 'streak' && !kept) {
@@ -833,7 +918,8 @@
             text.appendChild(el('span', 'missed-card__line missed-card__line--you', 'You: ' + m.picked.notation));
             text.appendChild(el('span', 'missed-card__line', 'Best: ' + m.question.best.notation));
             // A "too good" cube miss can cost no equity and still be the wrong action.
-            text.appendChild(el('span', 'missed-card__lost', m.lost < 0.0005 ? 'Same equity, wrong action' : '−' + m.lost.toFixed(3)));
+            text.appendChild(el('span', 'missed-card__lost', m.picked.unlisted ? '−' + m.lost.toFixed(3) + ' or worse'
+                : m.lost < 0.0005 ? 'Same equity, wrong action' : '−' + m.lost.toFixed(3)));
             card.appendChild(text);
             card.setAttribute('aria-label', 'Review this position: you played ' + m.picked.notation + ', best was ' + m.question.best.notation);
             card.addEventListener('click', function () { openMiss(i); });
@@ -846,7 +932,7 @@
         var m = lastMissed[index];
         if (!m) return;
         session = { mode: 'missed', misses: lastMissed, index: index, title: $('done-title').textContent + ' · missed positions',
-                    current: { item: m.item, question: m.question, picked: m.picked, verdict: m.verdict } };
+                    current: { item: m.item, question: m.question, picked: m.picked, verdict: m.verdict, result: m.result } };
         $('study-deck').textContent = session.title;
         if (view !== 'study') showView('study');
         renderCard();
@@ -909,6 +995,8 @@
     }
 
     function leaveStudy() {
+        if (board) board.destroy();
+        board = null;
         if (session && session.timer) clearInterval(session.timer);
         $('storm-meter').hidden = true;
         session = null;
@@ -948,6 +1036,7 @@
             $('set-orientation').value = settings.orientation;
             $('set-swap').checked = !!settings.swap;
             $('set-new').value = settings.newPerDay;
+            $('set-answer').value = settings.answerMode;
         });
     }
 
@@ -957,7 +1046,8 @@
             scheme: $('set-scheme').value,
             orientation: $('set-orientation').value,
             swap: $('set-swap').checked,
-            newPerDay: isFinite(n) && n >= 0 ? Math.min(n, 9999) : DEFAULTS.newPerDay
+            newPerDay: isFinite(n) && n >= 0 ? Math.min(n, 9999) : DEFAULTS.newPerDay,
+            answerMode: $('set-answer').value
         };
         Store.setMeta('settings', settings).then(refresh);
     }
@@ -1060,6 +1150,9 @@
     $('drill-streak').addEventListener('click', function () { startDrill('streak', $('drill-deck').value); });
     $('drill-storm').addEventListener('click', function () { startDrill('storm', $('drill-deck').value); });
     $('study-drill-end').addEventListener('click', finishDrill);
+    ['start', 'yours', 'best'].forEach(function (v) {
+        $('view-' + v).addEventListener('click', function () { if (session && session.current) showViews(v); });
+    });
     $('miss-prev').addEventListener('click', function () { if (session) openMiss(session.index - 1); });
     $('miss-next').addEventListener('click', function () { if (session) openMiss(session.index + 1); });
     $('miss-back').addEventListener('click', backToResults);
@@ -1095,6 +1188,11 @@
         }
         var cur = session.current;
         var key = e.key.toUpperCase();
+        if (cur.play && !cur.verdict) {
+            if (e.key === ' ') { e.preventDefault(); if (board) board.dice(); }
+            else if (e.key === 'Backspace' || key === 'X') { e.preventDefault(); if (board) board.undo(); }
+            return;
+        }
         if (!cur.verdict) {
             var i = LETTERS.indexOf(key);
             if (i < 0 && /^[1-9]$/.test(key)) i = parseInt(key, 10) - 1;
@@ -1162,7 +1260,7 @@
         }).observe(nav);
     }
 
-    ['set-scheme', 'set-orientation', 'set-swap', 'set-new'].forEach(function (id) {
+    ['set-scheme', 'set-orientation', 'set-swap', 'set-new', 'set-answer'].forEach(function (id) {
         $(id).addEventListener('change', saveSettings);
     });
     $('backup-btn').addEventListener('click', downloadBackup);

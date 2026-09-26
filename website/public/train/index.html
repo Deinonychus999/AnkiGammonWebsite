@@ -150,6 +150,15 @@
                         <p class="study-context" id="study-context"></p>
                         <h2 class="study-prompt" id="study-prompt"></h2>
                         <div class="study-choices" id="study-choices"></div>
+                        <div class="study-play" id="study-play" hidden>
+                            <p class="study-play__hint" id="study-play-hint"></p>
+                            <p class="study-play__move" id="study-play-move"></p>
+                        </div>
+                        <div class="app-seg study-views" id="study-views" role="group" aria-label="Board shows" hidden>
+                            <button type="button" id="view-start" class="app-seg__btn">Start</button>
+                            <button type="button" id="view-yours" class="app-seg__btn">Your move</button>
+                            <button type="button" id="view-best" class="app-seg__btn">Best move</button>
+                        </div>
                         <button class="app-link-btn study-skip" id="study-skip" type="button">I don't know, show the answer</button>
 
                         <div class="study-answer" id="study-answer" hidden>
@@ -263,6 +272,13 @@
             <section class="app-dialog__section app-dialog__grid" aria-labelledby="settings-reviews">
                 <h3 class="app-dialog__heading" id="settings-reviews">Reviews</h3>
                 <label class="app-field">
+                    <span>Checker plays</span>
+                    <select id="set-answer">
+                        <option value="board">Move the checkers</option>
+                        <option value="list">Pick from a list</option>
+                    </select>
+                </label>
+                <label class="app-field">
                     <span>New positions per day</span>
                     <input id="set-new" type="number" min="0" max="9999" step="1" value="20" inputmode="numeric">
                 </label>
@@ -304,6 +320,8 @@
     <script src="../js/apkg-reader.js"></script>
     <script src="../js/vendor/ts-fsrs.umd.js"></script>
     <script src="../js/train-deck.js"></script>
+    <script src="../js/train-moves.js"></script>
+    <script src="../js/train-board.js"></script>
     <script src="../js/train-store.js"></script>
     <script src="../js/train-app.js"></script>
 </body>

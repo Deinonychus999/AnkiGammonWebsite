@@ -545,12 +545,53 @@
         };
     }
 
+    // Where things sit on a rendered board, in SVG units, for drawing on top
+    // of it: the n-th checker of a stack (0 at the edge) on a point, either
+    // player's half of the bar or the bottom player's tray, the dice, and
+    // the middle of the half the dice aren't on.
+    function geometry(orientation, onRoll) {
+        setLayout(orientation === 'cw');
+        var centerY = BY + BOARD_H / 2;
+        var barCX = boardX + HALF_W + BAR_W / 2;
+        var points = [];
+        for (var p = 1; p <= 24; p++) {
+            var pp = getPointPosition(p);
+            points[p] = { x: pp.x, w: POINT_W, yBase: pp.yBase, isTop: pp.isTop };
+        }
+        var tray = { x: bearoffX, y: centerY + 70, w: BEAROFF_W, h: BOARD_H / 2 - 80 };
+        var d = diceOrigin(onRoll || 'O');
+        var diceLeft = d.x < barCX;
+        return {
+            radius: CR,
+            step: STACK_STEP,
+            pointSlots: POINT_SLOTS,
+            centerY: centerY,
+            points: points,
+            tray: tray,
+            dice: [
+                { x: d.x, y: d.y, size: DIE_SIZE },
+                { x: d.x + DIE_SIZE + DIE_GAP, y: d.y, size: DIE_SIZE }
+            ],
+            otherHalf: { x: diceLeft ? boardX + HALF_W + BAR_W + HALF_W / 2 : boardX + HALF_W / 2, y: centerY },
+            checker: function (where, index) {
+                var i = Math.max(0, index);
+                if (where === 'barO') return { x: barCX, y: centerY - BAR_GAP - Math.min(i, BAR_SLOTS - 1) * STACK_STEP };
+                if (where === 'barX') return { x: barCX, y: centerY + BAR_GAP + Math.min(i, BAR_SLOTS - 1) * STACK_STEP };
+                if (where === 'off') return { x: tray.x + tray.w / 2, y: tray.y + tray.h / 2 };
+                var pt = points[where];
+                var slot = Math.min(i, POINT_SLOTS - 1);
+                return { x: pt.x + POINT_W / 2, y: pt.isTop ? pt.yBase + CR + slot * STACK_STEP : pt.yBase - CR - slot * STACK_STEP };
+            }
+        };
+    }
+
     // ── Public API ──────────────────────────────────────────────────────
 
     window.BoardRenderer = {
         render: render,
         hitTest: hitTest,
         pointAt: pointAt,
+        geometry: geometry,
         POINT_SLOTS: POINT_SLOTS,
         BAR_SLOTS: BAR_SLOTS,
         SCHEMES: SCHEMES

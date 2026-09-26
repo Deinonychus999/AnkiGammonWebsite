@@ -141,11 +141,15 @@
      * Rows for the analysis table, ordered and labelled like the card back:
      * XG's three cube rows with errors signed against the best of them, or
      * checker plays grouped by analysis depth, then by error. Checker plays
-     * are the ones the question offered unless `all` asks for every move
+     * are the ones the question offered, plus the move played in the game
+     * and `picked` when they rank lower, unless `all` asks for every move
      * the engine looked at, which for a position file can be dozens.
      */
-    function analysisRows(decision, all) {
-        var moves = isCube(decision) || all ? decision.candidate_moves : decision.candidate_moves.slice(0, MAX_CHOICES);
+    function analysisRows(decision, all, picked) {
+        var moves = decision.candidate_moves;
+        if (!isCube(decision) && !all) {
+            moves = moves.filter(function (m, i) { return i < MAX_CHOICES || m.was_played || m === picked; });
+        }
         var analysed = moves.filter(function (m) { return m.from_xg_analysis !== false; });
         var label = function (m) { return m.xg_notation || m.notation; };
         if (isCube(decision)) {

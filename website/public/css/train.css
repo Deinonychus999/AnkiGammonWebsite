@@ -453,6 +453,36 @@
     color: var(--text-primary);
 }
 
+.study-play {
+    padding: var(--space-md);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.study-play__hint {
+    margin: 0 0 var(--space-xs);
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+.study-play__move {
+    min-height: 1.5em;
+    margin: var(--space-xs) 0 0;
+    font-family: var(--font-code);
+    font-size: 1.05em;
+}
+
+.study-views {
+    margin-bottom: var(--space-md);
+}
+
+.study-board svg {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 .study-skip {
     margin-top: var(--space-md);
     color: var(--text-dim);
