@@ -162,6 +162,61 @@
     color: var(--text-secondary);
 }
 
+/* Drills */
+.trainer-drills {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+}
+
+.trainer-drill {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-lg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.trainer-drill__title {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-sm);
+}
+
+.trainer-drill__text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+.trainer-drill__best {
+    color: var(--accent-success);
+    font-size: 0.9rem;
+}
+
+.trainer-drill__best:empty {
+    display: none;
+}
+
+.trainer-drill-options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-sm) var(--space-lg);
+    margin-top: var(--space-md);
+}
+
+.trainer-drill-options .app-field {
+    min-width: 220px;
+}
+
+.trainer-drill-options__note {
+    margin: 0 0 var(--space-sm);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
 /* Adding decks */
 .trainer-add {
     display: grid;
@@ -375,8 +430,12 @@ body.is-studying .footer {
     transition: border-color 0.15s, background 0.15s;
 }
 
-.study-choice:hover:not(:disabled) {
-    border-color: var(--accent-primary);
+/* Touch screens keep :hover on the last tapped spot, which in a drill is
+   where the next position's button appears. */
+@media (hover: hover) {
+    .study-choice:hover:not(:disabled) {
+        border-color: var(--accent-primary);
+    }
 }
 
 .study-choice:disabled {
@@ -640,6 +699,50 @@ body.is-studying .footer {
     color: var(--text-secondary);
 }
 
+.trainer-done__missed {
+    max-width: 640px;
+    margin: var(--space-xl) auto 0;
+    text-align: left;
+}
+
+.trainer-done__more {
+    margin-top: var(--space-sm);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.trainer-done__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
+}
+
+.study-drill-end {
+    margin-top: var(--space-lg);
+    width: 100%;
+}
+
+.study-bar__left[data-drill] {
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.study-bar__left[data-urgent] {
+    color: var(--accent-warning);
+}
+
+.trainer-missed th + th {
+    text-align: left;
+}
+
+.trainer-missed th:last-child {
+    text-align: right;
+}
+
 /* Installed app: the site's navigation would leave the app */
 @media (display-mode: standalone) {
     .nav,
@@ -658,7 +761,8 @@ body.is-studying .footer {
         font-size: 1.75rem;
     }
 
-    .trainer-add {
+    .trainer-add,
+    .trainer-drills {
         grid-template-columns: minmax(0, 1fr);
     }
 

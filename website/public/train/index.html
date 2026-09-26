@@ -80,6 +80,31 @@
 
             <h2 class="trainer-h2" id="decks-heading" hidden>Your decks</h2>
             <ul class="trainer-decks" id="deck-list"></ul>
+            <section class="trainer-drills-section" id="drills" hidden aria-labelledby="drills-heading">
+                <h2 class="trainer-h2" id="drills-heading">Drills</h2>
+                <div class="trainer-drills">
+                    <div class="trainer-drill">
+                        <h3 class="trainer-drill__title">Blunder Streak</h3>
+                        <p class="trainer-drill__text">How many positions in a row can you get right? One miss ends the run. A checker play within 0.020 of the best keeps you going.</p>
+                        <p class="trainer-drill__best" id="best-streak"></p>
+                        <button class="btn btn-primary btn-sm" id="drill-streak" type="button">Start a streak</button>
+                    </div>
+                    <div class="trainer-drill">
+                        <h3 class="trainer-drill__title">Storm</h3>
+                        <p class="trainer-drill__text">Three minutes to get as many right as you can. Each miss costs 10 seconds.</p>
+                        <p class="trainer-drill__best" id="best-storm"></p>
+                        <button class="btn btn-primary btn-sm" id="drill-storm" type="button">Start a storm</button>
+                    </div>
+                </div>
+                <div class="trainer-drill-options">
+                    <label class="app-field">
+                        <span>Positions from</span>
+                        <select id="drill-deck"></select>
+                    </label>
+                    <p class="trainer-drill-options__note">Drills don't change your review schedule.</p>
+                </div>
+            </section>
+
             <p class="trainer-empty" id="deck-empty" hidden>No decks on this device yet. Add a community deck below, or open a deck you made with AnkiGammon.</p>
 
             <h2 class="trainer-h2">Add a deck</h2>
@@ -181,6 +206,7 @@
                     <div class="study-chances" id="study-chances"></div>
                     <div class="study-note" id="study-note"></div>
                     <p class="study-source" id="study-source"></p>
+                    <button class="btn btn-primary study-drill-end" id="study-drill-end" type="button" hidden>See results</button>
                     <div class="study-grades" id="study-grades" role="group" aria-label="How well did you know it?">
                         <button class="study-grade study-grade--again" type="button" data-rating="1"><span class="study-grade__name">Again</span><span class="study-grade__when"></span></button>
                         <button class="study-grade study-grade--hard" type="button" data-rating="2"><span class="study-grade__name">Hard</span><span class="study-grade__when"></span></button>
@@ -195,10 +221,18 @@
     <!-- Session done -->
     <section class="section trainer-done" id="view-done" hidden>
         <div class="container trainer-container">
-            <h2 class="trainer-h2">Session done</h2>
+            <h2 class="trainer-h2" id="done-title">Session done</h2>
             <p id="done-summary"></p>
             <p class="trainer-done__next" id="done-next"></p>
-            <button class="btn btn-primary" id="done-back" type="button">Back to decks</button>
+            <div class="trainer-done__missed" id="done-missed" hidden>
+                <h3 class="trainer-h3">Positions you missed</h3>
+                <table class="study-analysis trainer-missed" id="done-missed-table"></table>
+                <p class="trainer-done__more" id="done-missed-more"></p>
+            </div>
+            <div class="trainer-done__actions">
+                <button class="btn btn-primary" id="done-again" type="button" hidden>Play again</button>
+                <button class="btn btn-secondary" id="done-back" type="button">Back to decks</button>
+            </div>
         </div>
     </section>
 

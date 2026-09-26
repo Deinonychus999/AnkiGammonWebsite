@@ -17,6 +17,9 @@
     // Anki's default: a late-night session still counts toward the day before.
     var DAY_CUTOFF_HOURS = 4;
     var DEFAULTS = { scheme: 'classic', orientation: 'ccw', swap: false, newPerDay: 20 };
+    var STORM_MS = 3 * 60 * 1000;
+    var STORM_PENALTY_MS = 10 * 1000;
+    var MISSED_SHOWN = 20;
     var LETTERS = 'ABCDEFGHIJ';
 
     var D = window.TrainDeck;
@@ -30,6 +33,7 @@
     var decks = [];
     var progressById = {};
     var newToday = { day: '', count: 0 };
+    var bests = { streak: 0, storm: 0 };
 
     // ── Small helpers ──────────────────────────────────────────────────
 
@@ -175,15 +179,18 @@
             summary.textContent = plural(totalDue, 'review') + ' due and ' + plural(newShown, 'new position') + ' for today.';
         }
         $('study-all').disabled = !totalDue && !newShown;
+        renderDrills();
         renderCommunityState();
     }
 
     function refresh() {
-        return Promise.all([Store.decks(), Store.progress(), Store.getMeta('newToday', { day: '', count: 0 })]).then(function (r) {
+        return Promise.all([Store.decks(), Store.progress(), Store.getMeta('newToday', { day: '', count: 0 }),
+            Store.getMeta('bests', { streak: 0, storm: 0 })]).then(function (r) {
             decks = r[0];
             progressById = {};
             r[1].forEach(function (p) { progressById[p.id] = p; });
             newToday = r[2];
+            bests = r[3];
             renderHome();
         });
     }
@@ -356,7 +363,7 @@
                 return;
             }
             var title = deckId ? (decks.filter(function (d) { return d.id === deckId; })[0] || {}).title : 'All decks';
-            session = { deckId: deckId, title: title, queue: queue, learning: [], answered: 0, best: 0, current: null };
+            session = { mode: 'review', deckId: deckId, title: title, queue: queue, learning: [], answered: 0, best: 0, current: null };
             $('study-deck').textContent = title;
             showView('study');
             history.pushState({ trainer: 'study' }, '');
@@ -409,7 +416,13 @@
         $('study-context').textContent = contextLine(parsed.metadata);
         var dice = parsed.metadata.dice;
         $('study-prompt').textContent = q.cube || !dice ? q.prompt : 'You rolled ' + dice[0] + '-' + dice[1] + '. ' + q.prompt;
-        $('study-left').textContent = plural(remaining(), 'position') + ' left';
+        if (session.mode === 'review') {
+            $('study-left').textContent = plural(remaining(), 'position') + ' left';
+            delete $('study-left').dataset.drill;
+            delete $('study-left').dataset.urgent;
+        } else {
+            renderDrillStatus();
+        }
 
         var box = $('study-choices');
         box.textContent = '';
@@ -422,7 +435,7 @@
             btn.addEventListener('click', function () { pick(i); });
             box.appendChild(btn);
         });
-        $('study-skip').hidden = false;
+        $('study-skip').hidden = session.mode !== 'review';
         $('study-answer').hidden = true;
         window.scrollTo(0, 0);
     }
@@ -553,15 +566,19 @@
         if (focus) focus.focus({ preventScroll: true });
     }
 
-    function reveal() {
-        var cur = session.current;
-        var d = cur.item.decision;
+    function markChoices(cur) {
         var bestIndex = cur.question.choices.indexOf(cur.question.best);
         Array.prototype.forEach.call(document.querySelectorAll('#study-choices .study-choice'), function (btn, i) {
             btn.disabled = true;
             if (i === bestIndex) btn.classList.add('is-answer');
             if (cur.picked && cur.question.choices[i] === cur.picked && i !== bestIndex) btn.classList.add('is-' + cur.verdict);
         });
+    }
+
+    function reveal() {
+        var cur = session.current;
+        var d = cur.item.decision;
+        markChoices(cur);
         var verdict = $('study-verdict');
         verdict.textContent = verdictText(cur);
         verdict.dataset.verdict = cur.verdict;
@@ -570,7 +587,11 @@
         renderNote(d);
         $('study-skip').hidden = true;
         $('study-answer').hidden = false;
-        renderGrades(D.suggestedRating(cur.verdict));
+        var review = session.mode === 'review';
+        $('study-grades').hidden = !review;
+        $('study-drill-end').hidden = review;
+        if (review) renderGrades(D.suggestedRating(cur.verdict));
+        else $('study-drill-end').focus({ preventScroll: true });
     }
 
     function pick(i) {
@@ -578,7 +599,8 @@
         if (!cur || cur.verdict) return;
         cur.picked = cur.question.choices[i];
         cur.verdict = D.verdict(cur.item.decision, cur.picked);
-        reveal();
+        if (session.mode === 'review') reveal();
+        else drillAnswer();
     }
 
     function skip() {
@@ -590,7 +612,7 @@
 
     function grade(rating) {
         var cur = session.current;
-        if (!cur || !cur.verdict) return;
+        if (!cur || !cur.verdict || session.mode !== 'review') return;
         var now = new Date();
         var p = progressFor(cur.item);
         var wasNew = !p.card;
@@ -625,11 +647,192 @@
             .filter(function (t) { return t > Date.now(); })
             .sort(function (a, b) { return a - b; })[0];
         $('done-next').textContent = upcoming ? 'Next review in ' + formatInterval(upcoming - Date.now()) + '.' : '';
+        $('done-title').textContent = 'Session done';
+        $('done-missed').hidden = true;
+        $('done-again').hidden = true;
+        session = null;
+        showView('done');
+    }
+
+    // ── Drills: Blunder Streak and Storm ───────────────────────────────
+    // Drills quiz positions at random for speed; they never touch the
+    // review schedule.
+
+    var lastDrill = null;
+
+    function shuffled(list) {
+        var out = list.slice();
+        for (var i = out.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = out[i]; out[i] = out[j]; out[j] = t;
+        }
+        return out;
+    }
+
+    function renderDrills() {
+        $('drills').hidden = decks.length === 0;
+        var select = $('drill-deck');
+        var chosen = select.value;
+        select.textContent = '';
+        var all = el('option', null, 'All decks');
+        all.value = '';
+        select.appendChild(all);
+        decks.forEach(function (d) {
+            var o = el('option', null, d.title);
+            o.value = d.id;
+            select.appendChild(o);
+        });
+        select.value = decks.some(function (d) { return d.id === chosen; }) ? chosen : '';
+        $('best-streak').textContent = bests.streak ? 'Your best: ' + bests.streak + ' in a row' : '';
+        $('best-storm').textContent = bests.storm ? 'Your best: ' + plural(bests.storm, 'point') : '';
+    }
+
+    function startDrill(mode, deckId) {
+        notify('');
+        Store.items(deckId || null).then(function (items) {
+            if (!items.length) {
+                notify('Add a deck first.');
+                return;
+            }
+            var scope = deckId ? (decks.filter(function (d) { return d.id === deckId; })[0] || {}).title : 'All decks';
+            lastDrill = { mode: mode, deckId: deckId };
+            session = {
+                mode: mode, deckId: deckId, title: (mode === 'streak' ? 'Blunder Streak' : 'Storm') + ' · ' + scope,
+                pool: items, queue: shuffled(items), answered: 0, best: 0, score: 0, lost: 0, missed: [],
+                current: null, endsAt: mode === 'storm' ? Date.now() + STORM_MS : 0, timer: null, token: 0
+            };
+            $('study-deck').textContent = session.title;
+            showView('study');
+            history.pushState({ trainer: 'study' }, '');
+            if (mode === 'storm') session.timer = setInterval(tickStorm, 250);
+            nextDrillCard();
+        }).catch(function (e) { notify(e.message, 'error'); });
+    }
+
+    function nextDrillCard() {
+        if (!session.queue.length) {
+            if (session.mode === 'streak') {
+                finishDrill();
+                return;
+            }
+            session.queue = shuffled(session.pool);
+        }
+        var item = session.queue.shift();
+        session.current = { item: item, question: D.question(item.decision), picked: null, verdict: null };
+        renderCard();
+    }
+
+    function formatClock(ms) {
+        var sec = Math.max(0, Math.ceil(ms / 1000));
+        return Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2);
+    }
+
+    function renderDrillStatus() {
+        var s = session;
+        var status = $('study-left');
+        status.dataset.drill = s.mode;
+        if (s.mode === 'streak') {
+            status.textContent = 'Streak ' + s.score + (bests.streak ? ' · best ' + bests.streak : '');
+            delete status.dataset.urgent;
+        } else {
+            var left = s.endsAt - Date.now();
+            status.textContent = formatClock(left) + ' · ' + plural(s.score, 'point');
+            if (left < 30000) status.dataset.urgent = 'true';
+            else delete status.dataset.urgent;
+        }
+    }
+
+    function tickStorm() {
+        if (!session || session.mode !== 'storm') return;
+        if (Date.now() >= session.endsAt) finishDrill();
+        else renderDrillStatus();
+    }
+
+    // Cube actions have no "close" answer, so their loss is the picked
+    // action's error as the analysis gives it.
+    function equityLost(cur) {
+        var err = D.answerError(cur.item.decision, cur.picked);
+        return err !== null ? err : Math.abs(cur.picked.error || 0);
+    }
+
+    function drillAnswer() {
+        var s = session;
+        var cur = s.current;
+        var kept = cur.verdict !== 'wrong';
+        var lost = equityLost(cur);
+        s.answered++;
+        s.lost += lost;
+        if (kept) s.score++;
+        if (cur.verdict === 'best') s.best++;
+        if (!kept) s.missed.push({ item: cur.item, picked: cur.picked.notation, best: cur.question.best.notation, lost: lost, cube: cur.question.cube });
+        markChoices(cur);
+        renderDrillStatus();
+        if (s.mode === 'streak' && !kept) {
+            reveal();
+            return;
+        }
+        if (s.mode === 'storm' && !kept) s.endsAt -= STORM_PENALTY_MS;
+        var token = ++s.token;
+        setTimeout(function () {
+            if (session !== s || s.token !== token) return;
+            if (s.mode === 'storm' && Date.now() >= s.endsAt) finishDrill();
+            else nextDrillCard();
+        }, kept ? 350 : 900);
+    }
+
+    function renderMissed(missed) {
+        var table = $('done-missed-table');
+        table.textContent = '';
+        $('done-missed').hidden = !missed.length;
+        if (!missed.length) return;
+        var head = el('tr');
+        ['Position', 'Your play', 'Best play', 'Lost'].forEach(function (h) { head.appendChild(el('th', null, h)); });
+        var thead = el('thead');
+        thead.appendChild(head);
+        table.appendChild(thead);
+        var body = el('tbody');
+        missed.slice(0, MISSED_SHOWN).forEach(function (m) {
+            var tr = el('tr');
+            var dice = m.item.decision.dice;
+            tr.appendChild(el('td', null, m.cube ? 'Cube' : (dice ? dice.join('-') : 'Checker')));
+            tr.appendChild(el('td', 'study-analysis__move', m.picked));
+            tr.appendChild(el('td', 'study-analysis__move', m.best));
+            tr.appendChild(el('td', 'study-analysis__num', m.lost.toFixed(3)));
+            body.appendChild(tr);
+        });
+        table.appendChild(body);
+        $('done-missed-more').textContent = missed.length > MISSED_SHOWN ? 'And ' + (missed.length - MISSED_SHOWN) + ' more.' : '';
+    }
+
+    function finishDrill() {
+        var s = session;
+        if (!s || s.mode === 'review') return;
+        if (s.timer) clearInterval(s.timer);
+        var record = s.score > (bests[s.mode] || 0);
+        if (record) {
+            bests[s.mode] = s.score;
+            Store.setMeta('bests', bests).catch(function () {});
+        }
+        $('done-title').textContent = s.mode === 'streak' ? 'Blunder Streak' : 'Storm';
+        var summary;
+        if (s.mode === 'streak') {
+            summary = s.missed.length
+                ? 'Streak of ' + s.score + '.'
+                : 'A perfect run: all ' + plural(s.score, 'position') + ' without a miss.';
+        } else {
+            summary = plural(s.score, 'point') + ' in 3 minutes, from ' + plural(s.answered, 'position') + '.';
+        }
+        if (s.answered) summary += ' Equity lost: ' + s.lost.toFixed(3) + '.';
+        $('done-summary').textContent = summary;
+        $('done-next').textContent = record ? 'New personal best!' : (bests[s.mode] ? 'Your best: ' + bests[s.mode] + '.' : '');
+        renderMissed(s.mode === 'storm' ? s.missed : []);
+        $('done-again').hidden = false;
         session = null;
         showView('done');
     }
 
     function leaveStudy() {
+        if (session && session.timer) clearInterval(session.timer);
         session = null;
         showView('home');
         refresh();
@@ -735,6 +938,12 @@
     // ── Events ─────────────────────────────────────────────────────────
 
     $('study-all').addEventListener('click', function () { startSession(null); });
+    $('drill-streak').addEventListener('click', function () { startDrill('streak', $('drill-deck').value); });
+    $('drill-storm').addEventListener('click', function () { startDrill('storm', $('drill-deck').value); });
+    $('study-drill-end').addEventListener('click', finishDrill);
+    $('done-again').addEventListener('click', function () {
+        if (lastDrill) startDrill(lastDrill.mode, lastDrill.deckId);
+    });
     $('study-back').addEventListener('click', function () { history.back(); });
     $('done-back').addEventListener('click', leaveStudy);
     $('study-skip').addEventListener('click', skip);
@@ -760,7 +969,7 @@
                 e.preventDefault();
                 pick(i);
             }
-        } else if (/^[1-4]$/.test(key)) {
+        } else if (session.mode === 'review' && /^[1-4]$/.test(key)) {
             e.preventDefault();
             grade(parseInt(key, 10));
         }
