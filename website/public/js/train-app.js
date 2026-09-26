@@ -435,6 +435,7 @@
             $('study-left').textContent = plural(remaining(), 'position') + ' left';
             delete $('study-left').dataset.drill;
             delete $('study-left').dataset.urgent;
+            $('storm-meter').hidden = true;
         } else {
             renderDrillStatus();
         }
@@ -749,11 +750,19 @@
         if (s.mode === 'streak') {
             status.textContent = 'Streak ' + s.score + (bests.streak ? ' · best ' + bests.streak : '');
             delete status.dataset.urgent;
+            $('storm-meter').hidden = true;
         } else {
-            var left = s.endsAt - Date.now();
-            status.textContent = formatClock(left) + ' · ' + plural(s.score, 'point');
-            if (left < 30000) status.dataset.urgent = 'true';
+            var left = Math.max(0, s.endsAt - Date.now());
+            status.textContent = '';
+            status.appendChild(el('span', 'drill-clock', formatClock(left)));
+            status.appendChild(el('span', 'drill-score', plural(s.score, 'point')));
+            var urgency = left < 10000 ? 'final' : left < 30000 ? 'soon' : '';
+            if (urgency) status.dataset.urgent = urgency;
             else delete status.dataset.urgent;
+            var meter = $('storm-meter');
+            meter.hidden = false;
+            meter.dataset.urgent = urgency;
+            meter.firstElementChild.style.width = (100 * left / STORM_MS) + '%';
         }
     }
 
@@ -823,6 +832,7 @@
         var s = session;
         if (!s || s.mode === 'review') return;
         if (s.timer) clearInterval(s.timer);
+        $('storm-meter').hidden = true;
         var record = s.score > (bests[s.mode] || 0);
         if (record) {
             bests[s.mode] = s.score;
@@ -848,6 +858,7 @@
 
     function leaveStudy() {
         if (session && session.timer) clearInterval(session.timer);
+        $('storm-meter').hidden = true;
         session = null;
         showView('home');
         refresh();

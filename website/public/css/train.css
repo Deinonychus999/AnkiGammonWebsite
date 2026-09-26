@@ -714,8 +714,66 @@
     font-variant-numeric: tabular-nums;
 }
 
-.study-bar__left[data-urgent] {
+/* Storm: a clock readable at a glance, and a bar that empties with it */
+.study-bar__left[data-drill="storm"] {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-md);
+}
+
+.drill-clock {
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+
+.drill-score {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.study-bar__left[data-urgent="soon"] .drill-clock {
     color: var(--accent-warning);
+}
+
+.study-bar__left[data-urgent="final"] .drill-clock {
+    color: var(--accent-danger);
+}
+
+.trainer-shell[data-view="study"] .app-bar {
+    position: relative;
+}
+
+.storm-meter {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 5px;
+    background: var(--bg-surface);
+}
+
+.storm-meter span {
+    display: block;
+    height: 100%;
+    background: var(--accent-success);
+    transition: width 0.25s linear;
+}
+
+.storm-meter[data-urgent="soon"] span {
+    background: var(--accent-warning);
+}
+
+.storm-meter[data-urgent="final"] span {
+    background: var(--accent-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .storm-meter span {
+        transition: none;
+    }
 }
 
 .trainer-missed th + th {
