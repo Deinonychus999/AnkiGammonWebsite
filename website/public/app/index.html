@@ -71,220 +71,240 @@
 <body>
     <!-- PARTIAL:nav -->
 
-    <main id="app" data-wheels="{{APP_WHEELS}}">
-    <section class="tool-hero section app-hero">
-        <div class="container">
-            <h1>Backgammon flashcards for Anki, in your browser</h1>
-            <p class="hero-subtitle">
-                Turn eXtreme Gammon analysis into Anki flashcards. Nothing to install.
-            </p>
-            <p class="app-hero__limits">
-                This version uses analysis you already have: <strong>.xg and .xgp files</strong>, or text copied from eXtreme Gammon.
-                To analyze position IDs or .mat files, or add score matrices, <a href="/#install">get the desktop app</a>.
-            </p>
-        </div>
-    </section>
-
-    <section class="section app-workspace">
-        <div class="container">
-            <p class="app-status" id="app-status" role="status" aria-live="polite">
+    <main id="app" data-wheels="{{APP_WHEELS}}" data-worker="{{APP_WORKER}}">
+    <div class="app-shell" id="app-shell" data-view="empty">
+        <header class="app-bar">
+            <div class="app-bar__group">
+                <button class="btn btn-primary btn-sm" id="browse-btn" type="button" disabled>Open file</button>
+                <button class="btn btn-secondary btn-sm" id="paste-open" type="button" disabled>Paste analysis</button>
+                <input type="file" id="file-input" accept=".xg,.xgp" hidden>
+            </div>
+            <p class="app-status app-bar__status" id="app-status" role="status" aria-live="polite">
                 <span class="app-status__dot" aria-hidden="true"></span>
-                <span id="app-status-text">Getting ready… the first visit downloads about 7&nbsp;MB, cached afterwards.</span>
+                <span id="app-status-text">Starting…</span>
             </p>
+            <div class="app-bar__group app-bar__actions">
+                <button class="app-deck-chip" id="deck-chip" type="button" title="Deck name and card options">
+                    <span class="app-deck-chip__label">Deck</span>
+                    <span class="app-deck-chip__name" id="deck-chip-name">AnkiGammon</span>
+                    <svg class="app-deck-chip__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                </button>
+                <button class="app-icon-btn" id="options-open" type="button" aria-label="Card options" title="Card options">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="train-btn" type="button" disabled
+                    title="Study the positions with spaced repetition in this browser, no Anki needed">Study in the trainer</button>
+                <button class="btn btn-secondary btn-sm" id="send-btn" type="button" disabled
+                    title="Add the cards to Anki on this computer through AnkiConnect (Chrome, Edge, Firefox)">Send to Anki</button>
+                <button class="btn btn-primary btn-sm" id="export-btn" type="button" disabled>Download .apkg</button>
+            </div>
+        </header>
 
-            <!-- Step 1 -->
-            <div class="app-step" id="step-source">
-                <h2 class="app-step__title"><span class="app-step__num">1</span> Add your analysis</h2>
-                <div class="app-source">
-                    <div class="drop-zone" id="drop-zone">
-                        <div class="drop-zone__icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="17 8 12 3 7 8"/>
-                                <line x1="12" y1="3" x2="12" y2="15"/>
-                            </svg>
-                        </div>
-                        <p class="drop-zone__text">
-                            Drag &amp; drop an .xg or .xgp file here, or
-                            <button class="drop-zone__browse" id="browse-btn" type="button">browse files</button>
-                        </p>
-                        <p class="drop-zone__hint">Match files keep only the mistakes above your thresholds. A position file becomes one card.</p>
-                        <input type="file" id="file-input" accept=".xg,.xgp" hidden>
-                    </div>
+        <aside class="app-side" aria-label="Positions">
+            <p class="app-side__meta" id="source-meta">No file open.</p>
 
-                    <div class="app-source__alt">
-                        <details class="app-paste" id="paste-details">
-                            <summary>Paste analysis copied from eXtreme Gammon</summary>
-                            <label class="visually-hidden" for="paste-input">XG analysis text</label>
-                            <textarea id="paste-input" class="input-area__textarea app-paste__text" rows="8" spellcheck="false"
-                                placeholder="In eXtreme Gammon, analyze a position, press Ctrl+C and paste here. Several positions can go in one paste."></textarea>
-                            <button class="btn btn-secondary btn-sm" id="paste-btn" type="button">Make cards from this text</button>
-                        </details>
-                        <p class="app-sample">No XG file at hand? <button class="app-link-btn" id="sample-btn" type="button">Try a sample match</button></p>
-                    </div>
+            <fieldset class="app-filter" id="filter-panel" hidden>
+                <legend class="visually-hidden">Keep mistakes of at least</legend>
+                <p class="app-filter__title" aria-hidden="true">Keep mistakes of at least</p>
+                <label class="app-field">
+                    <span>Checker error</span>
+                    <input id="checker-threshold" type="number" min="0" max="2" step="0.01" value="0.08" inputmode="decimal">
+                </label>
+                <label class="app-field">
+                    <span>Cube error</span>
+                    <input id="cube-threshold" type="number" min="0" max="2" step="0.01" value="0.08" inputmode="decimal">
+                </label>
+                <label class="app-check"><input id="include-o" type="checkbox" checked> <span id="name-o">Player O</span></label>
+                <label class="app-check"><input id="include-x" type="checkbox" checked> <span id="name-x">Player X</span></label>
+            </fieldset>
+
+            <div class="app-list" id="position-list" hidden>
+                <div class="app-list__head">
+                    <label class="app-check"><input id="select-all" type="checkbox" checked> All</label>
+                    <span id="pick-count" class="app-list__count"></span>
                 </div>
-
-                <div class="tool-error" id="error-display" hidden>
-                    <p class="tool-error__message" id="error-message"></p>
+                <div class="app-list__scroll">
+                    <table class="app-table">
+                        <thead class="visually-hidden">
+                            <tr><th>Include</th><th>Position</th></tr>
+                        </thead>
+                        <tbody id="rows"></tbody>
+                    </table>
                 </div>
             </div>
+        </aside>
 
-            <!-- Step 2 -->
-            <div class="app-step" id="step-review" hidden>
-                <h2 class="app-step__title"><span class="app-step__num">2</span> Pick the positions</h2>
-                <p class="app-step__meta" id="source-meta"></p>
-
-                <fieldset class="app-filter" id="filter-panel" hidden>
-                    <legend class="visually-hidden">Which mistakes to keep</legend>
-                    <label class="app-field">
-                        <span>Checker error at least</span>
-                        <input id="checker-threshold" type="number" min="0" max="2" step="0.01" value="0.08" inputmode="decimal">
-                    </label>
-                    <label class="app-field">
-                        <span>Cube error at least</span>
-                        <input id="cube-threshold" type="number" min="0" max="2" step="0.01" value="0.08" inputmode="decimal">
-                    </label>
-                    <label class="app-check"><input id="include-o" type="checkbox" checked> <span id="name-o">Player O</span></label>
-                    <label class="app-check"><input id="include-x" type="checkbox" checked> <span id="name-x">Player X</span></label>
-                </fieldset>
-
-                <div class="app-review">
-                    <div class="app-list">
-                        <div class="app-list__head">
-                            <label class="app-check"><input id="select-all" type="checkbox" checked> All</label>
-                            <span id="pick-count" class="app-list__count"></span>
-                        </div>
-                        <div class="app-list__scroll">
-                            <table class="app-table">
-                                <thead class="visually-hidden">
-                                    <tr><th>Include</th><th>Decision</th><th>Game</th><th>On roll</th><th>Played</th><th>Error</th></tr>
-                                </thead>
-                                <tbody id="rows"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="app-preview">
-                        <div class="app-preview__bar">
-                            <div class="app-seg" role="group" aria-label="Card side">
-                                <button type="button" id="show-front" class="app-seg__btn app-seg__btn--on">Front</button>
-                                <button type="button" id="show-back" class="app-seg__btn">Back</button>
-                            </div>
-                            <div class="app-seg" role="group" aria-label="Anki theme">
-                                <button type="button" id="theme-light" class="app-seg__btn">Light</button>
-                                <button type="button" id="theme-dark" class="app-seg__btn">Dark</button>
-                            </div>
-                            <span class="app-preview__hint" id="preview-hint">Pick a move on the front to flip it, as in Anki.</span>
-                        </div>
-                        <iframe id="card-frame" class="app-preview__frame" title="Card preview"></iframe>
-                    </div>
-                </div>
+        <section class="app-stage" aria-label="Card preview">
+            <div class="app-banner" id="error-display" role="alert" hidden>
+                <p class="app-banner__message" id="error-message"></p>
+                <button class="app-banner__close" id="error-close" type="button" aria-label="Dismiss">&times;</button>
             </div>
 
-            <!-- Step 3 -->
-            <div class="app-step" id="step-export" hidden>
-                <h2 class="app-step__title"><span class="app-step__num">3</span> Make the deck</h2>
-                <div class="app-export">
-                    <div class="app-options" role="group" aria-labelledby="card-options-title">
-                        <h3 class="app-options__title" id="card-options-title">Card options</h3>
-                        <label class="app-field">
-                            <span>Color scheme</span>
-                            <select id="opt-color_scheme">
-                                <option value="classic">Classic</option>
-                                <option value="forest">Forest</option>
-                                <option value="ocean">Ocean</option>
-                                <option value="desert">Desert</option>
-                                <option value="sunset">Sunset</option>
-                                <option value="midnight">Midnight</option>
-                                <option value="monochrome">Monochrome</option>
-                            </select>
-                        </label>
-                        <label class="app-field">
-                            <span>Board orientation</span>
-                            <select id="opt-board_orientation">
-                                <option value="counter-clockwise">Counter-clockwise</option>
-                                <option value="clockwise">Clockwise</option>
-                                <option value="random">Random</option>
-                            </select>
-                        </label>
-                        <label class="app-field">
-                            <span>Choices on the front</span>
-                            <select id="opt-max_moves">
-                                <option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                                <option value="5" selected>5</option><option value="6">6</option><option value="7">7</option>
-                                <option value="8">8</option><option value="9">9</option><option value="10">10</option>
-                            </select>
-                        </label>
-                        <label class="app-field">
-                            <span>Score format</span>
-                            <select id="opt-score_format">
-                                <option value="absolute">Absolute</option>
-                                <option value="away">Away</option>
-                            </select>
-                        </label>
-                        <label class="app-check"><input id="opt-show_options" type="checkbox" checked> Multiple choice on the front</label>
-                        <label class="app-check"><input id="opt-interactive_moves" type="checkbox" checked> Click a move to see it played</label>
-                        <label class="app-check"><input id="opt-show_pip_count" type="checkbox" checked> Show pip count</label>
-                        <label class="app-check"><input id="opt-swap_checker_colors" type="checkbox"> Swap checker colors</label>
-                        <label class="app-check"><input id="opt-split_cube_decisions" type="checkbox"> Split cube decisions by player</label>
-                    </div>
-
-                    <div class="app-download">
-                        <label class="app-field">
-                            <span>Deck name</span>
-                            <input id="deck-name" type="text" value="AnkiGammon" autocomplete="off">
-                        </label>
-                        <label class="app-check"><input id="use-subdecks" type="checkbox"> Checker and cube cards in subdecks</label>
-                        <button class="btn btn-primary app-download__btn" id="export-btn" type="button" disabled>Download .apkg</button>
-                        <p class="app-download__help" id="import-help">
-                            <strong>Anki on a computer:</strong> File &rarr; Import, or double-click the file.
-                            <strong>AnkiMobile and AnkiDroid:</strong> open the downloaded file and choose Anki.
-                            Importing a deck from this page again updates its cards instead of duplicating them.
-                        </p>
-
-                        <div class="app-send">
-                            <button class="btn btn-secondary app-download__btn" id="train-btn" type="button" disabled>Study in the trainer</button>
-                            <p class="app-download__help">
-                                Opens the cards in the <a href="../train/">browser trainer</a>, with spaced repetition and no Anki needed. They stay in this browser.
-                            </p>
-                        </div>
-
-                        <div class="app-send">
-                            <button class="btn btn-secondary app-download__btn" id="send-btn" type="button" disabled>Send to Anki</button>
-                            <p class="app-download__help">
-                                Adds the cards to Anki running on this computer, through the AnkiConnect add-on, and updates ones you sent before.
-                                Works in Chrome, Edge and Firefox; Anki asks once whether to allow this site.
-                            </p>
-                            <details class="app-anki-settings" id="anki-settings">
-                                <summary>Anki connection settings</summary>
-                                <label class="app-field">
-                                    <span>AnkiConnect address</span>
-                                    <input id="anki-url" type="url" value="http://127.0.0.1:8765" autocomplete="off" spellcheck="false">
-                                </label>
-                                <label class="app-field">
-                                    <span>API key (only if you set one in AnkiConnect)</span>
-                                    <input id="anki-key" type="password" autocomplete="off">
-                                </label>
-                            </details>
-                            <div class="app-anki-help" id="anki-help" role="alert" hidden>
-                                <p class="app-anki-help__lead" id="anki-help-lead"></p>
-                                <ul>
-                                    <li data-case="unreachable">Anki is open on this computer.</li>
-                                    <li data-case="unreachable">AnkiConnect is installed: in Anki, Tools &rarr; Add-ons &rarr; Get Add-ons, code <code>2055492159</code>, then restart Anki.</li>
-                                    <li data-case="unreachable">If the browser asked whether this site may reach apps on your device, you allowed it. If you dismissed it, allow it in the site settings next to the address bar.</li>
-                                    <li data-case="unreachable denied">If Anki asked whether to give this site access, you answered Yes. To fix a No, open Tools &rarr; Add-ons &rarr; AnkiConnect &rarr; Config in Anki, add <code id="anki-help-origin"></code> to <code>webCorsOriginList</code>, and remove it from <code>ignoreOriginList</code>.</li>
-                                    <li data-case="unreachable">Safari and iPhone or iPad browsers can't connect to Anki. Use Download .apkg instead.</li>
-                                    <li data-case="unreachable">Using a different port for AnkiConnect? Change the address under Anki connection settings.</li>
-                                    <li data-case="key">Enter the key under Anki connection settings, then send again.</li>
-                                    <li data-case="failed">Check that Anki isn't busy with a dialog, then send again. Cards already sent stay in Anki and are updated, not duplicated.</li>
-                                </ul>
-                            </div>
-                        </div>
+            <div class="app-empty" id="stage-empty">
+                <svg class="app-empty__dice" viewBox="0 0 120 90" aria-hidden="true">
+                    <g transform="rotate(-12 36 52)"><rect x="8" y="24" width="56" height="56" rx="10"/><circle cx="22" cy="38" r="4.5"/><circle cx="36" cy="52" r="4.5"/><circle cx="50" cy="66" r="4.5"/></g>
+                    <g transform="rotate(14 82 40)"><rect x="54" y="12" width="56" height="56" rx="10"/><circle cx="68" cy="26" r="4.5"/><circle cx="96" cy="26" r="4.5"/><circle cx="68" cy="54" r="4.5"/><circle cx="96" cy="54" r="4.5"/></g>
+                </svg>
+                <h1 class="app-empty__title">Backgammon flashcards for Anki, in your browser</h1>
+                <p class="app-empty__lead">Open an eXtreme Gammon .xg or .xgp file, or drop one anywhere here. A match keeps only the mistakes above your thresholds; a position file becomes one card.</p>
+                <div class="app-boot" id="app-boot" role="status" aria-live="polite">
+                    <ol class="app-boot__steps">
+                        <li class="app-boot__step" data-step="python" data-state="active">
+                            <span class="app-boot__icon" aria-hidden="true"></span>
+                            <span id="app-boot-python">Downloading Python for your browser</span>
+                        </li>
+                        <li class="app-boot__step" data-step="ankigammon" data-state="waiting">
+                            <span class="app-boot__icon" aria-hidden="true"></span>
+                            <span>Loading AnkiGammon</span>
+                        </li>
+                    </ol>
+                    <p class="app-boot__note" id="app-boot-note">The first visit downloads about 7&nbsp;MB. Your browser keeps it, so next time starts faster.</p>
+                    <div class="app-boot__failed" id="app-boot-failed" hidden>
+                        <button class="btn btn-primary" id="app-boot-reload" type="button">Reload</button>
+                        <a class="btn btn-secondary" href="/#install">Get the desktop app</a>
                     </div>
                 </div>
+                <div class="app-start" id="app-start" hidden>
+                    <div class="app-empty__actions">
+                        <button class="btn btn-primary" id="empty-open" type="button" disabled>Open file</button>
+                        <button class="btn btn-secondary" id="empty-paste" type="button" disabled>Paste analysis</button>
+                    </div>
+                    <p class="app-empty__sample">No XG file at hand? <button class="app-link-btn" id="sample-btn" type="button" disabled>Try a sample match</button></p>
+                </div>
+                <p class="app-empty__limits">
+                    This version uses analysis already done in eXtreme Gammon. To analyze position IDs or .mat files, or add score matrices,
+                    <a href="/#install">get the desktop app</a>.
+                </p>
             </div>
-        </div>
-    </section>
+
+            <div class="app-preview" id="stage-preview" hidden>
+                <div class="app-preview__bar">
+                    <div class="app-seg" role="group" aria-label="Card side">
+                        <button type="button" id="show-front" class="app-seg__btn app-seg__btn--on">Front</button>
+                        <button type="button" id="show-back" class="app-seg__btn">Back</button>
+                    </div>
+                    <div class="app-seg" role="group" aria-label="Anki theme">
+                        <button type="button" id="theme-light" class="app-seg__btn">Light</button>
+                        <button type="button" id="theme-dark" class="app-seg__btn">Dark</button>
+                    </div>
+                    <span class="app-preview__hint" id="preview-hint">Pick a move on the front to flip it, as in Anki.</span>
+                </div>
+                <iframe id="card-frame" class="app-preview__frame" title="Card preview"></iframe>
+            </div>
+
+            <div class="app-drop" id="drop-overlay" hidden>
+                <p>Drop the .xg or .xgp file to open it</p>
+            </div>
+        </section>
+    </div>
+
+    <dialog class="app-dialog" id="options-dialog" aria-labelledby="options-title">
+        <form method="dialog" class="app-dialog__body">
+            <h2 class="app-dialog__title" id="options-title">Card options</h2>
+
+            <section class="app-dialog__section" aria-labelledby="options-deck">
+                <h3 class="app-dialog__heading" id="options-deck">Deck</h3>
+                <label class="app-field">
+                    <span>Deck name</span>
+                    <input id="deck-name" type="text" value="AnkiGammon" autocomplete="off">
+                </label>
+                <label class="app-check"><input id="use-subdecks" type="checkbox"> Checker and cube cards in subdecks</label>
+            </section>
+
+            <section class="app-dialog__section app-dialog__grid" aria-labelledby="options-cards">
+                <h3 class="app-dialog__heading" id="options-cards">Cards</h3>
+                <label class="app-field">
+                    <span>Color scheme</span>
+                    <select id="opt-color_scheme">
+                        <option value="classic">Classic</option>
+                        <option value="forest">Forest</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="desert">Desert</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="midnight">Midnight</option>
+                        <option value="monochrome">Monochrome</option>
+                    </select>
+                </label>
+                <label class="app-field">
+                    <span>Board orientation</span>
+                    <select id="opt-board_orientation">
+                        <option value="counter-clockwise">Counter-clockwise</option>
+                        <option value="clockwise">Clockwise</option>
+                        <option value="random">Random</option>
+                    </select>
+                </label>
+                <label class="app-field">
+                    <span>Choices on the front</span>
+                    <select id="opt-max_moves">
+                        <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                        <option value="5" selected>5</option><option value="6">6</option><option value="7">7</option>
+                        <option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                    </select>
+                </label>
+                <label class="app-field">
+                    <span>Score format</span>
+                    <select id="opt-score_format">
+                        <option value="absolute">Absolute</option>
+                        <option value="away">Away</option>
+                    </select>
+                </label>
+                <label class="app-check"><input id="opt-show_options" type="checkbox" checked> Multiple choice on the front</label>
+                <label class="app-check"><input id="opt-interactive_moves" type="checkbox" checked> Click a move to see it played</label>
+                <label class="app-check"><input id="opt-show_pip_count" type="checkbox" checked> Show pip count</label>
+                <label class="app-check"><input id="opt-swap_checker_colors" type="checkbox"> Swap checker colors</label>
+                <label class="app-check"><input id="opt-split_cube_decisions" type="checkbox"> Split cube decisions by player</label>
+            </section>
+
+            <section class="app-dialog__section" id="anki-settings" aria-labelledby="options-anki">
+                <h3 class="app-dialog__heading" id="options-anki">Anki connection</h3>
+                <p class="app-dialog__note">Used by Send to Anki. Change these only if you set a different port or an API key in AnkiConnect.</p>
+                <label class="app-field">
+                    <span>AnkiConnect address</span>
+                    <input id="anki-url" type="url" value="http://127.0.0.1:8765" autocomplete="off" spellcheck="false">
+                </label>
+                <label class="app-field">
+                    <span>API key</span>
+                    <input id="anki-key" type="password" autocomplete="off">
+                </label>
+            </section>
+
+            <div class="app-dialog__footer">
+                <button class="btn btn-primary btn-sm" value="done">Done</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="paste-dialog" aria-labelledby="paste-title">
+        <form method="dialog" class="app-dialog__body">
+            <h2 class="app-dialog__title" id="paste-title">Paste analysis</h2>
+            <label class="app-dialog__note" for="paste-input">In eXtreme Gammon, analyze a position, press Ctrl+C and paste it here. Several positions can go in one paste.</label>
+            <textarea id="paste-input" class="input-area__textarea app-dialog__textarea" rows="10" spellcheck="false"></textarea>
+            <div class="app-dialog__footer">
+                <button class="btn btn-secondary btn-sm" value="cancel" formnovalidate>Cancel</button>
+                <button class="btn btn-primary btn-sm" id="paste-btn" type="button">Make cards</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="anki-help" aria-labelledby="anki-help-lead">
+        <form method="dialog" class="app-dialog__body">
+            <h2 class="app-dialog__title" id="anki-help-lead">Could not reach Anki.</h2>
+            <ul class="app-anki-help">
+                <li data-case="unreachable">Anki is open on this computer.</li>
+                <li data-case="unreachable">AnkiConnect is installed: in Anki, Tools &rarr; Add-ons &rarr; Get Add-ons, code <code>2055492159</code>, then restart Anki.</li>
+                <li data-case="unreachable">If the browser asked whether this site may reach apps on your device, you allowed it. If you dismissed it, allow it in the site settings next to the address bar.</li>
+                <li data-case="unreachable denied">If Anki asked whether to give this site access, you answered Yes. To fix a No, open Tools &rarr; Add-ons &rarr; AnkiConnect &rarr; Config in Anki, add <code id="anki-help-origin"></code> to <code>webCorsOriginList</code>, and remove it from <code>ignoreOriginList</code>.</li>
+                <li data-case="unreachable">Safari and iPhone or iPad browsers can't connect to Anki. Use Download .apkg instead.</li>
+                <li data-case="unreachable">Using a different port for AnkiConnect? Change the address in Card options.</li>
+                <li data-case="key">Enter the key under Anki connection in Card options, then send again.</li>
+                <li data-case="failed">Check that Anki isn't busy with a dialog, then send again. Cards already sent stay in Anki and are updated, not duplicated.</li>
+            </ul>
+            <div class="app-dialog__footer">
+                <button class="btn btn-secondary btn-sm" id="anki-help-settings" type="button">Connection settings</button>
+                <button class="btn btn-primary btn-sm" value="close">Close</button>
+            </div>
+        </form>
+    </dialog>
 
     <section class="tool-info section">
         <div class="container tool-guide">
@@ -312,8 +332,8 @@
 
             <h2>Getting analysis out of eXtreme Gammon</h2>
             <ul>
-                <li><strong>A whole match:</strong> analyze it in XG, save it, and drop the .xg file above. Pick the error thresholds and which player's mistakes to keep.</li>
-                <li><strong>One position:</strong> save it as an .xgp file, or analyze it, press <kbd>Ctrl</kbd>+<kbd>C</kbd> in XG and paste the text above.</li>
+                <li><strong>A whole match:</strong> analyze it in XG, save it, and open or drop the .xg file in the app above. Pick the error thresholds and which player's mistakes to keep.</li>
+                <li><strong>One position:</strong> save it as an .xgp file, or analyze it, press <kbd>Ctrl</kbd>+<kbd>C</kbd> in XG and paste the text into the app above.</li>
                 <li><strong>Comments</strong> you typed in XG come along and appear on the back of the card.</li>
             </ul>
 
@@ -334,6 +354,10 @@
                 <details class="faq-details__item">
                     <summary>How does Send to Anki work?</summary>
                     <p>With Anki and the AnkiConnect add-on running, the page sends the cards to Anki on your computer. The first time, Anki asks whether to allow this site, and Chrome, Edge or Firefox may ask whether the site can reach apps on your device; say yes to both. Allowing the site lets it change your Anki collection, which is why Anki asks. Safari and iPhone or iPad browsers block this, so use Download .apkg there.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>How do I import the downloaded deck?</summary>
+                    <p>In Anki on a computer, choose File &rarr; Import or double-click the file. In AnkiMobile or AnkiDroid, open the downloaded file and choose Anki. Importing a deck from this page again updates its cards instead of duplicating them.</p>
                 </details>
                 <details class="faq-details__item">
                     <summary>Why does the first visit take a few seconds?</summary>

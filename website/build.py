@@ -550,15 +550,19 @@ LOCAL_ASSET_RE = re.compile(r'(src|href)="(\.\./(?:js|css)/[^"?]+\.(?:js|css))"'
 def version_asset_urls(content, page_dir):
     """Add a content hash to the page's local scripts and stylesheets.
 
-    The trainer is an installable app whose service worker fetches it fresh,
-    but browsers still reuse scripts from memory for a few minutes, which can
-    pair a new page with old code. A changed file gets a new URL instead.
+    The trainer and the web app pair a page with scripts (and the app with a
+    worker), and browsers reuse scripts from cache or memory for a few
+    minutes, which can pair a new page with old code. A changed file gets a
+    new URL instead.
     """
     def versioned(m):
-        with open(os.path.normpath(os.path.join(page_dir, m.group(2))), "rb") as f:
-            digest = hashlib.sha256(f.read()).hexdigest()[:10]
-        return f'{m.group(1)}="{m.group(2)}?v={digest}"'
+        return f'{m.group(1)}="{m.group(2)}?v={asset_digest(page_dir, m.group(2))}"'
     return LOCAL_ASSET_RE.sub(versioned, content)
+
+
+def asset_digest(page_dir, rel_url):
+    with open(os.path.normpath(os.path.join(page_dir, rel_url)), "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:10]
 
 
 def build():
@@ -603,6 +607,10 @@ def build():
                 content = content.replace("<!-- MET:grid -->", render_met_grid())
             if rel.replace(os.sep, "/") == "app/index.html":
                 content = content.replace("{{APP_WHEELS}}", html.escape(json.dumps(app_wheels)))
+                page_dir = os.path.dirname(filepath)
+                worker = "../js/app-worker.js"
+                content = content.replace("{{APP_WORKER}}", f"{worker}?v={asset_digest(page_dir, worker)}")
+                content = version_asset_urls(content, page_dir)
             if rel.replace(os.sep, "/") == "train/index.html":
                 content = version_asset_urls(content, os.path.dirname(filepath))
 

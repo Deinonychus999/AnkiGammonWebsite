@@ -35,7 +35,11 @@
 
     function onWorkerMessage(event) {
         var data = event.data;
-        if (data.type === 'status') { setStatus(data.text, 'busy'); return; }
+        if (data.type === 'status') {
+            setStatus(data.text, 'busy');
+            if (/AnkiGammon/.test(data.text)) bootStep('ankigammon');
+            return;
+        }
         if (data.type === 'send-progress') {
             setStatus('Sending to Anki: ' + data.done + ' of ' + plural(data.total, 'card') + '…', 'busy');
             return;
@@ -56,6 +60,47 @@
     function setStatus(text, state) {
         $('app-status-text').textContent = text;
         $('app-status').dataset.state = state || '';
+    }
+
+    // ── Startup progress in the middle of the stage ────────────────────
+
+    var BOOT_ORDER = ['python', 'ankigammon'];
+    // Set after the first successful start. Pyodide's files are cached by the
+    // browser for a year, so later visits start Python from cache rather than
+    // downloading it (unless the browser has cleared its cache).
+    var STARTED_KEY = 'ankigammon-app-started';
+
+    function startedBefore() {
+        try { return localStorage.getItem(STARTED_KEY) === '1'; } catch (e) { return false; }
+    }
+
+    function describeBoot() {
+        if (!startedBefore()) return;
+        $('app-boot-python').textContent = 'Starting Python';
+        $('app-boot-note').textContent = 'Loading from this browser, which keeps the files from your first visit.';
+    }
+
+    function bootStep(step) {
+        var reached = BOOT_ORDER.indexOf(step);
+        document.querySelectorAll('#app-boot [data-step]').forEach(function (li) {
+            var i = BOOT_ORDER.indexOf(li.dataset.step);
+            li.dataset.state = i < reached ? 'done' : i === reached ? 'active' : 'waiting';
+        });
+    }
+
+    function bootReady() {
+        try { localStorage.setItem(STARTED_KEY, '1'); } catch (e) { /* storage blocked */ }
+        bootStep('done');
+        $('app-boot').hidden = true;
+        $('app-start').hidden = false;
+    }
+
+    function bootFail(message) {
+        var active = document.querySelector('#app-boot [data-state="active"]');
+        if (active) active.dataset.state = 'error';
+        $('app-boot').dataset.state = 'error';
+        $('app-boot-note').textContent = message;
+        $('app-boot-failed').hidden = false;
     }
 
     function showError(message) {
@@ -127,8 +172,16 @@
     var loadToken = 0;
 
     function setBusy(busy) {
-        ['browse-btn', 'paste-btn', 'sample-btn'].forEach(function (id) { $(id).disabled = busy || !ready; });
-        $('drop-zone').classList.toggle('drop-zone--disabled', busy || !ready);
+        ['browse-btn', 'paste-open', 'empty-open', 'empty-paste', 'sample-btn', 'paste-btn'].forEach(function (id) {
+            $(id).disabled = busy || !ready;
+        });
+    }
+
+    function setView(view) {
+        $('app-shell').dataset.view = view;
+        $('stage-empty').hidden = view !== 'empty';
+        $('stage-preview').hidden = view === 'empty';
+        $('position-list').hidden = view === 'empty';
     }
 
     function isMatchFile() {
@@ -204,8 +257,7 @@
         $('name-o').textContent = playerName('O');
         $('name-x').textContent = playerName('X');
 
-        $('step-review').hidden = false;
-        $('step-export').hidden = false;
+        setView('loaded');
         active = -1;
         renderList();
         setStatus('Ready', 'ready');
@@ -230,7 +282,7 @@
             var td = el('td', 'app-table__empty', isMatchFile()
                 ? 'No mistakes at these thresholds. Lower them to keep more positions.'
                 : 'No positions.');
-            td.colSpan = 6;
+            td.colSpan = 2;
             tr.appendChild(td);
             rows.appendChild(tr);
         }
@@ -248,15 +300,18 @@
             pickCell.appendChild(box);
             tr.appendChild(pickCell);
 
-            var typeCell = el('td');
-            typeCell.appendChild(el('span', 'app-tag app-tag--' + p.type, p.type === 'cube' ? 'Cube' : 'Checker'));
-            if (p.has_note) typeCell.appendChild(el('span', 'app-tag app-tag--note', 'Note'));
-            tr.appendChild(typeCell);
-
-            tr.appendChild(el('td', 'app-table__game', p.game !== null ? 'Game ' + p.game : ''));
-            tr.appendChild(el('td', 'app-table__roll', playerName(p.on_roll) + (p.dice ? ' ' + p.dice.join('-') : '')));
-            tr.appendChild(el('td', 'app-table__move', p.played || ''));
-            tr.appendChild(el('td', 'app-table__err', p.error !== null ? p.error.toFixed(3) : ''));
+            var main = el('td', 'app-row');
+            var top = el('div', 'app-row__top');
+            top.appendChild(el('span', 'app-row__who', playerName(p.on_roll) + (p.dice ? ' ' + p.dice.join('-') : '')));
+            top.appendChild(el('span', 'app-row__err', p.error !== null ? p.error.toFixed(3) : ''));
+            var bottom = el('div', 'app-row__bottom');
+            bottom.appendChild(el('span', 'app-tag app-tag--' + p.type, p.type === 'cube' ? 'Cube' : 'Checker'));
+            if (p.has_note) bottom.appendChild(el('span', 'app-tag app-tag--note', 'Note'));
+            bottom.appendChild(el('span', 'app-row__move', p.played || ''));
+            if (p.game !== null) bottom.appendChild(el('span', 'app-row__game', 'Game ' + p.game));
+            main.appendChild(top);
+            main.appendChild(bottom);
+            tr.appendChild(main);
             rows.appendChild(tr);
         });
         renderCounts();
@@ -416,11 +471,20 @@
         document.querySelectorAll('#anki-help [data-case]').forEach(function (el) {
             el.hidden = el.dataset.case.split(' ').indexOf(kind) < 0;
         });
-        $('anki-help').hidden = false;
-        if (kind === 'key') {
-            $('anki-settings').open = true;
-            $('anki-key').focus();
+        if (!$('anki-help').open) $('anki-help').showModal();
+    }
+
+    function openOptions(focusId) {
+        var dialog = $('options-dialog');
+        if (!dialog.open) dialog.showModal();
+        if (focusId) {
+            $(focusId).scrollIntoView({ block: 'nearest' });
+            $(focusId).focus();
         }
+    }
+
+    function syncDeckChip() {
+        $('deck-chip-name').textContent = $('deck-name').value.trim() || 'AnkiGammon';
     }
 
     function sendToAnki() {
@@ -431,7 +495,7 @@
         var opts = cardOptions();
         sending = true;
         renderCounts();
-        $('anki-help').hidden = true;
+        if ($('anki-help').open) $('anki-help').close();
         showError('');
         setStatus('Connecting to Anki…', 'busy');
 
@@ -538,28 +602,55 @@
         });
     }
 
-    var dropZone = $('drop-zone');
-    $('browse-btn').addEventListener('click', function () { $('file-input').click(); });
+    function openFilePicker() { $('file-input').click(); }
+    $('browse-btn').addEventListener('click', openFilePicker);
+    $('empty-open').addEventListener('click', openFilePicker);
     $('file-input').addEventListener('change', function () {
         readFile($('file-input').files[0]);
         $('file-input').value = '';
     });
-    dropZone.addEventListener('dragover', function (e) {
+
+    var shell = $('app-shell');
+    var overlay = $('drop-overlay');
+    function hasFiles(e) {
+        return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') >= 0;
+    }
+    shell.addEventListener('dragover', function (e) {
+        if (!hasFiles(e)) return;
         e.preventDefault();
-        dropZone.classList.add('drop-zone--active');
+        overlay.hidden = !ready;
     });
-    dropZone.addEventListener('dragleave', function () { dropZone.classList.remove('drop-zone--active'); });
-    dropZone.addEventListener('drop', function (e) {
+    shell.addEventListener('dragleave', function (e) {
+        if (!e.relatedTarget || !shell.contains(e.relatedTarget)) overlay.hidden = true;
+    });
+    shell.addEventListener('drop', function (e) {
+        if (!hasFiles(e)) return;
         e.preventDefault();
-        dropZone.classList.remove('drop-zone--active');
+        overlay.hidden = true;
         if (ready) readFile(e.dataTransfer.files[0]);
     });
 
+    function openPaste() {
+        $('paste-dialog').showModal();
+        $('paste-input').focus();
+    }
+    $('paste-open').addEventListener('click', openPaste);
+    $('empty-paste').addEventListener('click', openPaste);
     $('paste-btn').addEventListener('click', function () {
         var text = $('paste-input').value;
-        if (!text.trim()) { showError('Paste the analysis text from eXtreme Gammon first.'); return; }
+        if (!text.trim()) { $('paste-input').focus(); return; }
+        $('paste-dialog').close();
         load({ kind: 'text', text: text });
     });
+
+    $('options-open').addEventListener('click', function () { openOptions(); });
+    $('deck-chip').addEventListener('click', function () { openOptions('deck-name'); });
+    $('anki-help-settings').addEventListener('click', function () {
+        $('anki-help').close();
+        openOptions($('anki-help-lead').textContent.indexOf('API key') >= 0 ? 'anki-key' : 'anki-url');
+    });
+    $('error-close').addEventListener('click', function () { showError(''); });
+    $('deck-name').addEventListener('input', syncDeckChip);
 
     $('sample-btn').addEventListener('click', function () {
         setStatus('Fetching the sample match…', 'busy');
@@ -601,7 +692,12 @@
             return;
         }
         var tr = e.target.closest('tr[data-index]');
-        if (tr) selectPosition(+tr.dataset.index, false);
+        if (!tr) return;
+        selectPosition(+tr.dataset.index, false);
+        // On phones the preview sits below the list.
+        if (window.matchMedia('(max-width: 900px)').matches) {
+            $('stage-preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     });
     $('rows').addEventListener('keydown', function (e) {
         var tr = e.target.closest && e.target.closest('tr[data-index]');
@@ -636,31 +732,53 @@
     // ── Start ──────────────────────────────────────────────────────────
 
     applyPrefs(loadPrefs());
+    describeBoot();
+    syncDeckChip();
     applyTheme();
+    setView('empty');
     setBusy(true);
 
+    // The shell fills the window below the sticky nav, whose height changes when it wraps.
+    var nav = document.querySelector('.nav');
+    if (nav && window.ResizeObserver) {
+        new ResizeObserver(function () {
+            shell.style.setProperty('--app-nav', nav.offsetHeight + 'px');
+        }).observe(nav);
+    }
+
+    $('app-boot-reload').addEventListener('click', function () { location.reload(); });
+
+    function startFailed(message) {
+        setStatus(message, 'error');
+        bootFail(message);
+    }
+
     if (!wheels.length) {
-        setStatus('The browser app is not available right now. Please try again later, or use the desktop app.', 'error');
+        startFailed('The browser app is not available right now. Please try again later, or use the desktop app.');
         return;
     }
 
     try {
-        worker = new Worker('../js/app-worker.js', { type: 'module' });
+        // build.py writes a content-hashed URL, so a deploy never pairs this page with an old worker.
+        var workerUrl = (root.dataset.worker || '').indexOf('{{') === 0 || !root.dataset.worker
+            ? '../js/app-worker.js' : root.dataset.worker;
+        worker = new Worker(workerUrl, { type: 'module' });
     } catch (e) {
-        setStatus('This browser cannot run the app. Try a current version of Chrome, Edge, Firefox or Safari.', 'error');
+        startFailed('This browser cannot run the app. Try a current version of Chrome, Edge, Firefox or Safari.');
         return;
     }
     worker.addEventListener('message', onWorkerMessage);
     worker.addEventListener('error', function (e) {
         e.preventDefault();
-        setStatus('The app could not start. Check your connection and reload the page.', 'error');
+        startFailed('The app could not start. Check your connection and reload the page.');
     });
 
     call('init', { wheels: wheels, base: new URL('wheels/', location.href).href }).then(function () {
         ready = true;
         setBusy(false);
-        setStatus('Ready. Add a file or paste analysis to begin.', 'ready');
+        bootReady();
+        setStatus('Ready. Open an .xg or .xgp file, or paste analysis, to begin.', 'ready');
     }).catch(function (e) {
-        setStatus('The app could not start: ' + e.message + ' Reload the page to try again.', 'error');
+        startFailed('The app could not start: ' + e.message + ' Reload the page to try again.');
     });
 })();
