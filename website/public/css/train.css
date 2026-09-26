@@ -672,7 +672,7 @@
 
 .trainer-done {
     width: 100%;
-    max-width: 720px;
+    max-width: 960px;
     margin: 0 auto;
     padding: var(--space-2xl) var(--space-lg);
     text-align: center;
@@ -683,9 +683,98 @@
 }
 
 .trainer-done__missed {
-    max-width: 640px;
     margin: var(--space-xl) auto 0;
     text-align: left;
+}
+
+.trainer-done__missed-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm) var(--space-md);
+}
+
+.trainer-done__missed-head .trainer-h3 {
+    margin: 0;
+}
+
+.trainer-done__hint {
+    margin: var(--space-xs) 0 var(--space-md);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.missed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+.missed-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+@media (hover: hover) {
+    .missed-card:hover {
+        border-color: var(--accent-primary);
+    }
+}
+
+.missed-card:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+.missed-card__board svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.missed-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 var(--space-xs) var(--space-xs);
+    font-size: 0.85rem;
+}
+
+.missed-card__kind {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+}
+
+.missed-card__line {
+    font-family: var(--font-code);
+    overflow-wrap: anywhere;
+}
+
+.missed-card__line--you {
+    color: var(--accent-danger);
+}
+
+.missed-card__lost {
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.study-miss-nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
 }
 
 .trainer-done__more {
@@ -776,13 +865,6 @@
     }
 }
 
-.trainer-missed th + th {
-    text-align: left;
-}
-
-.trainer-missed th:last-child {
-    text-align: right;
-}
 
 /* Installed app: the site's navigation would leave the app */
 @media (display-mode: standalone) {

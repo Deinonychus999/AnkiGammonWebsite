@@ -160,6 +160,11 @@
                             <div class="study-note" id="study-note"></div>
                             <p class="study-source" id="study-source"></p>
                             <button class="btn btn-primary study-drill-end" id="study-drill-end" type="button" hidden>See results</button>
+                            <div class="study-miss-nav" id="study-miss-nav" hidden>
+                                <button class="btn btn-secondary btn-sm" id="miss-prev" type="button">&larr; Previous</button>
+                                <button class="btn btn-primary btn-sm" id="miss-back" type="button">Back to results</button>
+                                <button class="btn btn-secondary btn-sm" id="miss-next" type="button">Next &rarr;</button>
+                            </div>
                             <div class="study-grades" id="study-grades" role="group" aria-label="How well did you know it?">
                                 <button class="study-grade study-grade--again" type="button" data-rating="1"><span class="study-grade__name">Again</span><span class="study-grade__when"></span></button>
                                 <button class="study-grade study-grade--hard" type="button" data-rating="2"><span class="study-grade__name">Hard</span><span class="study-grade__when"></span></button>
@@ -177,8 +182,12 @@
                 <p id="done-summary"></p>
                 <p class="trainer-done__next" id="done-next"></p>
                 <div class="trainer-done__missed" id="done-missed" hidden>
-                    <h3 class="trainer-h3">Positions you missed</h3>
-                    <table class="study-analysis trainer-missed" id="done-missed-table"></table>
+                    <div class="trainer-done__missed-head">
+                        <h3 class="trainer-h3" id="done-missed-title">Positions you missed</h3>
+                        <button class="btn btn-secondary btn-sm" id="done-study-missed" type="button">Study these in reviews</button>
+                    </div>
+                    <p class="trainer-done__hint">Tap a position to see the board and the full analysis.</p>
+                    <div class="missed-grid" id="done-missed-grid"></div>
                     <p class="trainer-done__more" id="done-missed-more"></p>
                 </div>
                 <div class="trainer-done__actions">

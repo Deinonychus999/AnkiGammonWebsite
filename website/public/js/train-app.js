@@ -431,8 +431,10 @@
         $('study-context').textContent = contextLine(parsed.metadata);
         var dice = parsed.metadata.dice;
         $('study-prompt').textContent = q.cube || !dice ? q.prompt : 'You rolled ' + dice[0] + '-' + dice[1] + '. ' + q.prompt;
-        if (session.mode === 'review') {
-            $('study-left').textContent = plural(remaining(), 'position') + ' left';
+        if (session.mode === 'review' || session.mode === 'missed') {
+            $('study-left').textContent = session.mode === 'review'
+                ? plural(remaining(), 'position') + ' left'
+                : 'Miss ' + (session.index + 1) + ' of ' + session.misses.length;
             delete $('study-left').dataset.drill;
             delete $('study-left').dataset.urgent;
             $('storm-meter').hidden = true;
@@ -604,9 +606,12 @@
         $('study-skip').hidden = true;
         $('study-answer').hidden = false;
         var review = session.mode === 'review';
+        var viewer = session.mode === 'missed';
         $('study-grades').hidden = !review;
-        $('study-drill-end').hidden = review;
+        $('study-drill-end').hidden = review || viewer;
+        $('study-miss-nav').hidden = !viewer;
         if (review) renderGrades(D.suggestedRating(cur.verdict));
+        else if (viewer) renderMissNav();
         else $('study-drill-end').focus({ preventScroll: true });
     }
 
@@ -788,7 +793,7 @@
         s.lost += lost;
         if (kept) s.score++;
         if (cur.verdict === 'best') s.best++;
-        if (!kept) s.missed.push({ item: cur.item, picked: cur.picked.notation, best: cur.question.best.notation, lost: lost, cube: cur.question.cube });
+        if (!kept) s.missed.push({ item: cur.item, question: cur.question, picked: cur.picked, verdict: cur.verdict, lost: lost });
         markChoices(cur);
         renderDrillStatus();
         if (s.mode === 'streak' && !kept) {
@@ -804,28 +809,75 @@
         }, kept ? 350 : 900);
     }
 
+    // The results keep the misses of the last drill, so the viewer can step
+    // through them and return here.
+    var lastMissed = [];
+
     function renderMissed(missed) {
-        var table = $('done-missed-table');
-        table.textContent = '';
+        lastMissed = missed;
+        var grid = $('done-missed-grid');
+        grid.textContent = '';
         $('done-missed').hidden = !missed.length;
         if (!missed.length) return;
-        var head = el('tr');
-        ['Position', 'Your play', 'Best play', 'Lost'].forEach(function (h) { head.appendChild(el('th', null, h)); });
-        var thead = el('thead');
-        thead.appendChild(head);
-        table.appendChild(thead);
-        var body = el('tbody');
-        missed.slice(0, MISSED_SHOWN).forEach(function (m) {
-            var tr = el('tr');
+        $('done-missed-title').textContent = missed.length === 1 ? 'The position you missed' : plural(missed.length, 'position') + ' you missed';
+        missed.slice(0, MISSED_SHOWN).forEach(function (m, i) {
+            var card = el('button', 'missed-card');
+            card.type = 'button';
+            var parsed = window.PositionParser.parse(m.item.xgid);
+            var board = el('div', 'missed-card__board');
+            board.innerHTML = window.BoardRenderer.render(parsed.position, parsed.metadata, settings.scheme, settings.swap, settings.orientation === 'cw' ? 'cw' : 'ccw');
+            card.appendChild(board);
+            var text = el('span', 'missed-card__text');
             var dice = m.item.decision.dice;
-            tr.appendChild(el('td', null, m.cube ? 'Cube' : (dice ? dice.join('-') : 'Checker')));
-            tr.appendChild(el('td', 'study-analysis__move', m.picked));
-            tr.appendChild(el('td', 'study-analysis__move', m.best));
-            tr.appendChild(el('td', 'study-analysis__num', m.lost.toFixed(3)));
-            body.appendChild(tr);
+            text.appendChild(el('span', 'missed-card__kind', m.question.cube ? 'Cube decision' : (dice ? 'Rolled ' + dice.join('-') : 'Checker play')));
+            text.appendChild(el('span', 'missed-card__line missed-card__line--you', 'You: ' + m.picked.notation));
+            text.appendChild(el('span', 'missed-card__line', 'Best: ' + m.question.best.notation));
+            // A "too good" cube miss can cost no equity and still be the wrong action.
+            text.appendChild(el('span', 'missed-card__lost', m.lost < 0.0005 ? 'Same equity, wrong action' : '−' + m.lost.toFixed(3)));
+            card.appendChild(text);
+            card.setAttribute('aria-label', 'Review this position: you played ' + m.picked.notation + ', best was ' + m.question.best.notation);
+            card.addEventListener('click', function () { openMiss(i); });
+            grid.appendChild(card);
         });
-        table.appendChild(body);
-        $('done-missed-more').textContent = missed.length > MISSED_SHOWN ? 'And ' + (missed.length - MISSED_SHOWN) + ' more.' : '';
+        $('done-missed-more').textContent = missed.length > MISSED_SHOWN ? 'And ' + (missed.length - MISSED_SHOWN) + ' more; study them all with the button above.' : '';
+    }
+
+    function openMiss(index) {
+        var m = lastMissed[index];
+        if (!m) return;
+        session = { mode: 'missed', misses: lastMissed, index: index, title: $('done-title').textContent + ' · missed positions',
+                    current: { item: m.item, question: m.question, picked: m.picked, verdict: m.verdict } };
+        $('study-deck').textContent = session.title;
+        if (view !== 'study') showView('study');
+        renderCard();
+        reveal();
+    }
+
+    function renderMissNav() {
+        $('miss-prev').disabled = session.index === 0;
+        $('miss-next').disabled = session.index >= session.misses.length - 1;
+    }
+
+    function backToResults() {
+        session = null;
+        showView('done');
+    }
+
+    // Missed positions go into a normal review session, which does schedule them.
+    function studyMissed() {
+        var items = [];
+        var seen = {};
+        lastMissed.forEach(function (m) {
+            if (!seen[m.item.id]) {
+                seen[m.item.id] = true;
+                items.push(m.item);
+            }
+        });
+        if (!items.length) return;
+        session = { mode: 'review', deckId: null, title: 'Missed in ' + $('done-title').textContent, queue: items, learning: [], answered: 0, best: 0, current: null };
+        $('study-deck').textContent = session.title;
+        showView('study');
+        nextCard();
     }
 
     function finishDrill() {
@@ -850,7 +902,7 @@
         if (s.answered) summary += ' Equity lost: ' + s.lost.toFixed(3) + '.';
         $('done-summary').textContent = summary;
         $('done-next').textContent = record ? 'New personal best!' : (bests[s.mode] ? 'Your best: ' + bests[s.mode] + '.' : '');
-        renderMissed(s.mode === 'storm' ? s.missed : []);
+        renderMissed(s.missed);
         $('done-again').hidden = false;
         session = null;
         showView('done');
@@ -982,6 +1034,10 @@
     $('drill-streak').addEventListener('click', function () { startDrill('streak', $('drill-deck').value); });
     $('drill-storm').addEventListener('click', function () { startDrill('storm', $('drill-deck').value); });
     $('study-drill-end').addEventListener('click', finishDrill);
+    $('miss-prev').addEventListener('click', function () { if (session) openMiss(session.index - 1); });
+    $('miss-next').addEventListener('click', function () { if (session) openMiss(session.index + 1); });
+    $('miss-back').addEventListener('click', backToResults);
+    $('done-study-missed').addEventListener('click', studyMissed);
     $('done-again').addEventListener('click', function () {
         if (lastDrill) startDrill(lastDrill.mode, lastDrill.deckId);
     });
@@ -1001,6 +1057,12 @@
 
     document.addEventListener('keydown', function (e) {
         if (!session || !session.current || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (session.mode === 'missed') {
+            if (e.key === 'ArrowLeft' && session.index > 0) openMiss(session.index - 1);
+            else if (e.key === 'ArrowRight' && session.index < session.misses.length - 1) openMiss(session.index + 1);
+            else if (e.key === 'Escape') backToResults();
+            return;
+        }
         var cur = session.current;
         var key = e.key.toUpperCase();
         if (!cur.verdict) {
