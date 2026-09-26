@@ -537,20 +537,9 @@
     text-align: center;
 }
 
-.app-empty__dice {
+.app-empty__logo {
     width: 112px;
-    height: auto;
-    color: var(--text-dim);
-}
-
-.app-empty__dice rect {
-    fill: var(--bg-surface);
-    stroke: currentColor;
-    stroke-width: 3;
-}
-
-.app-empty__dice circle {
-    fill: currentColor;
+    height: 112px;
 }
 
 .app-empty__title {

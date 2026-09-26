@@ -34,7 +34,7 @@ website/
 ├── _partials/           # Shared HTML fragments (nav, footer, etc.)
 │   ├── nav.html         # Navigation bar (uses {{BASE}}, {{TOOLS_HREF}}, {{TOOLS_ACTIVE}})
 │   ├── footer.html      # Footer with social links
-│   ├── favicons.html    # Favicon link tags (uses {{BASE}})
+│   ├── favicons.html    # Favicon link tags (uses {{BASE}}); the icon files are rendered from the app repo's icon.svg by its scripts/generate_icons.py --website
 │   ├── css.html         # CSS stylesheet links (uses {{BASE}})
 │   ├── kofi.html        # Ko-fi donation widget
 │   └── icons/           # Lucide SVG icons (one file per icon, fetched from lucide-static)
