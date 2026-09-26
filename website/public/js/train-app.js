@@ -999,8 +999,8 @@
         });
     }
 
-    // The desktop app serves one study pack, once, on 127.0.0.1 for about two
-    // minutes, and opens the trainer with its port and a single-use key.
+    // The desktop app serves one study pack on 127.0.0.1 for about two minutes,
+    // and opens the trainer with its port and a single-use key.
     function importFromDesktop(port, key) {
         notify('');
         setStatus('Getting positions from AnkiGammon on this computer…', 'busy');
@@ -1010,7 +1010,11 @@
             return r.json();
         }).then(function (pack) {
             var title = (pack && pack.deck && pack.deck.title) || 'AnkiGammon';
-            return saveImported(D.fromPack(pack, { title: title, id: 'desktop:' + D.slug(title), source: 'desktop' }), false);
+            return saveImported(D.fromPack(pack, { title: title, id: 'desktop:' + D.slug(title), source: 'desktop' }), false).then(function () {
+                // The desktop app keeps offering the pack until this receipt, because
+                // Chrome can deliver the request before the user allows local access.
+                fetch('http://127.0.0.1:' + port + '/done/' + key, { method: 'POST' }).catch(function () {});
+            });
         }).catch(function (e) {
             notify(e instanceof TypeError
                 ? "Couldn't reach AnkiGammon on this computer. In the desktop app, use File → Export to Trainer to save the positions as a file, then open it here."
