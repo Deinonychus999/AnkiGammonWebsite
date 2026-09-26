@@ -173,6 +173,20 @@
     color: var(--accent-success);
 }
 
+/* One line under the start paths for studying without Anki */
+.start-alt {
+    max-width: 920px;
+    margin: calc(-1 * var(--space-lg)) auto var(--space-2xl);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.start-alt a {
+    color: var(--accent-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 /* ===== Start Paths (desktop app or browser) ===== */
 .start-paths {
     display: grid;

@@ -104,6 +104,14 @@
         },
         {
           "@type": "Question",
+          "name": "Do I need Anki?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Anki is the main way to study AnkiGammon decks, but the free AnkiGammon trainer at ankigammon.com/train/ runs in the browser on a phone or computer, with no Anki and no account. It asks for the best move or cube action, shows the analysis, grades your answer and schedules reviews with FSRS, the scheduler modern Anki uses. It also has Blunder Streak and Storm drills, and works offline once added to your Home Screen. Decks come from the community decks, from your own eXtreme Gammon matches through the web app, or from the desktop app with File, Export to Trainer. Progress stays in that browser; a backup file moves it to another device."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "What's the difference between AnkiConnect and APKG export?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -291,6 +299,10 @@
                 </article>
             </div>
 
+            <p class="start-alt">
+                No Anki? <a href="train/">The free trainer</a> quizzes your positions on any device, with spaced repetition, and works offline on your phone.
+            </p>
+
             <div class="quick-stats">
                 <span>
                     <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
@@ -366,10 +378,10 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <!-- ICON:zap -->
+                        <!-- ICON:smartphone -->
                     </div>
-                    <h3>Two Ways to Export</h3>
-                    <p>Choose AnkiConnect for instant one-click export to running Anki, or APKG files for offline/portable decks. Shows progress as it exports.</p>
+                    <h3>Study in Anki, or Without It</h3>
+                    <p>Send cards to a running Anki in one click with AnkiConnect, or download an .apkg for any Anki app. No Anki? Export a study pack for the free <a href="train/">browser trainer</a>, which schedules your reviews on a phone or computer, even offline.</p>
                 </div>
 
                 <div class="feature-card">
@@ -722,6 +734,23 @@
                         <div class="faq-answer-content">
                             <p>Yes: the <a href="app/">AnkiGammon web app</a> runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app.</p>
                             <p>It has no analysis engine, so it reads positions eXtreme Gammon has already analyzed: .xg and .xgp files, or analysis copied from XG with Ctrl+C. It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. To analyze position IDs or .mat and .sgf files with GNU Backgammon, or add score matrices, use the desktop app.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>Do I need Anki?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No. Anki is the main way to study AnkiGammon decks, but the free <a href="train/">AnkiGammon trainer</a> runs in the browser on a phone or computer, with no Anki and no account. It asks for the best move or cube action, shows the analysis, grades your answer and schedules reviews with FSRS, the scheduler modern Anki uses. It also has Blunder Streak and Storm drills, and works offline once added to your Home Screen.</p>
+                            <p>Decks come from the <a href="decks/">community decks</a>, from your own eXtreme Gammon matches through the <a href="app/">web app</a>, or from the desktop app with File &rarr; Export to Trainer. Progress stays in that browser; a backup file moves it to another device.</p>
                         </div>
                     </div>
                 </div>
