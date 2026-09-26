@@ -8,7 +8,7 @@
  * requests to the decks API go straight to the network; the trainer keeps
  * decks in IndexedDB.
  */
-var CACHE = 'ankigammon-trainer-v2';
+var CACHE = 'ankigammon-trainer-v3';
 var NETWORK_TIMEOUT_MS = 4000;
 
 var SHELL = [
@@ -30,8 +30,9 @@ var SHELL = [
     '../js/train-deck.js',
     '../js/train-store.js',
     '../js/train-app.js',
-    '../assets/images/icon.webp',
-    '../assets/images/icon.png',
+    '../favicon.ico',
+    '../assets/images/icon.svg',
+    '../assets/images/apple-touch-icon.png',
     '../assets/images/icon-192.png'
 ];
 
