@@ -55,9 +55,20 @@
 
     function notify(text, kind) {
         var box = $('trainer-notice');
-        box.textContent = text || '';
+        $('trainer-notice-text').textContent = text || '';
         box.hidden = !text;
-        box.className = 'trainer-notice' + (kind ? ' trainer-notice--' + kind : '');
+        if (kind) box.dataset.kind = kind;
+        else delete box.dataset.kind;
+    }
+
+    function openDialog(id) {
+        var dialog = $(id);
+        if (!dialog.open) dialog.showModal();
+    }
+
+    function closeDialog(id) {
+        var dialog = $(id);
+        if (dialog.open) dialog.close();
     }
 
     function loadScript(src, globalName) {
@@ -160,7 +171,8 @@
         });
 
         $('deck-empty').hidden = decks.length > 0;
-        $('decks-heading').hidden = decks.length === 0;
+        $('trainer-dash').hidden = decks.length === 0;
+        syncShell();
         var newShown = Math.min(totalNew, newLeftToday());
         var summary = $('today-summary');
         if (!decks.length) {
@@ -217,6 +229,7 @@
             if (result.skipped) parts.push(plural(result.skipped, 'position') + ' without analysis ' + (result.skipped === 1 ? 'was' : 'were') + ' left out');
             if (extra && extra.length) parts = parts.concat(extra);
             notify(parts.join('. ') + '.', 'ok');
+            closeDialog('add-dialog');
             return refresh();
         });
     }
@@ -245,6 +258,8 @@
         try { data = JSON.parse(text); } catch (e) { throw new Error(name + ' is not a trainer backup or an AnkiGammon position pack.'); }
         if (data && data.format === 'ankigammon-trainer-backup') {
             return Store.importAll(data).then(function (r) {
+                closeDialog('settings-dialog');
+                closeDialog('add-dialog');
                 return loadSettings().then(refresh).then(function () {
                     notify('Restored ' + plural(r.decks, 'deck') + ' with ' + plural(r.items, 'position') + '.', 'ok');
                 });
@@ -437,7 +452,7 @@
         });
         $('study-skip').hidden = session.mode !== 'review';
         $('study-answer').hidden = true;
-        window.scrollTo(0, 0);
+        scrollToTop();
     }
 
     function fmtEquity(n) {
@@ -838,12 +853,27 @@
         refresh();
     }
 
+    var view = 'home';
+
+    // The shell's data-view drives the bar, the deck list and the layout;
+    // "empty" is the home view before any deck is added.
+    function syncShell() {
+        $('trainer-shell').dataset.view = view === 'home' ? (decks.length ? 'home' : 'empty') : view;
+    }
+
+    function scrollToTop() {
+        $('trainer-shell').querySelector('.trainer-stage').scrollTop = 0;
+        window.scrollTo(0, 0);
+    }
+
     function showView(name) {
+        view = name;
         $('view-home').hidden = name !== 'home';
         $('view-study').hidden = name !== 'study';
         $('view-done').hidden = name !== 'done';
         document.body.classList.toggle('is-studying', name !== 'home');
-        window.scrollTo(0, 0);
+        syncShell();
+        scrollToTop();
     }
 
     // ── Settings ───────────────────────────────────────────────────────
@@ -976,6 +1006,13 @@
     });
 
     $('file-btn').addEventListener('click', function () { $('file-input').click(); });
+    ['add-open', 'add-open-side', 'empty-community'].forEach(function (id) {
+        $(id).addEventListener('click', function () { openDialog('add-dialog'); });
+    });
+    $('settings-open').addEventListener('click', function () { openDialog('settings-dialog'); });
+    $('empty-file').addEventListener('click', function () { $('file-input').click(); });
+    $('empty-restore').addEventListener('click', function () { $('file-input').click(); });
+    $('trainer-notice-close').addEventListener('click', function () { notify(''); });
     $('file-input').addEventListener('change', function () {
         importFile($('file-input').files[0]);
         $('file-input').value = '';
@@ -988,9 +1025,39 @@
     drop.addEventListener('dragleave', function () { drop.classList.remove('drop-zone--active'); });
     drop.addEventListener('drop', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         drop.classList.remove('drop-zone--active');
         importFile(e.dataTransfer.files[0]);
     });
+
+    // A file dropped anywhere on the home view is added too.
+    var shell = $('trainer-shell');
+    var overlay = $('drop-overlay');
+    function carriesFiles(e) {
+        return view === 'home' && e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') >= 0;
+    }
+    shell.addEventListener('dragover', function (e) {
+        if (!carriesFiles(e)) return;
+        e.preventDefault();
+        overlay.hidden = false;
+    });
+    shell.addEventListener('dragleave', function (e) {
+        if (!shell.contains(e.relatedTarget)) overlay.hidden = true;
+    });
+    shell.addEventListener('drop', function (e) {
+        overlay.hidden = true;
+        if (!carriesFiles(e)) return;
+        e.preventDefault();
+        importFile(e.dataTransfer.files[0]);
+    });
+
+    // The shell fills the window below the sticky nav, whose height changes when it wraps.
+    var nav = document.querySelector('.nav');
+    if (nav && window.ResizeObserver) {
+        new ResizeObserver(function () {
+            shell.style.setProperty('--app-nav', nav.offsetHeight + 'px');
+        }).observe(nav);
+    }
 
     ['set-scheme', 'set-orientation', 'set-swap', 'set-new'].forEach(function (id) {
         $(id).addEventListener('change', saveSettings);

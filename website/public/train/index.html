@@ -49,193 +49,244 @@
     <!-- PARTIAL:nav -->
 
     <main id="trainer" class="trainer">
-
-    <!-- Home -->
-    <section class="section trainer-home" id="view-home">
-        <div class="container trainer-container">
-            <header class="trainer-intro">
-                <h1>Backgammon trainer</h1>
-                <p class="trainer-intro__lead">Answer positions, see the analysis, and get each one back just before you would forget it. Works offline on your phone or computer, with no Anki and no account.</p>
-            </header>
-
-            <p class="app-status" id="trainer-status" role="status" aria-live="polite">
+    <div class="app-shell trainer-shell" id="trainer-shell" data-view="empty">
+        <header class="app-bar">
+            <div class="app-bar__group trainer-bar__home">
+                <button class="btn btn-primary btn-sm" id="study-all" type="button" disabled>Study now</button>
+                <button class="btn btn-secondary btn-sm" id="add-open" type="button">Add a deck</button>
+            </div>
+            <div class="app-bar__group trainer-bar__study">
+                <button class="btn btn-secondary btn-sm" id="study-back" type="button" aria-label="Back to decks">&larr; Decks</button>
+            </div>
+            <p class="app-status app-bar__status trainer-bar__home" id="trainer-status" role="status" aria-live="polite">
                 <span class="app-status__dot" aria-hidden="true"></span>
                 <span id="trainer-status-text">Opening your decks…</span>
             </p>
-
-            <div class="trainer-notice" id="trainer-notice" role="alert" hidden></div>
-
-            <div class="trainer-install" id="install-ios" hidden>
-                <p><strong>On iPhone and iPad, add the trainer to your Home Screen first:</strong> tap Share, then <em>Add to Home Screen</em>, and add decks from there. Safari deletes a website's data after 7 days without a visit; the Home Screen app keeps it.</p>
+            <p class="app-bar__status trainer-bar__study study-bar__deck" id="study-deck"></p>
+            <span class="study-bar__left trainer-bar__study" id="study-left"></span>
+            <div class="app-bar__group app-bar__actions trainer-bar__home">
+                <button class="app-icon-btn" id="settings-open" type="button" title="Settings and backup">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg>
+                    Settings
+                </button>
             </div>
-            <div class="trainer-install" id="install-app" hidden>
-                <p>Install the trainer as an app to study offline from your home screen.</p>
-                <button class="btn btn-secondary btn-sm" id="install-btn" type="button">Install</button>
-            </div>
+        </header>
 
-            <div class="trainer-today">
-                <p class="trainer-today__summary" id="today-summary"></p>
-                <button class="btn btn-primary" id="study-all" type="button" disabled>Study now</button>
-            </div>
-
-            <h2 class="trainer-h2" id="decks-heading" hidden>Your decks</h2>
+        <aside class="app-side trainer-side" aria-labelledby="decks-heading">
+            <h2 class="trainer-side__title" id="decks-heading">Your decks</h2>
             <ul class="trainer-decks" id="deck-list"></ul>
-            <section class="trainer-drills-section" id="drills" hidden aria-labelledby="drills-heading">
-                <h2 class="trainer-h2" id="drills-heading">Drills</h2>
-                <div class="trainer-drills">
-                    <div class="trainer-drill">
-                        <h3 class="trainer-drill__title">Blunder Streak</h3>
-                        <p class="trainer-drill__text">How many positions in a row can you get right? One miss ends the run. A checker play within 0.020 of the best keeps you going.</p>
-                        <p class="trainer-drill__best" id="best-streak"></p>
-                        <button class="btn btn-primary btn-sm" id="drill-streak" type="button">Start a streak</button>
+            <button class="app-link-btn trainer-side__add" id="add-open-side" type="button">Add a deck</button>
+        </aside>
+
+        <section class="app-stage trainer-stage" aria-label="Trainer">
+            <div class="app-banner trainer-notice" id="trainer-notice" role="alert" hidden>
+                <p class="app-banner__message" id="trainer-notice-text"></p>
+                <button class="app-banner__close" id="trainer-notice-close" type="button" aria-label="Dismiss">&times;</button>
+            </div>
+
+            <!-- Home -->
+            <div class="trainer-home" id="view-home">
+                <div class="trainer-install" id="install-ios" hidden>
+                    <p><strong>On iPhone and iPad, add the trainer to your Home Screen first:</strong> tap Share, then <em>Add to Home Screen</em>, and add decks from there. Safari deletes a website's data after 7 days without a visit; the Home Screen app keeps it.</p>
+                </div>
+                <div class="trainer-install" id="install-app" hidden>
+                    <p>Install the trainer as an app to study offline from your home screen.</p>
+                    <button class="btn btn-secondary btn-sm" id="install-btn" type="button">Install</button>
+                </div>
+
+                <div class="app-empty" id="deck-empty">
+                    <svg class="app-empty__dice" viewBox="0 0 120 90" aria-hidden="true">
+                        <g transform="rotate(-12 36 52)"><rect x="8" y="24" width="56" height="56" rx="10"/><circle cx="22" cy="38" r="4.5"/><circle cx="36" cy="52" r="4.5"/><circle cx="50" cy="66" r="4.5"/></g>
+                        <g transform="rotate(14 82 40)"><rect x="54" y="12" width="56" height="56" rx="10"/><circle cx="68" cy="26" r="4.5"/><circle cx="96" cy="26" r="4.5"/><circle cx="68" cy="54" r="4.5"/><circle cx="96" cy="54" r="4.5"/></g>
+                    </svg>
+                    <h1 class="app-empty__title">Backgammon trainer, no Anki needed</h1>
+                    <p class="app-empty__lead">Answer positions, see the analysis, and get each one back just before you would forget it. Works offline on your phone or computer, with no account.</p>
+                    <div class="app-empty__actions">
+                        <button class="btn btn-primary" id="empty-community" type="button">Browse community decks</button>
+                        <button class="btn btn-secondary" id="empty-file" type="button">Open a deck file</button>
                     </div>
-                    <div class="trainer-drill">
-                        <h3 class="trainer-drill__title">Storm</h3>
-                        <p class="trainer-drill__text">Three minutes to get as many right as you can. Each miss costs 10 seconds.</p>
-                        <p class="trainer-drill__best" id="best-storm"></p>
-                        <button class="btn btn-primary btn-sm" id="drill-storm" type="button">Start a storm</button>
+                    <p class="app-empty__sample">Have an eXtreme Gammon match? <a href="../app/">Make a deck from it in the web app</a>.</p>
+                    <p class="app-empty__limits">
+                        The web app needs XG's analysis: an .xg or .xgp file, or text copied from XG. Moving from another device?
+                        <button class="app-link-btn" id="empty-restore" type="button">Restore a backup</button>.
+                    </p>
+                </div>
+
+                <div class="trainer-dash" id="trainer-dash" hidden>
+                    <div class="trainer-today">
+                        <p class="trainer-today__summary" id="today-summary"></p>
+                    </div>
+
+                    <section class="trainer-drills-section" id="drills" hidden aria-labelledby="drills-heading">
+                        <h2 class="trainer-h2" id="drills-heading">Drills</h2>
+                        <div class="trainer-drills">
+                            <div class="trainer-drill">
+                                <h3 class="trainer-drill__title">Blunder Streak</h3>
+                                <p class="trainer-drill__text">How many positions in a row can you get right? One miss ends the run. A checker play within 0.020 of the best keeps you going.</p>
+                                <p class="trainer-drill__best" id="best-streak"></p>
+                                <button class="btn btn-primary btn-sm" id="drill-streak" type="button">Start a streak</button>
+                            </div>
+                            <div class="trainer-drill">
+                                <h3 class="trainer-drill__title">Storm</h3>
+                                <p class="trainer-drill__text">Three minutes to get as many right as you can. Each miss costs 10 seconds.</p>
+                                <p class="trainer-drill__best" id="best-storm"></p>
+                                <button class="btn btn-primary btn-sm" id="drill-storm" type="button">Start a storm</button>
+                            </div>
+                        </div>
+                        <div class="trainer-drill-options">
+                            <label class="app-field">
+                                <span>Positions from</span>
+                                <select id="drill-deck"></select>
+                            </label>
+                            <p class="trainer-drill-options__note">Drills don't change your review schedule.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Study -->
+            <div class="trainer-study" id="view-study" hidden>
+                <div class="study-layout">
+                    <div class="study-board" id="study-board"></div>
+                    <div class="study-panel">
+                        <p class="study-context" id="study-context"></p>
+                        <h2 class="study-prompt" id="study-prompt"></h2>
+                        <div class="study-choices" id="study-choices"></div>
+                        <button class="app-link-btn study-skip" id="study-skip" type="button">I don't know, show the answer</button>
+
+                        <div class="study-answer" id="study-answer" hidden>
+                            <p class="study-verdict" id="study-verdict" role="status"></p>
+                            <table class="study-analysis" id="study-analysis"></table>
+                            <button class="app-link-btn study-more" id="study-all-moves" type="button" hidden></button>
+                            <div class="study-chances" id="study-chances"></div>
+                            <div class="study-note" id="study-note"></div>
+                            <p class="study-source" id="study-source"></p>
+                            <button class="btn btn-primary study-drill-end" id="study-drill-end" type="button" hidden>See results</button>
+                            <div class="study-grades" id="study-grades" role="group" aria-label="How well did you know it?">
+                                <button class="study-grade study-grade--again" type="button" data-rating="1"><span class="study-grade__name">Again</span><span class="study-grade__when"></span></button>
+                                <button class="study-grade study-grade--hard" type="button" data-rating="2"><span class="study-grade__name">Hard</span><span class="study-grade__when"></span></button>
+                                <button class="study-grade study-grade--good" type="button" data-rating="3"><span class="study-grade__name">Good</span><span class="study-grade__when"></span></button>
+                                <button class="study-grade study-grade--easy" type="button" data-rating="4"><span class="study-grade__name">Easy</span><span class="study-grade__when"></span></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="trainer-drill-options">
-                    <label class="app-field">
-                        <span>Positions from</span>
-                        <select id="drill-deck"></select>
-                    </label>
-                    <p class="trainer-drill-options__note">Drills don't change your review schedule.</p>
+            </div>
+
+            <!-- Session done -->
+            <div class="trainer-done" id="view-done" hidden>
+                <h2 class="trainer-h2" id="done-title">Session done</h2>
+                <p id="done-summary"></p>
+                <p class="trainer-done__next" id="done-next"></p>
+                <div class="trainer-done__missed" id="done-missed" hidden>
+                    <h3 class="trainer-h3">Positions you missed</h3>
+                    <table class="study-analysis trainer-missed" id="done-missed-table"></table>
+                    <p class="trainer-done__more" id="done-missed-more"></p>
+                </div>
+                <div class="trainer-done__actions">
+                    <button class="btn btn-primary" id="done-again" type="button" hidden>Play again</button>
+                    <button class="btn btn-secondary" id="done-back" type="button">Back to decks</button>
+                </div>
+            </div>
+
+            <div class="app-drop" id="drop-overlay" hidden>
+                <p>Drop the deck file to add it</p>
+            </div>
+        </section>
+    </div>
+
+    <input type="file" id="file-input" accept=".apkg,.json,application/json" hidden>
+
+    <dialog class="app-dialog" id="add-dialog" aria-labelledby="add-title">
+        <form method="dialog" class="app-dialog__body">
+            <h2 class="app-dialog__title" id="add-title">Add a deck</h2>
+            <section class="app-dialog__section" aria-labelledby="add-community">
+                <h3 class="app-dialog__heading" id="add-community">Community decks</h3>
+                <ul class="trainer-community" id="community-list">
+                    <li class="trainer-community__empty">Loading…</li>
+                </ul>
+            </section>
+            <section class="app-dialog__section" aria-labelledby="add-own">
+                <h3 class="app-dialog__heading" id="add-own">Your own positions</h3>
+                <div class="drop-zone drop-zone--compact" id="drop-zone">
+                    <p class="drop-zone__text">
+                        Drop a study pack (<strong>.json</strong>) or an AnkiGammon <strong>.apkg</strong> deck here, or
+                        <button class="drop-zone__browse" id="file-btn" type="button">choose a file</button>
+                    </p>
+                    <p class="drop-zone__hint">In the desktop app, File &rarr; Export to Trainer saves a study pack. Adding the same deck again adds its new positions and keeps your progress.</p>
                 </div>
             </section>
-
-            <p class="trainer-empty" id="deck-empty" hidden>No decks on this device yet. Add a community deck below, or open a deck you made with AnkiGammon.</p>
-
-            <h2 class="trainer-h2">Add a deck</h2>
-            <div class="trainer-add">
-                <div class="trainer-add__panel">
-                    <h3 class="trainer-h3">Community decks</h3>
-                    <ul class="trainer-community" id="community-list">
-                        <li class="trainer-community__empty">Loading…</li>
-                    </ul>
-                </div>
-                <div class="trainer-add__panel">
-                    <h3 class="trainer-h3">Your own positions</h3>
-                    <div class="drop-zone drop-zone--compact" id="drop-zone">
-                        <p class="drop-zone__text">
-                            Drop a study pack (<strong>.json</strong>) or an AnkiGammon <strong>.apkg</strong> deck here, or
-                            <button class="drop-zone__browse" id="file-btn" type="button">choose a file</button>
-                        </p>
-                        <p class="drop-zone__hint">In the desktop app, File &rarr; Export to Trainer saves a study pack. Adding the same deck again adds its new positions and keeps your progress.</p>
-                        <input type="file" id="file-input" accept=".apkg,.json,application/json" hidden>
-                    </div>
-                    <p class="trainer-add__alt">No deck yet? <a href="../app/">Make one from an eXtreme Gammon file</a>, then choose <em>Study in the trainer</em>.</p>
-                </div>
+            <section class="app-dialog__section" aria-labelledby="add-xg">
+                <h3 class="app-dialog__heading" id="add-xg">From an eXtreme Gammon match</h3>
+                <p class="app-dialog__note">Have an XG match? <a href="../app/">Make a deck from it in the web app</a>, then choose <em>Study in the trainer</em>. It needs XG's analysis: an .xg or .xgp file, or text copied from XG.</p>
+            </section>
+            <div class="app-dialog__footer">
+                <button class="btn btn-secondary btn-sm" value="close">Close</button>
             </div>
+        </form>
+    </dialog>
 
-            <details class="trainer-details">
-                <summary>Settings</summary>
-                <div class="trainer-settings">
-                    <label class="app-field">
-                        <span>Color scheme</span>
-                        <select id="set-scheme">
-                            <option value="classic">Classic</option>
-                            <option value="forest">Forest</option>
-                            <option value="ocean">Ocean</option>
-                            <option value="desert">Desert</option>
-                            <option value="sunset">Sunset</option>
-                            <option value="midnight">Midnight</option>
-                            <option value="monochrome">Monochrome</option>
-                        </select>
-                    </label>
-                    <label class="app-field">
-                        <span>Board orientation</span>
-                        <select id="set-orientation">
-                            <option value="ccw">Counter-clockwise</option>
-                            <option value="cw">Clockwise</option>
-                            <option value="random">Random</option>
-                        </select>
-                    </label>
-                    <label class="app-field">
-                        <span>New positions per day</span>
-                        <input id="set-new" type="number" min="0" max="9999" step="1" value="20" inputmode="numeric">
-                    </label>
-                    <label class="app-check"><input id="set-swap" type="checkbox"> Swap checker colors</label>
+    <dialog class="app-dialog" id="settings-dialog" aria-labelledby="settings-title">
+        <form method="dialog" class="app-dialog__body">
+            <h2 class="app-dialog__title" id="settings-title">Settings</h2>
+            <section class="app-dialog__section app-dialog__grid" aria-labelledby="settings-board">
+                <h3 class="app-dialog__heading" id="settings-board">Board</h3>
+                <label class="app-field">
+                    <span>Color scheme</span>
+                    <select id="set-scheme">
+                        <option value="classic">Classic</option>
+                        <option value="forest">Forest</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="desert">Desert</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="midnight">Midnight</option>
+                        <option value="monochrome">Monochrome</option>
+                    </select>
+                </label>
+                <label class="app-field">
+                    <span>Board orientation</span>
+                    <select id="set-orientation">
+                        <option value="ccw">Counter-clockwise</option>
+                        <option value="cw">Clockwise</option>
+                        <option value="random">Random</option>
+                    </select>
+                </label>
+                <label class="app-check"><input id="set-swap" type="checkbox"> Swap checker colors</label>
+            </section>
+            <section class="app-dialog__section app-dialog__grid" aria-labelledby="settings-reviews">
+                <h3 class="app-dialog__heading" id="settings-reviews">Reviews</h3>
+                <label class="app-field">
+                    <span>New positions per day</span>
+                    <input id="set-new" type="number" min="0" max="9999" step="1" value="20" inputmode="numeric">
+                </label>
+            </section>
+            <section class="app-dialog__section" aria-labelledby="settings-backup">
+                <h3 class="app-dialog__heading" id="settings-backup">Backup and other devices</h3>
+                <p class="app-dialog__note">Your decks and progress are stored only in this browser. To move them to another device, or keep a copy, download a backup and open it in the trainer there. Restoring never replaces newer progress with older.</p>
+                <div class="trainer-backup__actions">
+                    <button class="btn btn-secondary btn-sm" id="backup-btn" type="button">Download backup</button>
+                    <button class="btn btn-secondary btn-sm" id="restore-btn" type="button">Restore a backup</button>
                 </div>
-            </details>
-
-            <details class="trainer-details">
-                <summary>Backup and other devices</summary>
-                <div class="trainer-backup">
-                    <p>Your decks and progress are stored only in this browser. To move them to another device, or keep a copy, download a backup and open it in the trainer there. Restoring never replaces newer progress with older.</p>
-                    <div class="trainer-backup__actions">
-                        <button class="btn btn-secondary btn-sm" id="backup-btn" type="button">Download backup</button>
-                        <button class="btn btn-secondary btn-sm" id="restore-btn" type="button">Restore a backup</button>
-                    </div>
-                </div>
-            </details>
-
-            <div class="tool-guide trainer-guide">
-                <h2>How it works</h2>
-                <ul>
-                    <li><strong>Pick the play.</strong> Each position asks for the best move or cube action, like the AnkiGammon Anki cards.</li>
-                    <li><strong>See the analysis.</strong> The answer shows every candidate with its equity, the winning chances and any notes.</li>
-                    <li><strong>The trainer grades you.</strong> The best play counts as <em>Good</em>, a checker play within 0.020 as <em>Hard</em>, anything else as <em>Again</em>. Change the grade before moving on if you disagree.</li>
-                    <li><strong>It schedules the reviews.</strong> The trainer uses FSRS, the same scheduler modern Anki uses, so positions you know come back less and less often.</li>
-                </ul>
-                <p>Already use Anki? Keep using it: the same decks import into Anki from the <a href="../app/">web app</a> or the <a href="/#install">desktop app</a>.</p>
+            </section>
+            <div class="app-dialog__footer">
+                <button class="btn btn-primary btn-sm" value="close">Done</button>
             </div>
+        </form>
+    </dialog>
+
+    <section class="tool-info section">
+        <div class="container tool-guide">
+            <h2>How it works</h2>
+            <ul>
+                <li><strong>Pick the play.</strong> Each position asks for the best move or cube action, like the AnkiGammon Anki cards.</li>
+                <li><strong>See the analysis.</strong> The answer shows every candidate with its equity, the winning chances and any notes.</li>
+                <li><strong>The trainer grades you.</strong> The best play counts as <em>Good</em>, a checker play within 0.020 as <em>Hard</em>, anything else as <em>Again</em>. Change the grade before moving on if you disagree.</li>
+                <li><strong>It schedules the reviews.</strong> The trainer uses FSRS, the same scheduler modern Anki uses, so positions you know come back less and less often.</li>
+                <li><strong>Drills</strong> are for speed: Blunder Streak ends at your first miss, and Storm gives you three minutes. They don't change the review schedule.</li>
+            </ul>
+            <p>Your decks can come from the community, from the <a href="../app/">web app</a> (your own eXtreme Gammon matches), or from the <a href="/#install">desktop app</a> with File &rarr; Export to Trainer. Already use Anki? Keep using it: the same decks import into Anki too.</p>
         </div>
     </section>
-
-    <!-- Study -->
-    <section class="trainer-study" id="view-study" hidden>
-        <div class="study-bar">
-            <button class="study-bar__back" id="study-back" type="button" aria-label="Back to decks">&larr; Decks</button>
-            <span class="study-bar__deck" id="study-deck"></span>
-            <span class="study-bar__left" id="study-left"></span>
-        </div>
-        <div class="study-layout">
-            <div class="study-board" id="study-board"></div>
-            <div class="study-panel">
-                <p class="study-context" id="study-context"></p>
-                <h2 class="study-prompt" id="study-prompt"></h2>
-                <div class="study-choices" id="study-choices"></div>
-                <button class="app-link-btn study-skip" id="study-skip" type="button">I don't know, show the answer</button>
-
-                <div class="study-answer" id="study-answer" hidden>
-                    <p class="study-verdict" id="study-verdict" role="status"></p>
-                    <table class="study-analysis" id="study-analysis"></table>
-                    <button class="app-link-btn study-more" id="study-all-moves" type="button" hidden></button>
-                    <div class="study-chances" id="study-chances"></div>
-                    <div class="study-note" id="study-note"></div>
-                    <p class="study-source" id="study-source"></p>
-                    <button class="btn btn-primary study-drill-end" id="study-drill-end" type="button" hidden>See results</button>
-                    <div class="study-grades" id="study-grades" role="group" aria-label="How well did you know it?">
-                        <button class="study-grade study-grade--again" type="button" data-rating="1"><span class="study-grade__name">Again</span><span class="study-grade__when"></span></button>
-                        <button class="study-grade study-grade--hard" type="button" data-rating="2"><span class="study-grade__name">Hard</span><span class="study-grade__when"></span></button>
-                        <button class="study-grade study-grade--good" type="button" data-rating="3"><span class="study-grade__name">Good</span><span class="study-grade__when"></span></button>
-                        <button class="study-grade study-grade--easy" type="button" data-rating="4"><span class="study-grade__name">Easy</span><span class="study-grade__when"></span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Session done -->
-    <section class="section trainer-done" id="view-done" hidden>
-        <div class="container trainer-container">
-            <h2 class="trainer-h2" id="done-title">Session done</h2>
-            <p id="done-summary"></p>
-            <p class="trainer-done__next" id="done-next"></p>
-            <div class="trainer-done__missed" id="done-missed" hidden>
-                <h3 class="trainer-h3">Positions you missed</h3>
-                <table class="study-analysis trainer-missed" id="done-missed-table"></table>
-                <p class="trainer-done__more" id="done-missed-more"></p>
-            </div>
-            <div class="trainer-done__actions">
-                <button class="btn btn-primary" id="done-again" type="button" hidden>Play again</button>
-                <button class="btn btn-secondary" id="done-back" type="button">Back to decks</button>
-            </div>
-        </div>
-    </section>
-
     </main>
 
     <!-- PARTIAL:footer -->

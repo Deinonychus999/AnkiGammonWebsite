@@ -1,27 +1,31 @@
 /* ===== Trainer (train/) ===== */
+/* The shell, bar, side list, stage, dialogs and empty state are the web
+   app's, from app.css; this file adds what only the trainer needs. */
 
-.trainer-container {
-    max-width: 880px;
+.trainer-shell:not([data-view="study"]):not([data-view="done"]) .trainer-bar__study,
+.trainer-shell[data-view="study"] .trainer-bar__home,
+.trainer-shell[data-view="done"] .trainer-bar__home,
+.trainer-shell[data-view="done"] .study-bar__left {
+    display: none;
 }
 
-.trainer-home {
-    padding-top: var(--space-2xl);
+.trainer-shell[data-view="study"],
+.trainer-shell[data-view="done"] {
+    grid-template-columns: minmax(0, 1fr);
 }
 
-.trainer-intro h1 {
-    font-size: 2.25rem;
-    margin-bottom: var(--space-md);
+.trainer-shell[data-view="study"] .app-side,
+.trainer-shell[data-view="done"] .app-side {
+    display: none;
 }
 
-.trainer-intro__lead {
-    color: var(--text-secondary);
-    font-size: 1.05rem;
-    max-width: 640px;
+.trainer-stage {
+    overflow-y: auto;
 }
 
 .trainer-h2 {
-    font-size: 1.35rem;
-    margin: var(--space-2xl) 0 var(--space-md);
+    font-size: 1.2rem;
+    margin: var(--space-xl) 0 var(--space-md);
 }
 
 .trainer-h3 {
@@ -29,64 +33,6 @@
     margin-bottom: var(--space-md);
     color: var(--text-secondary);
     font-weight: 600;
-}
-
-.trainer-notice {
-    margin-bottom: var(--space-lg);
-    padding: var(--space-md) var(--space-lg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-elevated);
-    color: var(--text-secondary);
-}
-
-.trainer-notice--ok {
-    border-color: var(--accent-success);
-    color: var(--text-primary);
-}
-
-.trainer-notice--error {
-    border-color: var(--accent-warning);
-    color: var(--text-primary);
-}
-
-.trainer-install {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
-    padding: var(--space-md) var(--space-lg);
-    border: 1px solid var(--accent-primary);
-    border-radius: 8px;
-    background: var(--bg-elevated);
-}
-
-.trainer-install p {
-    margin: 0;
-    flex: 1 1 280px;
-    color: var(--text-secondary);
-}
-
-.trainer-install strong {
-    color: var(--text-primary);
-}
-
-.trainer-today {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-md);
-    padding: var(--space-lg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-secondary);
-}
-
-.trainer-today__summary {
-    margin: 0;
-    font-size: 1.05rem;
 }
 
 .btn:disabled,
@@ -97,7 +43,51 @@
     box-shadow: none;
 }
 
-/* Deck list */
+/* Notice: app.css's banner, in the trainer's three tones */
+.trainer-notice {
+    border-left-color: var(--accent-primary);
+}
+
+.trainer-notice .app-banner__message {
+    color: var(--text-secondary);
+}
+
+.trainer-notice[data-kind="ok"] {
+    border-left-color: var(--accent-success);
+}
+
+.trainer-notice[data-kind="ok"] .app-banner__message {
+    color: var(--text-primary);
+}
+
+.trainer-notice[data-kind="error"] {
+    border-left-color: var(--accent-warning);
+}
+
+.trainer-notice[data-kind="error"] .app-banner__message {
+    color: var(--accent-warning);
+}
+
+/* Side: the decks on this device */
+.trainer-side {
+    overflow-y: auto;
+}
+
+.trainer-side__title {
+    margin: var(--space-md) var(--space-lg) var(--space-sm);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.trainer-side__add {
+    align-self: flex-start;
+    margin: var(--space-md) var(--space-lg) var(--space-lg);
+    font-size: 0.9rem;
+}
+
 .trainer-decks,
 .trainer-community {
     list-style: none;
@@ -110,7 +100,11 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-md);
-    padding: var(--space-md) 0;
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--border);
+}
+
+.trainer-deck:last-child {
     border-bottom: 1px solid var(--border);
 }
 
@@ -119,7 +113,7 @@
 }
 
 .trainer-deck__title {
-    font-size: 1.05rem;
+    font-size: 1rem;
     margin: 0 0 2px;
     overflow-wrap: anywhere;
 }
@@ -127,14 +121,14 @@
 .trainer-deck__meta {
     margin: 0;
     color: var(--text-dim);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .trainer-deck__counts {
     display: flex;
     gap: var(--space-md);
     margin: var(--space-xs) 0 0;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .trainer-count--due {
@@ -158,8 +152,54 @@
     font-size: 0.8rem;
 }
 
-.trainer-empty {
+/* Stage: home */
+.trainer-home {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    padding: var(--space-lg) var(--space-xl) var(--space-2xl);
+}
+
+.trainer-dash {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+}
+
+.trainer-install {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    border: 1px solid var(--accent-primary);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.trainer-install p {
+    margin: 0;
+    flex: 1 1 280px;
     color: var(--text-secondary);
+}
+
+.trainer-install strong {
+    color: var(--text-primary);
+}
+
+.trainer-today {
+    padding: var(--space-lg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.trainer-today__summary {
+    margin: 0;
+    font-size: 1.05rem;
 }
 
 /* Drills */
@@ -217,33 +257,9 @@
     font-size: 0.85rem;
 }
 
-/* Adding decks */
-.trainer-add {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--space-lg);
-}
-
-.trainer-add__panel {
-    padding: var(--space-lg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-elevated);
-}
-
-.trainer-add__alt {
-    margin: var(--space-md) 0 0;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-.trainer-add__alt a {
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}
-
+/* Add a deck dialog */
 .trainer-community {
-    max-height: 340px;
+    max-height: 260px;
     overflow-y: auto;
 }
 
@@ -276,31 +292,11 @@
     font-size: 0.85rem;
 }
 
-/* Settings and backup */
-.trainer-details {
-    margin-top: var(--space-lg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-elevated);
-}
-
-.trainer-details summary {
-    padding: var(--space-md) var(--space-lg);
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.trainer-settings {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    align-items: end;
-    gap: var(--space-md);
-    padding: 0 var(--space-lg) var(--space-lg);
-}
-
-.trainer-backup {
-    padding: 0 var(--space-lg) var(--space-lg);
-    color: var(--text-secondary);
+.app-dialog__note a,
+.app-empty__sample a {
+    color: var(--accent-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 .trainer-backup__actions {
@@ -309,47 +305,9 @@
     gap: var(--space-sm);
 }
 
-.trainer-guide {
-    margin-top: var(--space-2xl);
-}
-
 /* ===== Study view ===== */
 
-body.is-studying .nav,
-body.is-studying .footer {
-    display: none;
-}
-
-.trainer-study {
-    padding: 0 0 var(--space-2xl);
-}
-
-.study-bar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-sm) var(--space-md);
-    padding-top: max(var(--space-sm), env(safe-area-inset-top));
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.9em;
-}
-
-.study-bar__back {
-    background: none;
-    border: none;
-    color: var(--accent-primary);
-    font: inherit;
-    cursor: pointer;
-    padding: var(--space-xs) 0;
-}
-
 .study-bar__deck {
-    flex: 1;
-    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -362,8 +320,8 @@ body.is-studying .footer {
 }
 
 /* The board takes all the width it can while staying fully in view: its
-   height is capped at the window height minus the study bar and padding,
-   and 880/600 is the board SVG's aspect ratio. */
+   height is capped at the window height minus the nav, the app bar (57px)
+   and padding, and 880/600 is the board SVG's aspect ratio. */
 .study-layout {
     display: flex;
     align-items: flex-start;
@@ -374,11 +332,11 @@ body.is-studying .footer {
 
 .study-board {
     position: sticky;
-    top: 64px;
+    top: var(--space-lg);
     flex: 1 1 0;
     min-width: 0;
-    max-width: calc((100vh - 7rem) * 880 / 600);
-    max-width: calc((100dvh - 7rem) * 880 / 600);
+    max-width: calc((100vh - var(--app-nav, 73px) - 57px - 3rem) * 880 / 600);
+    max-width: calc((100dvh - var(--app-nav, 73px) - 57px - 3rem) * 880 / 600);
 }
 
 .study-panel {
@@ -644,7 +602,7 @@ body.is-studying .footer {
     margin-top: var(--space-lg);
     padding: var(--space-sm) 0;
     padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
-    background: var(--bg-primary);
+    background: var(--bg-secondary);
 }
 
 .study-grade {
@@ -692,6 +650,10 @@ body.is-studying .footer {
 }
 
 .trainer-done {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-lg);
     text-align: center;
 }
 
@@ -747,21 +709,48 @@ body.is-studying .footer {
 @media (display-mode: standalone) {
     .nav,
     .footer,
-    .trainer-guide {
+    .tool-info {
         display: none;
     }
 }
 
-@media (max-width: 768px) {
+/* Tablets and phones: app.css stacks the shell into one scrolling column */
+@media (max-width: 900px) {
+    .trainer-stage,
+    .trainer-side {
+        overflow: visible;
+    }
+
+    .trainer-shell .app-bar__actions {
+        width: auto;
+        margin-left: auto;
+    }
+
+    /* Studying on a phone: the whole screen for the position */
+    body.is-studying .nav,
+    body.is-studying .footer {
+        display: none;
+    }
+
+    .trainer-shell[data-view="study"] .app-bar,
+    .trainer-shell[data-view="done"] .app-bar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-wrap: nowrap;
+        padding-top: max(var(--space-sm), env(safe-area-inset-top));
+    }
+
+    .trainer-shell[data-view="study"] .app-bar__status,
+    .trainer-shell[data-view="done"] .app-bar__status {
+        order: 0;
+        flex-basis: auto;
+    }
+
     .trainer-home {
-        padding-top: var(--space-lg);
+        padding: var(--space-md);
     }
 
-    .trainer-intro h1 {
-        font-size: 1.75rem;
-    }
-
-    .trainer-add,
     .trainer-drills {
         grid-template-columns: minmax(0, 1fr);
     }
