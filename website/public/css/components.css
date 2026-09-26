@@ -195,7 +195,8 @@
     max-width: 920px;
     margin: 0 auto var(--space-2xl);
     text-align: left;
-    scroll-margin-top: var(--space-3xl);
+    /* Clears the ~80px sticky nav with room to spare */
+    scroll-margin-top: calc(var(--space-3xl) + var(--space-2xl));
 }
 
 .start-path {

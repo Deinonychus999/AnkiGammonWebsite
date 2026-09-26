@@ -70,9 +70,6 @@
         font-size: 0.9rem;
     }
 
-    /* Hide less critical items on mobile */
-    .nav-link[href="#how-it-works"],
-    .nav-link[href="#install"],
     .nav-link.nav-cta {
         display: none;
     }
