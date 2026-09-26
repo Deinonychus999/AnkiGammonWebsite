@@ -999,12 +999,34 @@
         });
     }
 
-    // ── Entry points: #deck=<id> from a deck page, #inbox from the app ──
+    // The desktop app serves one study pack, once, on 127.0.0.1 for about two
+    // minutes, and opens the trainer with its port and a single-use key.
+    function importFromDesktop(port, key) {
+        notify('');
+        setStatus('Getting positions from AnkiGammon on this computer…', 'busy');
+        return fetch('http://127.0.0.1:' + port + '/pack/' + key).then(function (r) {
+            if (r.status === 404) throw new Error('This link from AnkiGammon was already used or has expired. In the desktop app, choose Study in Trainer again.');
+            if (!r.ok) throw new Error('AnkiGammon on this computer answered with an error (HTTP ' + r.status + ').');
+            return r.json();
+        }).then(function (pack) {
+            var title = (pack && pack.deck && pack.deck.title) || 'AnkiGammon';
+            return saveImported(D.fromPack(pack, { title: title, id: 'desktop:' + D.slug(title), source: 'desktop' }), false);
+        }).catch(function (e) {
+            notify(e instanceof TypeError
+                ? "Couldn't reach AnkiGammon on this computer. In the desktop app, use File → Export to Trainer to save the positions as a file, then open it here."
+                : e.message, 'error');
+        }).then(function () { setStatus('Ready', 'ready'); });
+    }
+
+    // ── Entry points: #deck=<id> from a deck page, #inbox from the app, ──
+    // ── #desktop=<port>.<key> from the desktop app                       ──
 
     function handleHash() {
         var hash = location.hash.replace(/^#/, '');
         if (!hash) return Promise.resolve();
         history.replaceState(null, '', location.pathname + location.search);
+        var desktop = /^desktop=(\d{1,5})\.([0-9a-f]{32})$/.exec(hash);
+        if (desktop && +desktop[1] >= 1 && +desktop[1] <= 65535) return importFromDesktop(+desktop[1], desktop[2]);
         var m = /^deck=([\w-]+)$/.exec(hash);
         if (m) {
             var id = m[1];
@@ -1049,6 +1071,10 @@
     });
     Array.prototype.forEach.call(document.querySelectorAll('#study-grades [data-rating]'), function (btn) {
         btn.addEventListener('click', function () { grade(parseInt(btn.dataset.rating, 10)); });
+    });
+    // A link opened in a trainer tab that is already open only changes the hash.
+    window.addEventListener('hashchange', function () {
+        if (location.hash) handleHash();
     });
     window.addEventListener('popstate', function () {
         if (!$('view-home').hidden) return;
