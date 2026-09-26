@@ -40,6 +40,7 @@
         "Filters mistakes by error threshold and player",
         "Previews each flashcard, front and back",
         "Downloads an .apkg deck for Anki, AnkiMobile and AnkiDroid",
+        "Sends cards straight to a running Anki through AnkiConnect",
         "Runs in the browser with no upload"
       ],
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -64,7 +65,7 @@
             </p>
             <p class="app-hero__limits">
                 This version uses analysis you already have: <strong>.xg and .xgp files</strong>, or text copied from eXtreme Gammon.
-                To analyze position IDs or .mat files, add score matrices, or send cards straight into Anki, <a href="/#install">get the desktop app</a>.
+                To analyze position IDs or .mat files, or add score matrices, <a href="/#install">get the desktop app</a>.
             </p>
         </div>
     </section>
@@ -225,6 +226,38 @@
                             <strong>AnkiMobile and AnkiDroid:</strong> open the downloaded file and choose Anki.
                             Importing a deck from this page again updates its cards instead of duplicating them.
                         </p>
+
+                        <div class="app-send">
+                            <button class="btn btn-secondary app-download__btn" id="send-btn" type="button" disabled>Send to Anki</button>
+                            <p class="app-download__help">
+                                Adds the cards to Anki running on this computer, through the AnkiConnect add-on, and updates ones you sent before.
+                                Works in Chrome, Edge and Firefox; Anki asks once whether to allow this site.
+                            </p>
+                            <details class="app-anki-settings" id="anki-settings">
+                                <summary>Anki connection settings</summary>
+                                <label class="app-field">
+                                    <span>AnkiConnect address</span>
+                                    <input id="anki-url" type="url" value="http://127.0.0.1:8765" autocomplete="off" spellcheck="false">
+                                </label>
+                                <label class="app-field">
+                                    <span>API key (only if you set one in AnkiConnect)</span>
+                                    <input id="anki-key" type="password" autocomplete="off">
+                                </label>
+                            </details>
+                            <div class="app-anki-help" id="anki-help" role="alert" hidden>
+                                <p class="app-anki-help__lead" id="anki-help-lead"></p>
+                                <ul>
+                                    <li data-case="unreachable">Anki is open on this computer.</li>
+                                    <li data-case="unreachable">AnkiConnect is installed: in Anki, Tools &rarr; Add-ons &rarr; Get Add-ons, code <code>2055492159</code>, then restart Anki.</li>
+                                    <li data-case="unreachable">If the browser asked whether this site may reach apps on your device, you allowed it. If you dismissed it, allow it in the site settings next to the address bar.</li>
+                                    <li data-case="unreachable denied">If Anki asked whether to give this site access, you answered Yes. To fix a No, open Tools &rarr; Add-ons &rarr; AnkiConnect &rarr; Config in Anki, add <code id="anki-help-origin"></code> to <code>webCorsOriginList</code>, and remove it from <code>ignoreOriginList</code>.</li>
+                                    <li data-case="unreachable">Safari and iPhone or iPad browsers can't connect to Anki. Use Download .apkg instead.</li>
+                                    <li data-case="unreachable">Using a different port for AnkiConnect? Change the address under Anki connection settings.</li>
+                                    <li data-case="key">Enter the key under Anki connection settings, then send again.</li>
+                                    <li data-case="failed">Check that Anki isn't busy with a dialog, then send again. Cards already sent stay in Anki and are updated, not duplicated.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -248,7 +281,7 @@
                         <tr><th scope="row">.mat, .sgf and .txt match files</th><td>No</td><td>Yes</td></tr>
                         <tr><th scope="row">Score matrix and cube comparisons</th><td>No</td><td>Yes</td></tr>
                         <tr><th scope="row">Your own notes on cards</th><td>Notes written in XG</td><td>Notes written in XG, or add your own</td></tr>
-                        <tr><th scope="row">Getting cards into Anki</th><td>Download an .apkg and import it</td><td>.apkg, or straight into Anki with AnkiConnect</td></tr>
+                        <tr><th scope="row">Getting cards into Anki</th><td>.apkg, or straight into Anki with AnkiConnect (Chrome, Edge, Firefox)</td><td>.apkg, or straight into Anki with AnkiConnect</td></tr>
                         <tr><th scope="row">Decks organized in a tree, saved collections</th><td>No</td><td>Yes</td></tr>
                     </tbody>
                 </table>
@@ -275,6 +308,10 @@
                 <details class="faq-details__item">
                     <summary>Are these the same cards as the desktop app makes?</summary>
                     <p>Yes. The browser runs the same AnkiGammon code as the desktop app, so the cards look and work the same.</p>
+                </details>
+                <details class="faq-details__item">
+                    <summary>How does Send to Anki work?</summary>
+                    <p>With Anki and the AnkiConnect add-on running, the page sends the cards to Anki on your computer. The first time, Anki asks whether to allow this site, and Chrome, Edge or Firefox may ask whether the site can reach apps on your device; say yes to both. Allowing the site lets it change your Anki collection, which is why Anki asks. Safari and iPhone or iPad browsers block this, so use Download .apkg there.</p>
                 </details>
                 <details class="faq-details__item">
                     <summary>Why does the first visit take a few seconds?</summary>

@@ -487,6 +487,62 @@
     font-weight: 600;
 }
 
+.app-send {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border);
+}
+
+.app-anki-settings summary {
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.app-anki-settings[open] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.app-anki-settings[open] summary {
+    margin-bottom: var(--space-xs);
+}
+
+.app-anki-help {
+    padding: var(--space-md);
+    border-left: 4px solid var(--accent-warning);
+    border-radius: 6px;
+    background: var(--bg-surface);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.app-anki-help__lead {
+    color: var(--accent-warning);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.app-anki-help ul {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.app-anki-help li + li {
+    margin-top: var(--space-xs);
+}
+
+.app-anki-help code {
+    font-family: var(--font-code);
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+}
+
 /* Guide */
 .app-compare {
     width: 100%;

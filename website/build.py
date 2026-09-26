@@ -47,6 +47,9 @@ APP_WHEEL_PINS = {
 }
 # Releases before this module existed cannot run the app.
 APP_ENTRY_MODULE = "ankigammon/web.py"
+# Desktop-only parts of the ankigammon wheel (mostly app icons); the app
+# repo's tests guarantee ankigammon.web never imports them.
+APP_STRIP_PREFIXES = ("ankigammon/gui/", "ankigammon/utils/xg_auto/")
 
 PARTIAL_RE = re.compile(r"^[ \t]*<!-- PARTIAL:(\w[\w-]*) -->[ \t]*$", re.MULTILINE)
 ICON_RE = re.compile(r"<!-- ICON:([a-z0-9-]+) -->")
@@ -402,6 +405,33 @@ def wheel_has(path, member):
         return member in zf.namelist()
 
 
+def strip_wheel(path, prefixes):
+    """Rewrite a wheel in place without the files under `prefixes`, with a RECORD
+    that lists the remaining files' hashes and sizes."""
+    import base64
+    import csv
+    import io
+    import zipfile
+
+    out = io.BytesIO()
+    with zipfile.ZipFile(path) as src, zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as dst:
+        record_name = next(n for n in src.namelist() if n.endswith(".dist-info/RECORD"))
+        rows = []
+        for info in src.infolist():
+            if info.filename == record_name or info.filename.startswith(prefixes):
+                continue
+            data = src.read(info)
+            dst.writestr(info, data)
+            digest = base64.urlsafe_b64encode(hashlib.sha256(data).digest()).rstrip(b"=").decode()
+            rows.append((info.filename, f"sha256={digest}", str(len(data))))
+        rows.append((record_name, "", ""))
+        record = io.StringIO()
+        csv.writer(record, lineterminator="\n").writerows(rows)
+        dst.writestr(record_name, record.getvalue())
+    with open(path, "wb") as f:
+        f.write(out.getvalue())
+
+
 def fetch_app_wheels():
     """Wheel filenames for the browser app in install order, or [] when unavailable.
 
@@ -423,8 +453,12 @@ def fetch_app_wheels():
         else:
             filename, url, sha256 = pypi_wheel("ankigammon")
             download_verified(url, sha256, os.path.join(APP_WHEELS_DIR, filename))
-        if not wheel_has(os.path.join(APP_WHEELS_DIR, filename), APP_ENTRY_MODULE):
+        wheel_path = os.path.join(APP_WHEELS_DIR, filename)
+        if not wheel_has(wheel_path, APP_ENTRY_MODULE):
             raise ValueError(f"{filename} predates {APP_ENTRY_MODULE}")
+        before = os.path.getsize(wheel_path)
+        strip_wheel(wheel_path, APP_STRIP_PREFIXES)
+        print(f"Stripped desktop-only files from {filename}: {before // 1024} KB -> {os.path.getsize(wheel_path) // 1024} KB")
         names.append(filename)
     except Exception as e:  # network or PyPI trouble must not fail the site build
         print(f"build.py: browser app wheels unavailable ({e}); the app page will say so")

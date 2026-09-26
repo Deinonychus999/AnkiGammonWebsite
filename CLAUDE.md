@@ -126,11 +126,13 @@ Tool pages share the site's core CSS and add [tool.css](website/public/css/tool.
 
 ### Browser app (`/app/`)
 
-A limited AnkiGammon in the browser, linked from the homepage hero next to the desktop download (deliberately not under Tools). It runs the real `ankigammon` Python package under Pyodide, so cards are identical to the desktop app's; there is no analysis engine, so it only accepts analyzed XG input (.xg, .xgp, XG text export) and exports .apkg.
+A limited AnkiGammon in the browser, linked from the homepage hero next to the desktop download (deliberately not under Tools). It runs the real `ankigammon` Python package under Pyodide, so cards are identical to the desktop app's; there is no analysis engine, so it only accepts analyzed XG input (.xg, .xgp, XG text export). Cards leave as an .apkg download or through Send to Anki.
 
 - [app/index.html](website/public/app/index.html) + [js/app.js](website/public/js/app.js) (UI, IIFE) + [js/app-worker.js](website/public/js/app-worker.js) (module worker; Pyodide 314 requires one) + [css/app.css](website/public/css/app.css). `app/sample-match.xg` is `tests/data/sample_match.xg` from the app repo.
 - The worker only calls `ankigammon.web` (app repo `ankigammon/web.py`); change both sides together.
 - `build.py` downloads the wheels into `build/app/wheels/`, verifies PyPI's sha256, and writes their names into the page's `data-wheels` attribute. ankigammon is the latest PyPI release that contains `ankigammon/web.py` (older ones leave the page showing "not available"); genanki and its pure-Python deps are pinned in `APP_WHEEL_PINS`. Pyodide itself loads from cdn.jsdelivr.net.
+- `build.py` also strips `ankigammon/gui/` and `ankigammon/utils/xg_auto/` (desktop icons and XG automation, about 600 KB) from the served wheel and rewrites its `RECORD`. The app repo's `test_browser_path_never_imports_desktop_only_modules` keeps that safe.
+- **Send to Anki** runs the desktop's own `AnkiConnect` client inside the worker (`ankigammon.web.send_to_anki`), with its transport swapped for a synchronous `XMLHttpRequest` whose plain-text body keeps it a CORS simple request. Before that, `app.js` sends `requestPermission` from the page's main thread: that call opens Anki's permission dialog and, on the live https site, Chrome/Firefox's local-network prompt. Safari and iOS block https→localhost, so the help panel points them to the download. The AnkiConnect address and optional API key live under "Anki connection settings" (the address is remembered, the key isn't).
 - Preview a local, unreleased app build: `pip wheel ../xg2anki --no-deps -w /tmp/w` then `ANKIGAMMON_WHEEL=/tmp/w/ankigammon-<ver>-py3-none-any.whl python website/build.py`.
 - The card preview iframe mimics Anki 25.9's reviewer (theme variables, night-mode classes, `pycmd('ans')`); card CSS depends on those.
 - `serve.py`'s default port 8765 is AnkiConnect's; pass another port when Anki is running.

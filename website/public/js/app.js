@@ -36,6 +36,10 @@
     function onWorkerMessage(event) {
         var data = event.data;
         if (data.type === 'status') { setStatus(data.text, 'busy'); return; }
+        if (data.type === 'send-progress') {
+            setStatus('Sending to Anki: ' + data.done + ' of ' + plural(data.total, 'card') + '…', 'busy');
+            return;
+        }
         var p = pending[data.id];
         delete pending[data.id];
         if (!p) return;
@@ -72,6 +76,7 @@
         prefs.deck = $('deck-name').value;
         prefs.use_subdecks = $('use-subdecks').checked;
         prefs.night_mode = nightMode;
+        prefs.anki_url = $('anki-url').value.trim();
         try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) { /* storage blocked */ }
     }
 
@@ -87,6 +92,7 @@
         if (prefs.deck) $('deck-name').value = prefs.deck;
         if (prefs.use_subdecks !== undefined) $('use-subdecks').checked = !!prefs.use_subdecks;
         if (prefs.night_mode !== undefined) nightMode = !!prefs.night_mode;
+        if (prefs.anki_url) $('anki-url').value = prefs.anki_url;
     }
 
     function cardOptions() {
@@ -265,6 +271,7 @@
         $('select-all').disabled = !positions.length;
         $('export-btn').disabled = picked === 0 || !ready;
         $('export-btn').textContent = picked ? 'Download .apkg (' + plural(picked, 'card') + ')' : 'Download .apkg';
+        $('send-btn').disabled = picked === 0 || !ready || sending;
     }
 
     // ── Card preview ───────────────────────────────────────────────────
@@ -377,6 +384,87 @@
     });
 
     // ── Export ─────────────────────────────────────────────────────────
+
+    // ── Send to Anki ───────────────────────────────────────────────────
+
+    var ANKI_DEFAULT_URL = 'http://127.0.0.1:8765';
+    var sending = false;
+
+    // Runs on the page, not in the worker: this first request is what opens
+    // Anki's permission dialog and the browser's local-network prompt. A
+    // string body keeps it a CORS simple request, which AnkiConnect answers
+    // for origins it doesn't know yet.
+    function ankiRequest(url, action, key) {
+        var body = { action: action, version: 6 };
+        if (key) body.key = key;
+        return fetch(url, { method: 'POST', body: JSON.stringify(body) }).then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        });
+    }
+
+    function showAnkiHelp(kind, detail) {
+        var lead = {
+            unreachable: 'Could not reach Anki.',
+            denied: 'Anki refused the connection.',
+            key: 'Your AnkiConnect needs an API key.',
+            failed: 'Sending stopped: ' + (detail || 'unknown error') + '.'
+        }[kind];
+        $('anki-help-lead').textContent = lead;
+        $('anki-help-origin').textContent = location.origin;
+        document.querySelectorAll('#anki-help [data-case]').forEach(function (el) {
+            el.hidden = el.dataset.case.split(' ').indexOf(kind) < 0;
+        });
+        $('anki-help').hidden = false;
+        if (kind === 'key') {
+            $('anki-settings').open = true;
+            $('anki-key').focus();
+        }
+    }
+
+    function sendToAnki() {
+        var picked = positions.filter(function (p) { return p.picked; });
+        if (!picked.length || sending) return;
+        var url = $('anki-url').value.trim() || ANKI_DEFAULT_URL;
+        var key = $('anki-key').value.trim();
+        var opts = cardOptions();
+        sending = true;
+        renderCounts();
+        $('anki-help').hidden = true;
+        showError('');
+        setStatus('Connecting to Anki…', 'busy');
+
+        ankiRequest(url, 'requestPermission').catch(function () {
+            throw { help: 'unreachable' };
+        }).then(function (reply) {
+            var result = (reply && reply.result) || {};
+            if (result.permission !== 'granted') throw { help: 'denied' };
+            if (result.requireApikey && !key) throw { help: 'key' };
+            return call('configure', { settings: cardSettings() });
+        }).then(function () {
+            return call('sendToAnki', {
+                indices: picked.map(function (p) { return p.index; }),
+                deckName: $('deck-name').value.trim() || 'AnkiGammon',
+                url: url,
+                apiKey: key,
+                showOptions: opts.show_options,
+                interactiveMoves: opts.interactive_moves,
+                useSubdecks: $('use-subdecks').checked
+            });
+        }).then(function (summary) {
+            var parts = [];
+            if (summary.added) parts.push(summary.added + ' added');
+            if (summary.updated) parts.push(summary.updated + ' updated');
+            setStatus('Sent ' + plural(summary.total, 'card') + ' to Anki (' + parts.join(', ') + ').', 'ready');
+        }).catch(function (e) {
+            setStatus('Ready', 'ready');
+            if (e && e.help) showAnkiHelp(e.help);
+            else showAnkiHelp('failed', e && e.message);
+        }).then(function () {
+            sending = false;
+            renderCounts();
+        });
+    }
 
     function exportDeck() {
         var picked = positions.filter(function (p) { return p.picked; });
@@ -516,6 +604,8 @@
     $('show-front').addEventListener('click', function () { showSide('front'); });
     $('show-back').addEventListener('click', function () { showSide('back'); });
     $('export-btn').addEventListener('click', exportDeck);
+    $('send-btn').addEventListener('click', sendToAnki);
+    $('anki-url').addEventListener('change', savePrefs);
 
     // ── Start ──────────────────────────────────────────────────────────
 
