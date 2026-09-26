@@ -5,7 +5,7 @@
   <!-- Main page -->
   <url>
     <loc>https://ankigammon.com/</loc>
-    <lastmod>2025-11-02</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -36,7 +36,7 @@
 
   <url>
     <loc>https://ankigammon.com/tools/xg-to-mat</loc>
-    <lastmod>2026-02-09</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

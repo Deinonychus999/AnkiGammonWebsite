@@ -162,6 +162,7 @@
             <h2>What is a .mat file?</h2>
             <p>A <strong>.mat</strong> file is the plain-text match format most backgammon software reads: download a match from Backgammon Galaxy, Backgammon Heroes, OpenGammon, or BG Hub and you usually get one. GNU Backgammon, eXtreme Gammon, BGBlitz, and Snowie all import it.</p>
             <p>An <strong>.xg</strong> file is eXtreme Gammon's own binary format. It stores the match together with XG's analysis, rollouts, and comments, and only XG reads it. Converting to .mat lets you open an XG match in GNU Backgammon, which is free and runs on Windows, macOS, and Linux, or in anything else that reads .mat. If you own XG, it can export .mat itself with <strong>File &rarr; Export &rarr; JellyFish</strong>; this tool is for when you don't have XG at hand, or someone sends you an .xg file.</p>
+            <p>Want to study the match rather than replay it? The <a href="../app/">AnkiGammon web app</a> reads the same .xg file, keeps XG's analysis, and turns your mistakes into Anki flashcards, also without uploading anything.</p>
 
             <h2>How to use</h2>
             <ol>
@@ -212,7 +213,7 @@
                 </details>
                 <details class="faq-details__item">
                     <summary>Why is XG's analysis missing?</summary>
-                    <p>The .mat format only records moves, cube actions, and results; it has no place for evaluations or comments. Open the file in GNU Backgammon and run <strong>Analyse &rarr; Analyse match or session</strong> for a fresh analysis.</p>
+                    <p>The .mat format only records moves, cube actions, and results; it has no place for evaluations or comments. Open the file in GNU Backgammon and run <strong>Analyse &rarr; Analyse match or session</strong> for a fresh analysis, or open the original .xg file in the <a href="../app/">AnkiGammon web app</a>, which keeps XG's analysis and turns it into flashcards.</p>
                 </details>
                 <details class="faq-details__item">
                     <summary>What does <code>64: 24/18 13/9</code> mean?</summary>
@@ -226,6 +227,10 @@
         <div class="container">
             <h2>More Tools</h2>
             <div class="related-tools__grid">
+                <a href="../app/" class="related-tools__link">
+                    <div class="related-tools__name">AnkiGammon Web App</div>
+                    <p class="related-tools__desc">Turn the mistakes in an .xg match into Anki flashcards, with XG's analysis on every card.</p>
+                </a>
                 <a href="position-editor" class="related-tools__link">
                     <div class="related-tools__name">Position Editor &amp; Converter</div>
                     <p class="related-tools__desc">Set up or edit a position on the board and convert between XGID, GNUID, and OGID.</p>

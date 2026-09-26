@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Turn eXtreme Gammon analysis into Anki flashcards in your browser. Drop an .xg or .xgp file or paste XG analysis, pick the mistakes, download an .apkg deck. Free, nothing uploaded.">
+    <meta name="description" content="Turn eXtreme Gammon analysis into Anki flashcards in your browser. Drop an .xg or .xgp file, pick the mistakes, then download the deck or send it to Anki. Free.">
     <meta name="author" content="AnkiGammon">
     <title>AnkiGammon Web App - XG Analysis to Anki Flashcards in Your Browser</title>
 
@@ -13,15 +13,19 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/app/">
-    <meta property="og:title" content="AnkiGammon in your browser">
+    <meta property="og:title" content="Backgammon flashcards in your browser - AnkiGammon">
     <meta property="og:description" content="Turn eXtreme Gammon analysis into Anki flashcards without installing anything. Free, and your files never leave your browser.">
-    <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+    <meta property="og:image" content="https://ankigammon.com/assets/images/app-og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="An AnkiGammon flashcard in the browser: a backgammon position with the dice rolled 3-2 and five candidate moves to choose from">
     <meta property="og:site_name" content="AnkiGammon">
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="AnkiGammon in your browser">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Backgammon flashcards in your browser - AnkiGammon">
     <meta name="twitter:description" content="Turn eXtreme Gammon analysis into Anki flashcards without installing anything. Free, and your files never leave your browser.">
-    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/app-og.png">
+    <meta name="twitter:image:alt" content="An AnkiGammon flashcard in the browser: a backgammon position with the dice rolled 3-2 and five candidate moves to choose from">
 
     <meta name="robots" content="index, follow">
 
@@ -43,8 +47,20 @@
         "Sends cards straight to a running Anki through AnkiConnect",
         "Runs in the browser with no upload"
       ],
+      "screenshot": "https://ankigammon.com/assets/images/app-og.png",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "isPartOf": { "@type": "WebSite", "name": "AnkiGammon", "url": "https://ankigammon.com/" }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ankigammon.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Web App" }
+      ]
     }
     </script>
 
@@ -59,7 +75,7 @@
     <main id="app" data-wheels="{{APP_WHEELS}}">
     <section class="tool-hero section app-hero">
         <div class="container">
-            <h1>AnkiGammon in your browser</h1>
+            <h1>Backgammon flashcards for Anki, in your browser</h1>
             <p class="hero-subtitle">
                 Turn eXtreme Gammon analysis into Anki flashcards. Nothing to install, and your files never leave this page.
             </p>
