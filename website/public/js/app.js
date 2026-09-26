@@ -190,6 +190,9 @@
 
     function load(newSource) {
         if (!ready) return;
+        // A failed load leaves the list on screen, so later reloads (a new
+        // threshold) must keep using the source that list came from.
+        var shown = source;
         source = newSource || source;
         if (!source) return;
         var token = ++loadToken;
@@ -224,6 +227,7 @@
             showLoaded(result.total);
         }).catch(function (e) {
             if (token !== loadToken) return;
+            source = shown;
             setStatus('Ready', 'ready');
             showError(e.message);
         }).then(function () {
