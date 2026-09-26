@@ -47,6 +47,13 @@ APP_WHEEL_PINS = {
 }
 # Releases before this module existed cannot run the app.
 APP_ENTRY_MODULE = "ankigammon/web.py"
+# The oldest release the page's JavaScript works with (1.12.0 added
+# send_to_anki). Raise it whenever app.js starts calling new ankigammon.web API.
+APP_MIN_ANKIGAMMON = (1, 12, 0)
+# Just after a release, PyPI's JSON API can still answer with the previous
+# version on some requests; one deploy shipped 1.11.0 that way.
+PYPI_LAG_RETRIES = 10
+PYPI_LAG_WAIT_SECONDS = 30
 # Desktop-only parts of the ankigammon wheel (mostly app icons); the app
 # repo's tests guarantee ankigammon.web never imports them.
 APP_STRIP_PREFIXES = ("ankigammon/gui/", "ankigammon/utils/xg_auto/")
@@ -432,6 +439,32 @@ def strip_wheel(path, prefixes):
         f.write(out.getvalue())
 
 
+def wheel_version(filename):
+    return tuple(int(part) for part in re.match(r"ankigammon-(\d+)\.(\d+)\.(\d+)", filename).groups())
+
+
+def latest_ankigammon_wheel():
+    """The latest ankigammon release, which must be at least APP_MIN_ANKIGAMMON.
+
+    An older answer means PyPI is still propagating a release, so wait for it;
+    if it never arrives, stop the build rather than deploy JavaScript that
+    calls API the served wheel lacks. The live site keeps its last deploy.
+    """
+    import time
+    for attempt in range(PYPI_LAG_RETRIES + 1):
+        filename, url, sha256 = pypi_wheel("ankigammon")
+        if wheel_version(filename) >= APP_MIN_ANKIGAMMON:
+            return filename, url, sha256
+        if attempt < PYPI_LAG_RETRIES:
+            print(f"build.py: PyPI still reports {filename}; waiting for a release >= "
+                  f"{'.'.join(map(str, APP_MIN_ANKIGAMMON))}")
+            time.sleep(PYPI_LAG_WAIT_SECONDS)
+    raise SystemExit(
+        f"build.py: PyPI's latest ankigammon is {filename}, older than "
+        f"{'.'.join(map(str, APP_MIN_ANKIGAMMON))} that the app page needs; not deploying."
+    )
+
+
 def fetch_app_wheels():
     """Wheel filenames for the browser app in install order, or [] when unavailable.
 
@@ -451,7 +484,7 @@ def fetch_app_wheels():
             filename = os.path.basename(local)
             shutil.copyfile(local, os.path.join(APP_WHEELS_DIR, filename))
         else:
-            filename, url, sha256 = pypi_wheel("ankigammon")
+            filename, url, sha256 = latest_ankigammon_wheel()
             download_verified(url, sha256, os.path.join(APP_WHEELS_DIR, filename))
         wheel_path = os.path.join(APP_WHEELS_DIR, filename)
         if not wheel_has(wheel_path, APP_ENTRY_MODULE):
