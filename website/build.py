@@ -47,9 +47,9 @@ APP_WHEEL_PINS = {
 }
 # Releases before this module existed cannot run the app.
 APP_ENTRY_MODULE = "ankigammon/web.py"
-# The oldest release the page's JavaScript works with (1.12.0 added
-# send_to_anki). Raise it whenever app.js starts calling new ankigammon.web API.
-APP_MIN_ANKIGAMMON = (1, 12, 0)
+# The oldest release the page's JavaScript works with (1.13.0 added
+# export_pack). Raise it whenever app.js starts calling new ankigammon.web API.
+APP_MIN_ANKIGAMMON = (1, 13, 0)
 # Just after a release, PyPI's JSON API can still answer with the previous
 # version on some requests; one deploy shipped 1.11.0 that way.
 PYPI_LAG_RETRIES = 10

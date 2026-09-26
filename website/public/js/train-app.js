@@ -719,7 +719,9 @@
         if (hash === 'inbox') {
             return Store.takeInbox('app').then(function (entry) {
                 if (!entry) return;
-                return importApkg(entry.bytes, entry.name + '.apkg', { title: entry.name, id: 'app:' + D.slug(entry.name), source: 'app' });
+                var info = { title: entry.name, id: 'app:' + D.slug(entry.name), source: 'app' };
+                if (entry.pack) return saveImported(D.fromPack(JSON.parse(entry.pack), info), false);
+                return importApkg(entry.bytes, entry.name + '.apkg', info);
             }).catch(function (e) { notify(e.message, 'error'); }).then(function () { setStatus('Ready', 'ready'); });
         }
         return Promise.resolve();

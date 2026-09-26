@@ -481,15 +481,18 @@
         });
     }
 
-    // The trainer reads the positions' analysis out of the same .apkg the
-    // download makes, handed over through its IndexedDB inbox.
+    // The positions go to the trainer as a study pack, through its IndexedDB inbox.
     function studyInTrainer() {
         var picked = positions.filter(function (p) { return p.picked; });
         if (!picked.length) return;
-        var deckName = $('deck-name').value.trim() || 'AnkiGammon';
+        var deckName = ($('deck-name').value.trim() || 'AnkiGammon').split('::').pop();
         $('train-btn').disabled = true;
-        buildDeck(picked, deckName).then(function (buffer) {
-            return window.TrainStore.putInbox('app', { name: deckName.split('::').pop(), bytes: buffer });
+        setStatus('Preparing ' + plural(picked.length, 'position') + ' for the trainer…', 'busy');
+        call('exportPack', {
+            indices: picked.map(function (p) { return p.index; }),
+            deckName: deckName
+        }).then(function (pack) {
+            return window.TrainStore.putInbox('app', { name: deckName, pack: pack });
         }).then(function () {
             location.href = '../train/#inbox';
         }).catch(function (e) {

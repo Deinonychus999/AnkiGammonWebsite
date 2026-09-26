@@ -77,6 +77,10 @@ const commands = {
         return JSON.parse(web.send_to_anki(JSON.stringify(args.indices), args.deckName, args.url,
             args.showOptions, args.interactiveMoves, args.useSubdecks, args.apiKey || "", progress));
     },
+    async exportPack(args) {
+        const { web } = await ready;
+        return web.export_pack(JSON.stringify(args.indices), args.deckName);
+    },
     async exportDeck(args) {
         const { py, web } = await ready;
         const path = web.export_apkg(JSON.stringify(args.indices), args.deckName,
