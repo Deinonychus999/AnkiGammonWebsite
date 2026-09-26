@@ -35,6 +35,27 @@
     font-weight: 600;
 }
 
+/* The site's .btn-sm is about 27px tall; the web app's bar buttons are
+   36px, and the trainer's match them, dialogs included. */
+.trainer .btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 16px;
+    font-size: 0.9rem;
+}
+
+.trainer .trainer-drill .btn {
+    min-height: 42px;
+    padding: 0 22px;
+    font-size: 0.95rem;
+}
+
+.trainer-deck__actions .btn {
+    min-width: 84px;
+}
+
 .btn:disabled,
 .btn:disabled:hover {
     opacity: 0.45;
@@ -724,6 +745,13 @@
     .trainer-shell .app-bar__actions {
         width: auto;
         margin-left: auto;
+    }
+
+    /* Touch targets */
+    .trainer .btn-sm,
+    .trainer .trainer-drill .btn,
+    .trainer-shell .app-icon-btn {
+        min-height: 44px;
     }
 
     /* Studying on a phone: the whole screen for the position */
