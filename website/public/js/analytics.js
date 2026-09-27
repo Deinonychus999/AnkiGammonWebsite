@@ -8,7 +8,7 @@
 (function () {
     'use strict';
 
-    var POSTHOG_KEY = 'phc_MjfUXfepPQXXQuY72KITRlGiG4jAHZuvgFHas1b34pV';
+    var POSTHOG_KEY = 'phc_vTE7UuEgJKAYN3YiZuvfcJCTcE6E8UfxTEx8DPa3WFcM';
     var POSTHOG_HOST = 'https://us.i.posthog.com';
 
     var queue = [];
