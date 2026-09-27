@@ -8,6 +8,13 @@
 (function () {
     'use strict';
 
+    var TOOL = 'position_editor';
+
+    // analytics.js loads deferred, after this script, so look it up per call.
+    function track(action) {
+        if (window.agTrackOnce) window.agTrackOnce('tool_used', { tool: TOOL, action: action });
+    }
+
     // ── DOM references ─────────────────────────────────────────────────
     var posInput     = document.getElementById('position-input');
     var xgpDropZone  = document.getElementById('xgp-drop-zone');
@@ -119,9 +126,11 @@
         try {
             currentImageFilename = 'backgammon-position.png';
             showPosition(window.PositionParser.parse(input), input.trim());
+            track('load');
             return true;
         } catch (err) {
             console.error('Position parsing error:', err);
+            track('load_failed');
             showError(err.message);
             return false;
         }
@@ -374,6 +383,7 @@
     copyImageBtn.addEventListener('click', function () {
         var svgEl = boardContainer.querySelector('svg');
         if (!svgEl) return;
+        track('copy_image');
 
         runImageAction(
             copyImageBtn,
@@ -387,6 +397,7 @@
     downloadImageBtn.addEventListener('click', function () {
         var svgEl = boardContainer.querySelector('svg');
         if (!svgEl) return;
+        track('download_image');
 
         runImageAction(
             downloadImageBtn,
@@ -401,7 +412,10 @@
         if (e.target.classList.contains('copy-btn')) {
             var targetId = e.target.getAttribute('data-target');
             var targetEl = document.getElementById(targetId);
-            if (targetEl) copyToClipboard(targetEl.textContent, e.target);
+            if (targetEl) {
+                copyToClipboard(targetEl.textContent, e.target);
+                track('copy_id');
+            }
         }
     });
 
@@ -665,6 +679,7 @@
 
     editToggleBtn.addEventListener('click', function () {
         setEditing(!editing);
+        if (editing) track('edit');
     });
 
     switchTurnBtn.addEventListener('click', function () {

@@ -162,6 +162,8 @@ A spaced-repetition trainer that needs neither Anki nor Pyodide: it quizzes posi
 ### Usage analytics
 [website/public/js/analytics.js](website/public/js/analytics.js), loaded on every page from the `css` partial: PostHog in cookieless `always` mode (no cookies or storage, no `identify`, autocapture/recordings/flags off), URLs stripped of `?query` and `#hash` (the trainer's `#desktop=<port>.<key>` must never be sent), skipped on localhost and under Do Not Track / Global Privacy Control, and inert while `POSTHOG_KEY` is empty. The footer's privacy line describes this; keep the two in step. Pages call `window.agTrack(name, props)` through a local `track()` guard, since analytics.js is deferred. Props are counts and kinds only, never deck names, positions or file contents.
 - Web app (`app.js`): `app_ready` {seconds}, `app_start_failed`, `app_file_loaded` / `app_file_failed` {kind: xg|xgp|paste|sample, positions}, `app_apkg_downloaded` {cards}, `app_sent_to_anki` {cards}, `app_send_failed` {reason}, `app_study_in_trainer` {cards}
+- Every page (`analytics.js`): `download_clicked` {platform: windows|macos|linux}, from any link to a GitHub release file
+- Tools, once per page visit through `window.agTrackOnce`: `tool_used` {tool: xg_to_mat, action: convert|convert_failed|copy|download}, {tool: position_editor, action: load|load_failed|copy_id|copy_image|download_image|edit}, {tool: met_calculator, action: lookup|grid}
 - Trainer (`train-app.js`): `trainer_deck_added` {source: community|file|apkg|app|desktop, positions, added}, `trainer_session_finished` {cards, best}, `trainer_drill_finished` {mode: streak|storm, score, answered}, `trainer_installed`
 
 ### SEO & Structured Data

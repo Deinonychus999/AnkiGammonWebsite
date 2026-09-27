@@ -8,6 +8,13 @@
 (function () {
     'use strict';
 
+    var TOOL = 'xg_to_mat';
+
+    // analytics.js loads deferred, after this script, so look it up per call.
+    function track(action) {
+        if (window.agTrackOnce) window.agTrackOnce('tool_used', { tool: TOOL, action: action });
+    }
+
     // ── DOM references ─────────────────────────────────────────────────
     var dropZone = document.getElementById('drop-zone');
     var fileInput = document.getElementById('file-input');
@@ -71,8 +78,10 @@
 
                 matOutput.textContent = currentMatText;
                 setState('result');
+                track('convert');
             } catch (err) {
                 console.error('XG parsing error:', err);
+                track('convert_failed');
                 showError('Failed to convert: ' + err.message);
             }
         };
@@ -118,6 +127,7 @@
 
     // Copy to clipboard
     copyBtn.addEventListener('click', function () {
+        track('copy');
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(currentMatText).then(function () {
                 copyBtn.textContent = 'Copied!';
@@ -140,6 +150,7 @@
 
     // Download .mat file
     downloadBtn.addEventListener('click', function () {
+        track('download');
         var blob = new Blob([currentMatText], { type: 'text/plain' });
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');

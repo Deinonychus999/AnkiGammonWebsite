@@ -18,12 +18,29 @@
         else if (queue) queue.push([name, props || {}]);
     };
 
+    // For actions that repeat within a visit (a lookup on every keystroke):
+    // count whether the visitor did it, not how often.
+    var sentOnce = {};
+    window.agTrackOnce = function (name, props) {
+        var key = name + JSON.stringify(props || {});
+        if (sentOnce[key]) return;
+        sentOnce[key] = true;
+        window.agTrack(name, props);
+    };
+
     var host = location.hostname;
     var optedOut = navigator.doNotTrack === '1' || navigator.globalPrivacyControl === true;
     if (!POSTHOG_KEY || optedOut || host === 'localhost' || host === '127.0.0.1') {
         queue = null;
         return;
     }
+
+    var PLATFORMS = { zip: 'windows', dmg: 'macos', appimage: 'linux' };
+    document.addEventListener('click', function (e) {
+        var link = e.target.closest && e.target.closest('a[href]');
+        var m = link && /\/releases\/(?:latest\/)?download\/(?:[^/]+\/)?[^/?#]+\.(\w+)$/i.exec(link.href);
+        if (m) window.agTrack('download_clicked', { platform: PLATFORMS[m[1].toLowerCase()] || m[1].toLowerCase() });
+    }, true);
 
     // The trainer's #desktop=<port>.<key> handoff link and any query string
     // stay out of the recorded URLs.

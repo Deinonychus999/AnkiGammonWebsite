@@ -5,6 +5,11 @@
 (function () {
   'use strict';
 
+  // analytics.js loads deferred, after this script, so look it up per call.
+  function track(action) {
+    if (window.agTrackOnce) window.agTrackOnce('tool_used', { tool: 'met_calculator', action: action });
+  }
+
   var matchLengthEl, yourScoreEl, oppScoreEl;
   var resultEl, mwcValueEl, awayDisplayEl, crawfordBadgeEl;
   var postCrawfordGroupEl, postCrawfordCheckEl;
@@ -36,6 +41,9 @@
     matchLengthEl.addEventListener('input', doLookup);
     yourScoreEl.addEventListener('input', doLookup);
     oppScoreEl.addEventListener('input', doLookup);
+    [matchLengthEl, yourScoreEl, oppScoreEl].forEach(function (el) {
+      el.addEventListener('input', function () { track('lookup'); });
+    });
     postCrawfordCheckEl.addEventListener('change', doLookup);
     gridFilterEl.addEventListener('change', renderGrid);
     preCrawfordTabEl.addEventListener('click', function () { showTab('pre'); });
@@ -224,6 +232,7 @@
 
   /* ---- Grid interaction ---- */
   function onCellClick(e) {
+    track('grid');
     var cell = e.currentTarget;
     var r = parseInt(cell.dataset.r);
     var c = parseInt(cell.dataset.c);
