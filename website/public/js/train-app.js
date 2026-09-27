@@ -50,6 +50,11 @@
         return n + ' ' + word + (n === 1 ? '' : 's');
     }
 
+    // analytics.js is deferred and skipped on localhost, so it may not be there.
+    function track(name, props) {
+        if (window.agTrack) window.agTrack(name, props);
+    }
+
     function setStatus(text, state) {
         $('trainer-status-text').textContent = text;
         $('trainer-status').dataset.state = state || '';
@@ -230,10 +235,12 @@
         if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
     }
 
-    function saveImported(result, replace, extra) {
+    // `via` names an import the deck's source doesn't tell apart, such as an .apkg file.
+    function saveImported(result, replace, extra, via) {
         if (!result.items.length) throw new Error('This deck has no positions the trainer can use.');
         return Store.saveDeck(result.deck, result.items, replace).then(function (saved) {
             askToKeepStorage();
+            track('trainer_deck_added', { source: via || result.deck.source, positions: saved.total, added: saved.added });
             var parts = ['"' + result.deck.title + '" is ready: ' + plural(saved.total, 'position')];
             if (saved.added > 0 && saved.added < saved.total) parts[0] += ', ' + saved.added + ' of them new';
             if (result.skipped) parts.push(plural(result.skipped, 'position') + ' without analysis ' + (result.skipped === 1 ? 'was' : 'were') + ' left out');
@@ -259,7 +266,7 @@
                 title: title,
                 source: (info && info.source) || 'file'
             });
-            return saveImported(imported, false, result.warnings);
+            return saveImported(imported, false, result.warnings, info && info.source ? null : 'apkg');
         });
     }
 
@@ -1020,6 +1027,7 @@
 
     function finishSession() {
         var s = session;
+        if (s.answered) track('trainer_session_finished', { cards: s.answered, best: s.best });
         $('done-summary').textContent = s.answered
             ? 'You answered ' + plural(s.answered, 'position') + ' and found the best play ' + s.best + ' ' + (s.best === 1 ? 'time' : 'times') + '.'
             : 'Nothing left to study.';
@@ -1248,6 +1256,7 @@
         if (!s || s.mode === 'review') return;
         if (s.timer) clearInterval(s.timer);
         $('storm-meter').hidden = true;
+        track('trainer_drill_finished', { mode: s.mode, score: s.score, answered: s.answered });
         var record = s.score > (bests[s.mode] || 0);
         if (record) {
             bests[s.mode] = s.score;
@@ -1348,6 +1357,7 @@
     function setUpInstall() {
         var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
         if (standalone) return;
+        window.addEventListener('appinstalled', function () { track('trainer_installed'); });
         var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (ios) $('install-ios').hidden = false;
         var deferred = null;
