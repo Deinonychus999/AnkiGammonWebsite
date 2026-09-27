@@ -159,6 +159,11 @@ A spaced-repetition trainer that needs neither Anki nor Pyodide: it quizzes posi
 - [train/sw.js](website/public/train/sw.js) serves the trainer's own page, CSS, JS and icons network-first (revalidated, falling back to the cache offline or after 4 s), so the trainer is never older than the web app page that hands it decks: a cache-first trainer once received a handoff format it didn't know. The unpkg/cdnjs libraries the `.apkg` importer loads have versioned URLs and are served cache-first. Deck API requests are not cached. Bump `CACHE` when changing `sw.js` so old caches are dropped, and keep its `SHELL` list in step with the files `train/index.html` loads: a missing file makes the install fail. The `#inbox` handoff is cleared only after it imports, so an entry an out-of-date trainer can't read survives a reload.
 - The decks API only allows `https://ankigammon.com` and `http://localhost:8765` (`ALLOWED_ORIGINS` in `worker/wrangler.jsonc`), so community decks don't load when previewing on another port.
 
+### Usage analytics
+[website/public/js/analytics.js](website/public/js/analytics.js), loaded on every page from the `css` partial: PostHog in cookieless `always` mode (no cookies or storage, no `identify`, autocapture/recordings/flags off), URLs stripped of `?query` and `#hash` (the trainer's `#desktop=<port>.<key>` must never be sent), skipped on localhost and under Do Not Track / Global Privacy Control, and inert while `POSTHOG_KEY` is empty. The footer's privacy line describes this; keep the two in step. Pages call `window.agTrack(name, props)` through a local `track()` guard, since analytics.js is deferred. Props are counts and kinds only, never deck names, positions or file contents.
+- Web app (`app.js`): `app_ready` {seconds}, `app_start_failed`, `app_file_loaded` / `app_file_failed` {kind: xg|xgp|paste|sample, positions}, `app_apkg_downloaded` {cards}, `app_sent_to_anki` {cards}, `app_send_failed` {reason}, `app_study_in_trainer` {cards}
+- Trainer (`train-app.js`): `trainer_deck_added` {source: community|file|apkg|app|desktop, positions, added}, `trainer_session_finished` {cards, best}, `trainer_drill_finished` {mode: streak|storm, score, answered}, `trainer_installed`
+
 ### SEO & Structured Data
 
 The site includes extensive SEO optimization in [index.html](website/public/index.html:1-100):

@@ -804,6 +804,15 @@
     font-size: 0.9rem;
 }
 
+.footer-privacy {
+    flex: 1 1 100%;
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
 /* ===== Lucide Icons ===== */
 .icon {
     display: inline-block;

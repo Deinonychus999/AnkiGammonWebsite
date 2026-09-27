@@ -88,7 +88,20 @@
         });
     }
 
+    // analytics.js loads deferred, after this script, so look it up per call.
+    function track(name, props) {
+        if (window.agTrack) window.agTrack(name, props);
+    }
+
+    function sourceKind() {
+        if (!source) return null;
+        if (source.kind === 'text') return 'paste';
+        if (source.name === 'sample-match.xg') return 'sample';
+        return (source.name.match(/\.(\w+)$/) || [, 'other'])[1].toLowerCase();
+    }
+
     function bootReady() {
+        track('app_ready', { seconds: Math.round(performance.now() / 1000) });
         try { localStorage.setItem(STARTED_KEY, '1'); } catch (e) { /* storage blocked */ }
         bootStep('done');
         $('app-boot').hidden = true;
@@ -101,6 +114,7 @@
         $('app-boot').dataset.state = 'error';
         $('app-boot-note').textContent = message;
         $('app-boot-failed').hidden = false;
+        track('app_start_failed');
     }
 
     function showError(message) {
@@ -225,8 +239,10 @@
             else if (source.kind === 'text' || !isMatchFile()) players = { o: null, x: null };
             positions = result.positions.map(function (p) { return Object.assign({ picked: true }, p); });
             showLoaded(result.total);
+            track('app_file_loaded', { kind: sourceKind(), positions: positions.length });
         }).catch(function (e) {
             if (token !== loadToken) return;
+            track('app_file_failed', { kind: sourceKind() });
             source = shown;
             setStatus('Ready', 'ready');
             showError(e.message);
@@ -525,7 +541,9 @@
             if (summary.added) parts.push(summary.added + ' added');
             if (summary.updated) parts.push(summary.updated + ' updated');
             setStatus('Sent ' + plural(summary.total, 'card') + ' to Anki (' + parts.join(', ') + ').', 'ready');
+            track('app_sent_to_anki', { cards: summary.total });
         }).catch(function (e) {
+            track('app_send_failed', { reason: (e && e.help) || 'failed' });
             setStatus('Ready', 'ready');
             if (e && e.help) showAnkiHelp(e.help);
             else showAnkiHelp('failed', e && e.message);
@@ -562,6 +580,7 @@
         }).then(function (pack) {
             return window.TrainStore.putInbox('app', { name: deckName, pack: pack });
         }).then(function () {
+            track('app_study_in_trainer', { cards: picked.length });
             location.href = '../train/#inbox';
         }).catch(function (e) {
             setStatus('Ready', 'ready');
@@ -584,6 +603,7 @@
             a.remove();
             setTimeout(function () { URL.revokeObjectURL(a.href); }, 30000);
             setStatus('Downloaded ' + plural(picked.length, 'card') + '. Open the file to import it into Anki.', 'ready');
+            track('app_apkg_downloaded', { cards: picked.length });
         }).catch(function (e) {
             setStatus('Ready', 'ready');
             showError('The deck could not be built: ' + e.message);
