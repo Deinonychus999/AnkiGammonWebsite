@@ -327,13 +327,25 @@
         }).then(function () { setStatus('Ready', 'ready'); });
     }
 
+    // A deck saved here after it was last published is up to date, and left
+    // out of the list; one published again since is offered as an update.
     function renderCommunityState() {
         if (!catalog) return;
         var have = {};
-        decks.forEach(function (d) { have[d.id] = true; });
+        decks.forEach(function (d) { have[d.id] = d; });
+        var published = {};
+        catalog.forEach(function (d) { published[d.id] = d.published_at; });
+        var shown = 0;
         Array.prototype.forEach.call(document.querySelectorAll('#community-list [data-deck]'), function (btn) {
-            btn.textContent = have['deck:' + btn.dataset.deck] ? 'Update' : 'Add';
+            var mine = have['deck:' + btn.dataset.deck];
+            var at = published[btn.dataset.deck];
+            var current = !!(mine && mine.updatedAt && at && new Date(mine.updatedAt) >= new Date(at));
+            btn.textContent = mine ? 'Update' : 'Add';
+            btn.title = mine ? 'A newer version of this deck was published' : '';
+            btn.closest('.trainer-community__row').hidden = current;
+            if (!current) shown++;
         });
+        $('community-all-added').hidden = shown > 0;
     }
 
     function loadCatalog() {
@@ -349,6 +361,10 @@
                 list.appendChild(el('li', 'trainer-community__empty', 'No community decks yet.'));
                 return;
             }
+            var allAdded = el('li', 'trainer-community__empty', 'You have every community deck, up to date.');
+            allAdded.id = 'community-all-added';
+            allAdded.hidden = true;
+            list.appendChild(allAdded);
             catalog.forEach(function (deck) {
                 var row = el('li', 'trainer-community__row');
                 var text = el('div', 'trainer-community__text');

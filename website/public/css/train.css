@@ -293,6 +293,10 @@
     border-bottom: 1px solid var(--border);
 }
 
+.trainer-community__row[hidden] {
+    display: none;
+}
+
 .trainer-community__row:last-child {
     border-bottom: none;
 }
