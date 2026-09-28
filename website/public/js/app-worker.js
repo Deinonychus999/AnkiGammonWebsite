@@ -43,24 +43,54 @@ async function start(wheels, base) {
     return { py: py, web: py.pyimport("ankigammon.web") };
 }
 
+function writeInput(py, name, bytes) {
+    const path = "/tmp/in/" + name.replace(/[\\/]/g, "_");
+    py.FS.mkdirTree("/tmp/in");
+    py.FS.writeFile(path, new Uint8Array(bytes));
+    return path;
+}
+
 const commands = {
     async init(args) {
         ready = start(args.wheels, args.base);
         await ready;
         return true;
     },
+    async analysisKind(args) {
+        const { py, web } = await ready;
+        return JSON.parse(web.analysis_kind(writeInput(py, args.name, args.bytes)));
+    },
     async loadFile(args) {
         const { py, web } = await ready;
-        const path = "/tmp/in/" + args.name.replace(/[\\/]/g, "_");
-        py.FS.mkdirTree("/tmp/in");
-        py.FS.writeFile(path, new Uint8Array(args.bytes));
-        const players = /\.xg$/i.test(args.name) ? JSON.parse(web.read_player_names(path)) : null;
-        const loaded = JSON.parse(web.load_file(path, args.checker, args.cube, args.includeX, args.includeO));
+        const path = writeInput(py, args.name, args.bytes);
+        const players = /\.(xg|ogxm)$/i.test(args.name) ? JSON.parse(web.read_player_names(path)) : null;
+        const loaded = JSON.parse(web.load_file(path, args.checker, args.cube, args.includeX, args.includeO,
+            args.sourceDescription || null));
         return Object.assign({ players: players }, loaded);
     },
     async loadText(args) {
         const { web } = await ready;
         return JSON.parse(web.load_text(args.text));
+    },
+    async positionRequests(args) {
+        const { web } = await ready;
+        return JSON.parse(web.position_requests(args.text, args.preset));
+    },
+    async applyPositionAnalysis(args) {
+        const { web } = await ready;
+        return JSON.parse(web.apply_position_analysis(JSON.stringify(args.results), args.presetLabel, args.request));
+    },
+    async matrixRequests(args) {
+        const { web } = await ready;
+        return JSON.parse(web.matrix_requests(JSON.stringify(args.indices), args.preset));
+    },
+    async applyMatrixAnalysis(args) {
+        const { web } = await ready;
+        return JSON.parse(web.apply_matrix_analysis(JSON.stringify(args.xgids), JSON.stringify(args.results), args.preset));
+    },
+    async generationWarnings() {
+        const { web } = await ready;
+        return JSON.parse(web.generation_warnings());
     },
     async configure(args) {
         const { web } = await ready;

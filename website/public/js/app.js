@@ -7,10 +7,15 @@
 
     var root = document.getElementById('app');
     if (!root) return;
+    // The window HedgeHog sends back to after connecting never starts the app.
+    var H = window.AgHedgeHog;
+    if (H && H.handleCallback()) return;
 
     var PREFS_KEY = 'ankigammon-app-prefs-v1';
     var CARD_SETTINGS = ['color_scheme', 'board_orientation', 'max_moves', 'score_format',
-        'show_pip_count', 'swap_checker_colors', 'split_cube_decisions'];
+        'show_pip_count', 'swap_checker_colors', 'split_cube_decisions',
+        'generate_score_matrix', 'generate_move_score_matrix', 'generate_move_cube_matrix'];
+    var MATRIX_SETTINGS = ['generate_score_matrix', 'generate_move_score_matrix', 'generate_move_cube_matrix'];
     var CARD_FLAGS = ['show_options', 'interactive_moves'];
 
     var $ = function (id) { return document.getElementById(id); };
@@ -96,8 +101,9 @@
     function sourceKind() {
         if (!source) return null;
         if (source.kind === 'text') return 'paste';
+        if (source.kind === 'analyzed') return 'ids';
         if (source.name === 'sample-match.xg') return 'sample';
-        return (source.name.match(/\.(\w+)$/) || [, 'other'])[1].toLowerCase();
+        return ((source.label || source.name).match(/\.(\w+)$/) || [, 'other'])[1].toLowerCase();
     }
 
     function bootReady() {
@@ -136,6 +142,7 @@
         prefs.use_subdecks = $('use-subdecks').checked;
         prefs.night_mode = nightMode;
         prefs.anki_url = $('anki-url').value.trim();
+        prefs.hedgehog_preset = $('hedgehog-preset').value;
         try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) { /* storage blocked */ }
     }
 
@@ -152,6 +159,7 @@
         if (prefs.use_subdecks !== undefined) $('use-subdecks').checked = !!prefs.use_subdecks;
         if (prefs.night_mode !== undefined) nightMode = !!prefs.night_mode;
         if (prefs.anki_url) $('anki-url').value = prefs.anki_url;
+        if (prefs.hedgehog_preset) $('hedgehog-preset').value = prefs.hedgehog_preset;
     }
 
     function cardOptions() {
@@ -169,7 +177,13 @@
         var all = cardOptions();
         var out = {};
         CARD_SETTINGS.forEach(function (key) { out[key] = all[key]; });
+        out.hedgehog_preset = $('hedgehog-preset').value;
         return out;
+    }
+
+    function matricesWanted() {
+        var all = cardOptions();
+        return MATRIX_SETTINGS.some(function (key) { return all[key]; });
     }
 
     function threshold(id) {
@@ -191,6 +205,20 @@
         });
     }
 
+    // Loads, analyses and exports can overlap (a preview's matrix fetch runs
+    // while an export waits), so opening another file stays off until all end.
+    var working = 0;
+
+    function beginWork() {
+        working++;
+        setBusy(true);
+    }
+
+    function endWork() {
+        working = Math.max(0, working - 1);
+        setBusy(working > 0);
+    }
+
     function setView(view) {
         $('app-shell').dataset.view = view;
         $('stage-empty').hidden = view !== 'empty';
@@ -199,7 +227,7 @@
     }
 
     function isMatchFile() {
-        return source && source.kind === 'file' && /\.xg$/i.test(source.name);
+        return source && source.kind === 'file' && /\.(xg|ogxm)$/i.test(source.name);
     }
 
     function load(newSource) {
@@ -208,11 +236,12 @@
         // threshold) must keep using the source that list came from.
         var shown = source;
         source = newSource || source;
-        if (!source) return;
+        // Positions HedgeHog analyzed from a paste exist only in the worker.
+        if (!source || source.kind === 'analyzed') return;
         var token = ++loadToken;
         showError('');
-        setBusy(true);
-        setStatus(source.kind === 'file' ? 'Reading ' + source.name + '…' : 'Reading the pasted analysis…', 'busy');
+        beginWork();
+        setStatus(source.kind === 'file' ? 'Reading ' + (source.label || source.name) + '…' : 'Reading the pasted analysis…', 'busy');
 
         var request;
         if (source.kind === 'file') {
@@ -224,7 +253,8 @@
                     checker: threshold('checker-threshold'),
                     cube: threshold('cube-threshold'),
                     includeX: $('include-x').checked,
-                    includeO: $('include-o').checked
+                    includeO: $('include-o').checked,
+                    sourceDescription: source.sourceDescription || null
                 }, [bytes]);
             });
         } else {
@@ -235,10 +265,7 @@
 
         request.then(function (result) {
             if (token !== loadToken) return;
-            if (result.players) players = result.players;
-            else if (source.kind === 'text' || !isMatchFile()) players = { o: null, x: null };
-            positions = result.positions.map(function (p) { return Object.assign({ picked: true }, p); });
-            showLoaded(result.total);
+            showResult(result);
             track('app_file_loaded', { kind: sourceKind(), positions: positions.length });
         }).catch(function (e) {
             if (token !== loadToken) return;
@@ -246,9 +273,14 @@
             source = shown;
             setStatus('Ready', 'ready');
             showError(e.message);
-        }).then(function () {
-            if (token === loadToken) setBusy(false);
-        });
+        }).then(endWork);
+    }
+
+    function showResult(result) {
+        if (result.players) players = result.players;
+        else if (source.kind !== 'file' || !isMatchFile()) players = { o: null, x: null };
+        positions = result.positions.map(function (p) { return Object.assign({ picked: true }, p); });
+        showLoaded(result.total);
     }
 
     function playerName(side) {
@@ -260,14 +292,18 @@
     }
 
     function showLoaded(total) {
-        var label = source.kind === 'file' ? source.name : 'Pasted analysis';
+        var label = source.kind === 'file' ? (source.label || source.name)
+            : source.kind === 'analyzed' ? 'Pasted positions' : 'Pasted analysis';
         var meta;
         if (isMatchFile()) {
             meta = plural(positions.length, 'mistake') + ' kept from ' + plural(total, 'decision') + '.';
+        } else if (source.kind === 'analyzed') {
+            meta = plural(positions.length, 'position') + (source.byHedgeHog === positions.length
+                ? ', analyzed by HedgeHog.' : ' (' + source.byHedgeHog + ' analyzed by HedgeHog).');
         } else if (source.kind === 'text' && total > positions.length) {
             var skipped = total - positions.length;
             meta = plural(positions.length, 'analyzed position') + '. ' + plural(skipped, 'position') +
-                ' without analysis ' + (skipped === 1 ? 'was' : 'were') + ' skipped; the desktop app can analyze them.';
+                ' without analysis ' + (skipped === 1 ? 'was' : 'were') + ' skipped.';
         } else {
             meta = plural(positions.length, 'position') + '.';
         }
@@ -439,15 +475,18 @@
         var token = ++previewToken;
         var opts = cardOptions();
         $('preview-hint').textContent = 'Rendering…';
-        call('configure', { settings: cardSettings() }).then(function () {
-            return call('preview', { index: active, showOptions: opts.show_options, interactiveMoves: opts.interactive_moves });
+        var index = active;
+        var current = function () { return token === previewToken; };
+        fetchMatrices([index], 'preview', current).then(function () {
+            if (!current()) return null;
+            return call('preview', { index: index, showOptions: opts.show_options, interactiveMoves: opts.interactive_moves });
         }).then(function (result) {
-            if (token !== previewToken) return;
+            if (!result || !current()) return;
             card = result;
             $('show-front').disabled = $('show-back').disabled = false;
-            $('preview-hint').textContent = opts.show_options
-                ? 'Pick a move on the front to flip it, as in Anki.'
-                : 'Use Back to see the answer.';
+            $('preview-hint').textContent = result.warnings && result.warnings.length
+                ? 'Some card-back analyses are missing: ' + result.warnings[0]
+                : opts.show_options ? 'Pick a move on the front to flip it, as in Anki.' : 'Use Back to see the answer.';
             showSide('front');
         }).catch(function (e) {
             if (token !== previewToken) return;
@@ -496,7 +535,10 @@
 
     function openOptions(focusId) {
         var dialog = $('options-dialog');
-        if (!dialog.open) dialog.showModal();
+        if (!dialog.open) {
+            dialog.showModal();
+            if (!connecting) refreshHedgeHogStatus();
+        }
         if (focusId) {
             $(focusId).scrollIntoView({ block: 'nearest' });
             $(focusId).focus();
@@ -510,10 +552,23 @@
     function sendToAnki() {
         var picked = positions.filter(function (p) { return p.picked; });
         if (!picked.length || sending) return;
+        withMatrices(function () { sendPicked(picked); });
+    }
+
+    function exportCancelled(e) {
+        return e && e.cancelled;
+    }
+
+    function showWarnings(warnings) {
+        if (warnings && warnings.length) showError(warnings.join(' '));
+    }
+
+    function sendPicked(picked) {
         var url = $('anki-url').value.trim() || ANKI_DEFAULT_URL;
         var key = $('anki-key').value.trim();
         var opts = cardOptions();
         sending = true;
+        beginWork();
         renderCounts();
         if ($('anki-help').open) $('anki-help').close();
         showError('');
@@ -525,7 +580,7 @@
             var result = (reply && reply.result) || {};
             if (result.permission !== 'granted') throw { help: 'denied' };
             if (result.requireApikey && !key) throw { help: 'key' };
-            return call('configure', { settings: cardSettings() });
+            return fetchMatrices(picked.map(function (p) { return p.index; }), 'export');
         }).then(function () {
             return call('sendToAnki', {
                 indices: picked.map(function (p) { return p.index; }),
@@ -541,22 +596,25 @@
             if (summary.added) parts.push(summary.added + ' added');
             if (summary.updated) parts.push(summary.updated + ' updated');
             setStatus('Sent ' + plural(summary.total, 'card') + ' to Anki (' + parts.join(', ') + ').', 'ready');
+            showWarnings(summary.warnings);
             track('app_sent_to_anki', { cards: summary.total });
         }).catch(function (e) {
+            if (exportCancelled(e)) { setStatus('Sending cancelled.', 'ready'); return; }
             track('app_send_failed', { reason: (e && e.help) || 'failed' });
             setStatus('Ready', 'ready');
             if (e && e.help) showAnkiHelp(e.help);
             else showAnkiHelp('failed', e && e.message);
         }).then(function () {
             sending = false;
+            endWork();
             renderCounts();
         });
     }
 
     function buildDeck(picked, deckName) {
         var opts = cardOptions();
-        setStatus('Building ' + plural(picked.length, 'card') + '…', 'busy');
-        return call('configure', { settings: cardSettings() }).then(function () {
+        return fetchMatrices(picked.map(function (p) { return p.index; }), 'export').then(function () {
+            setStatus('Building ' + plural(picked.length, 'card') + '…', 'busy');
             return call('exportDeck', {
                 indices: picked.map(function (p) { return p.index; }),
                 deckName: deckName,
@@ -571,29 +629,43 @@
     function studyInTrainer() {
         var picked = positions.filter(function (p) { return p.picked; });
         if (!picked.length) return;
+        withMatrices(function () { trainPicked(picked); });
+    }
+
+    function trainPicked(picked) {
         var deckName = ($('deck-name').value.trim() || 'AnkiGammon').split('::').pop();
         $('train-btn').disabled = true;
-        setStatus('Preparing ' + plural(picked.length, 'position') + ' for the trainer…', 'busy');
-        call('exportPack', {
-            indices: picked.map(function (p) { return p.index; }),
-            deckName: deckName
+        beginWork();
+        fetchMatrices(picked.map(function (p) { return p.index; }), 'export').then(function () {
+            setStatus('Preparing ' + plural(picked.length, 'position') + ' for the trainer…', 'busy');
+            return call('exportPack', {
+                indices: picked.map(function (p) { return p.index; }),
+                deckName: deckName
+            });
         }).then(function (pack) {
             return window.TrainStore.putInbox('app', { name: deckName, pack: pack });
         }).then(function () {
             track('app_study_in_trainer', { cards: picked.length });
             location.href = '../train/#inbox';
         }).catch(function (e) {
+            endWork();
+            renderCounts();
+            if (exportCancelled(e)) { setStatus('Cancelled.', 'ready'); return; }
             setStatus('Ready', 'ready');
             showError('The cards could not be opened in the trainer: ' + e.message);
-            renderCounts();
         });
     }
 
     function exportDeck() {
         var picked = positions.filter(function (p) { return p.picked; });
         if (!picked.length) return;
+        withMatrices(function () { downloadPicked(picked); });
+    }
+
+    function downloadPicked(picked) {
         var deckName = $('deck-name').value.trim() || 'AnkiGammon';
         $('export-btn').disabled = true;
+        beginWork();
         buildDeck(picked, deckName).then(function (buffer) {
             var a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([buffer], { type: 'application/octet-stream' }));
@@ -604,26 +676,329 @@
             setTimeout(function () { URL.revokeObjectURL(a.href); }, 30000);
             setStatus('Downloaded ' + plural(picked.length, 'card') + '. Open the file to import it into Anki.', 'ready');
             track('app_apkg_downloaded', { cards: picked.length });
+            return call('generationWarnings').then(showWarnings);
         }).catch(function (e) {
+            if (exportCancelled(e)) { setStatus('Download cancelled.', 'ready'); return; }
             setStatus('Ready', 'ready');
             showError('The deck could not be built: ' + e.message);
         }).then(function () {
+            endWork();
             renderCounts();
         });
+    }
+
+    // ── HedgeHog analysis ──────────────────────────────────────────────
+
+    var hedgehogLabels = null;
+    var connecting = false;
+    var runs = [];
+    var afterConnect = null;
+    var matrixQueue = Promise.resolve();
+
+    function presetLabel(preset) {
+        return (hedgehogLabels && hedgehogLabels[preset]) || H.PRESET_LABELS[preset] || preset;
+    }
+
+    function fillPresets(presets) {
+        var select = $('hedgehog-preset');
+        var current = select.value;
+        select.textContent = '';
+        presets.forEach(function (preset) {
+            var option = el('option', null, presetLabel(preset));
+            option.value = preset;
+            select.appendChild(option);
+        });
+        select.value = presets.indexOf(current) >= 0 ? current : presets.indexOf('2ply') >= 0 ? '2ply' : presets[0];
+    }
+
+    function analysesLeft(allowance) {
+        return allowance ? Math.max(0, allowance.limit - allowance.used + (allowance.credits || 0)) : 0;
+    }
+
+    function syncHedgeHogBadges() {
+        var connected = H.isConnected();
+        $('hedgehog-chip-state').textContent = connected ? 'Connected' : 'Connect';
+        $('hedgehog-chip').classList.toggle('is-connected', connected);
+        $('hedgehog-panel-btn').textContent = connected ? 'HedgeHog settings' : 'Connect HedgeHog';
+    }
+
+    function openHedgeHogSettings() {
+        openOptions('hedgehog-connect');
+        $('hedgehog-settings').scrollIntoView({ block: 'start' });
+    }
+
+    function refreshHedgeHogStatus() {
+        syncHedgeHogBadges();
+        var connected = H.isConnected();
+        $('hedgehog-connect').textContent = connected ? 'Disconnect' : 'Connect HedgeHog';
+        $('hedgehog-status').textContent = connected ? 'Connected.' : 'Not connected.';
+        if (!connected) return;
+        H.me().then(function (me) {
+            hedgehogLabels = me.preset_labels || null;
+            fillPresets((me.presets && me.presets.position) || Object.keys(H.PRESET_LABELS));
+            var text = 'Connected' + (me.username ? ' as ' + me.username : '') + '.';
+            var allowance = me.allowance;
+            if (allowance && allowance.position && allowance.position.limit !== null) {
+                text += ' Free plan, left today: ' + analysesLeft(allowance.position) + ' position and ' +
+                    analysesLeft(allowance.match) + ' match analyses.';
+            }
+            $('hedgehog-status').textContent = text;
+        }).catch(function (e) {
+            $('hedgehog-status').textContent = e.message;
+            $('hedgehog-connect').textContent = H.isConnected() ? 'Disconnect' : 'Connect HedgeHog';
+            syncHedgeHogBadges();
+        });
+    }
+
+    function allowanceLeft(me, kind) {
+        var allowance = me && me.allowance && me.allowance[kind];
+        return allowance && allowance.limit !== null ? analysesLeft(allowance) : null;
+    }
+
+    // On HedgeHog's free plan, asks before a run needs more analyses than are
+    // left today; HedgeHog would refuse the rest part way through.
+    function confirmCost(kind, cost) {
+        if (!cost) return Promise.resolve(true);
+        return H.me().then(function (me) {
+            var left = allowanceLeft(me, kind);
+            if (left === null || cost <= left) return true;
+            return window.confirm('This needs about ' + cost + ' ' + kind + (cost === 1 ? ' analysis' : ' analyses') +
+                ' on HedgeHog, and your free plan has ' + left + ' left today. HedgeHog will refuse the rest.\n\nContinue anyway?');
+        }, function () { return true; });  // the run itself shows what HedgeHog says
+    }
+
+    function noteAllowance(text) {
+        H.me().then(function (me) {
+            var positionsLeft = allowanceLeft(me, 'position');
+            if (positionsLeft === null) return;
+            setStatus(text + ' HedgeHog free plan: ' + positionsLeft + ' position and ' +
+                allowanceLeft(me, 'match') + ' match analyses left today.', 'ready');
+        }).catch(function () { /* the note is optional */ });
+    }
+
+    // Score matrices and the other card-back analyses: the worker says which
+    // positions the cards will ask about, the page fetches them, and the cards
+    // are built from the answers, cached per depth for the session. Runs one at
+    // a time. For an export, declining the cost or cancelling stops the export;
+    // a preview goes on without the analyses, and skips the fetch once stale.
+    function fetchMatrices(indices, mode, stillWanted) {
+        var run = matrixQueue.then(function () { return fetchMatricesNow(indices, mode, stillWanted); });
+        matrixQueue = run.catch(function () {});
+        return run;
+    }
+
+    function fetchMatricesNow(indices, mode, stillWanted) {
+        var stop = function () {
+            if (mode === 'export') throw { cancelled: true };
+            return null;
+        };
+        return call('configure', { settings: cardSettings() }).then(function () {
+            if (!matricesWanted() || !H.isConnected() || (stillWanted && !stillWanted())) return null;
+            var preset = $('hedgehog-preset').value;
+            return call('matrixRequests', { indices: indices, preset: preset }).then(function (requests) {
+                if (!requests.xgids.length) return null;
+                return confirmCost('position', requests.cost).then(function (go) {
+                    if (!go) return stop();
+                    var controller = startAnalysis();
+                    setStatus('HedgeHog is analyzing the card-back analyses: ' + plural(requests.xgids.length, 'position') + '…', 'busy');
+                    return H.analyzePositions(requests.batches, preset, function (done, total) {
+                        setStatus('Card-back analyses: HedgeHog analyzed ' + done + ' of ' + plural(total, 'position') + '…', 'busy');
+                    }, controller.signal).then(function (results) {
+                        return call('applyMatrixAnalysis', { xgids: requests.xgids, results: results, preset: preset });
+                    }).then(function (stored) {
+                        endAnalysis(controller);
+                        setStatus('Ready', 'ready');
+                        if (stored.failed.length) {
+                            showError('Card-back analyses left off for ' + plural(stored.failed.length, 'position') +
+                                ': ' + stored.failed[0]);
+                        }
+                    }, function (e) {
+                        endAnalysis(controller);
+                        if (e && e.name === 'AbortError') { setStatus('Ready', 'ready'); return stop(); }
+                        // The cards are still made, without the analyses that failed.
+                        showError('Card-back analyses left off: ' + e.message);
+                    });
+                });
+            });
+        });
+    }
+
+    // Exports without a HedgeHog connection offer to connect when matrices are on.
+    function withMatrices(work) {
+        if (!matricesWanted() || H.isConnected()) { work(); return; }
+        withHedgeHog(work, 'the score matrices');
+    }
+
+    // Runs `work` now if HedgeHog is connected, otherwise once the user connects.
+    function withHedgeHog(work, what) {
+        if (H.isConnected()) { work(); return; }
+        afterConnect = work;
+        setStatus('Ready', 'ready');
+        openHedgeHogSettings();
+        $('hedgehog-status').textContent = 'Connect your HedgeHog account to analyze ' + what +
+            '. The analysis runs on hedgehog-bg.com and counts toward your HedgeHog plan.';
+    }
+
+    function connectOrDisconnect() {
+        if (connecting) { H.cancelConnect(); return; }
+        if (H.isConnected()) {
+            H.disconnect().then(refreshHedgeHogStatus);
+            syncHedgeHogBadges();
+            track('app_hedgehog_disconnect');
+            return;
+        }
+        connecting = true;
+        $('hedgehog-connect').textContent = 'Cancel';
+        $('hedgehog-status').textContent = 'Sign in to HedgeHog in the window that opened and click Allow.';
+        H.connect().then(function () {
+            connecting = false;
+            track('app_hedgehog_connect');
+            refreshHedgeHogStatus();
+            var work = afterConnect;
+            afterConnect = null;
+            if (work) {
+                $('options-dialog').close();
+                work();
+            }
+        }).catch(function (e) {
+            connecting = false;
+            syncHedgeHogBadges();
+            $('hedgehog-connect').textContent = H.isConnected() ? 'Disconnect' : 'Connect HedgeHog';
+            $('hedgehog-status').textContent = e.message;
+        });
+    }
+
+    // Each run gets its own controller; Cancel stops every run in progress.
+    function startAnalysis() {
+        var controller = new AbortController();
+        runs.push(controller);
+        $('analysis-cancel').hidden = false;
+        beginWork();
+        return controller;
+    }
+
+    function endAnalysis(controller) {
+        runs = runs.filter(function (c) { return c !== controller; });
+        $('analysis-cancel').hidden = runs.length === 0;
+        endWork();
+    }
+
+    function analysisFailed(controller, e) {
+        endAnalysis(controller);
+        if (e && e.name === 'AbortError') {
+            setStatus('Analysis cancelled.', 'ready');
+            return;
+        }
+        track('app_hedgehog_failed', { reason: (e && e.code) || 'error' });
+        setStatus('Ready', 'ready');
+        showError(e.message);
+    }
+
+    // A match file without analysis: HedgeHog analyzes it and returns its .ogxm.
+    function analyzeFile(name, bytes, kind) {
+        withHedgeHog(function () {
+            confirmCost('match', 1).then(function (go) { if (go) runMatchAnalysis(name, bytes, kind); });
+        }, name);
+    }
+
+    function runMatchAnalysis(name, bytes, kind) {
+        var preset = $('hedgehog-preset').value;
+        var label = presetLabel(preset);
+        var controller = startAnalysis();
+        var steps = {
+            sending: 'Sending ' + name + ' to HedgeHog…',
+            analyzing: 'HedgeHog is analyzing ' + name + ' (' + label + '). Long matches take a minute…',
+            downloading: 'Downloading HedgeHog’s analysis…'
+        };
+        H.analyzeMatch(bytes, kind, preset, function (step) { setStatus(steps[step], 'busy'); }, controller.signal)
+            .then(function (result) {
+                endAnalysis(controller);
+                track('app_hedgehog_analyzed', { kind: 'match' });
+                load({
+                    kind: 'file', name: name + '.ogxm', label: name, bytes: result.bytes,
+                    sourceDescription: 'HedgeHog analysis (' + result.modelName + ', ' + label + ") from '" + name + "'"
+                });
+            }).catch(function (e) { analysisFailed(controller, e); });
+    }
+
+    function pasteNotes(requests, result) {
+        var notes = [];
+        if (requests.rejected.length) {
+            notes.push(plural(requests.rejected.length, 'line') + ' did not read as a position ID: ' +
+                requests.rejected.map(function (r) { return r.split('\n')[0]; }).join(', ') + '.');
+        }
+        if (result.failed.length) {
+            notes.push(plural(result.failed.length, 'position') + ' could not be analyzed: ' + result.failed[0]);
+        }
+        return notes.join(' ');
+    }
+
+    function analyzePaste(text, requests, preset) {
+        var label = presetLabel(preset);
+        var controller = startAnalysis();
+        setStatus('HedgeHog is analyzing ' + plural(requests.pending, 'position') + ' (' + label + ')…', 'busy');
+        H.analyzePositions(requests.batches, preset, function (done, total) {
+            setStatus('HedgeHog analyzed ' + done + ' of ' + plural(total, 'position') + '…', 'busy');
+        }, controller.signal).then(function (results) {
+            return call('configure', { settings: cardSettings() }).then(function () {
+                return call('applyPositionAnalysis', { results: results, presetLabel: label, request: requests.request });
+            });
+        }).then(function (result) {
+            endAnalysis(controller);
+            source = { kind: 'analyzed', text: text, byHedgeHog: requests.pending - result.failed.length };
+            showResult(result);
+            showError(pasteNotes(requests, result));
+            noteAllowance('Analyzed ' + plural(source.byHedgeHog, 'position') + '.');
+            track('app_file_loaded', { kind: 'ids', positions: positions.length });
+            track('app_hedgehog_analyzed', { kind: 'positions', positions: requests.pending });
+        }).catch(function (e) { analysisFailed(controller, e); });
+    }
+
+    function makeCardsFromPaste(text) {
+        if (!ready) return;
+        var preset = $('hedgehog-preset').value;
+        afterConnect = null;
+        showError('');
+        call('positionRequests', { text: text, preset: preset }).then(function (requests) {
+            if (!requests.pending && !requests.analyzed && requests.rejected.length) {
+                showError(requests.rejected.join('\n\n'));
+                return;
+            }
+            if (!requests.pending) {
+                load({ kind: 'text', text: text });
+                return;
+            }
+            withHedgeHog(function () {
+                confirmCost('position', requests.cost).then(function (go) {
+                    if (go) analyzePaste(text, requests, preset);
+                });
+            }, plural(requests.pending, 'pasted position'));
+        }).catch(function (e) { showError(e.message); });
     }
 
     // ── Events ─────────────────────────────────────────────────────────
 
     function readFile(file) {
-        if (!file) return;
-        if (!/\.xgp?$/i.test(file.name)) {
-            showError('The browser version reads eXtreme Gammon .xg and .xgp files. ' +
-                'For .mat, .sgf and other formats, use the desktop app, which analyzes them with GNU Backgammon.');
+        if (!file || !ready) return;
+        if (working) {
+            showError('Wait for the current analysis or export to finish, then open ' + file.name + '.');
             return;
         }
+        afterConnect = null;
+        showError('');
         file.arrayBuffer().then(function (bytes) {
-            load({ kind: 'file', name: file.name, bytes: bytes });
-        });
+            return call('analysisKind', { name: file.name, bytes: bytes.slice(0) }).then(function (kind) {
+                if (kind.text) {
+                    load({ kind: 'text', text: new TextDecoder().decode(bytes) });
+                } else if (kind.analyzed) {
+                    load({ kind: 'file', name: file.name, bytes: bytes });
+                } else if (kind.import) {
+                    analyzeFile(file.name, bytes, kind.import);
+                } else {
+                    showError(file.name + ' is not a match file. Open an .xg, .xgp, .ogxm, .mat, .sgf or .txt match.');
+                }
+            });
+        }).catch(function (e) { showError(e.message); });
     }
 
     function openFilePicker() { $('file-input').click(); }
@@ -664,7 +1039,7 @@
         var text = $('paste-input').value;
         if (!text.trim()) { $('paste-input').focus(); return; }
         $('paste-dialog').close();
-        load({ kind: 'text', text: text });
+        makeCardsFromPaste(text);
     });
 
     $('options-open').addEventListener('click', function () { openOptions(); });
@@ -752,10 +1127,27 @@
     $('send-btn').addEventListener('click', sendToAnki);
     $('train-btn').addEventListener('click', studyInTrainer);
     $('anki-url').addEventListener('change', savePrefs);
+    $('hedgehog-preset').addEventListener('change', savePrefs);
+    $('hedgehog-connect').addEventListener('click', connectOrDisconnect);
+    $('hedgehog-chip').addEventListener('click', openHedgeHogSettings);
+    $('hedgehog-panel-btn').addEventListener('click', function () {
+        var connected = H.isConnected();
+        openHedgeHogSettings();
+        // The popup must open inside this click, or the browser blocks it.
+        if (!connected && !connecting) connectOrDisconnect();
+    });
+    $('analysis-cancel').addEventListener('click', function () {
+        runs.forEach(function (controller) { controller.abort(); });
+    });
+    // Work queued behind Connect only runs if the user connects from that prompt.
+    $('options-dialog').addEventListener('close', function () {
+        if (!connecting) afterConnect = null;
+    });
 
     // ── Start ──────────────────────────────────────────────────────────
 
     applyPrefs(loadPrefs());
+    syncHedgeHogBadges();
     describeBoot();
     syncDeckChip();
     applyTheme();
@@ -801,7 +1193,7 @@
         ready = true;
         setBusy(false);
         bootReady();
-        setStatus('Ready. Open an .xg or .xgp file, or paste analysis, to begin.', 'ready');
+        setStatus('Ready. Open a match file, or paste analysis or position IDs, to begin.', 'ready');
     }).catch(function (e) {
         startFailed('The app could not start: ' + e.message + ' Reload the page to try again.');
     });

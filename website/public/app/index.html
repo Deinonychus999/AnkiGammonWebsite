@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Turn eXtreme Gammon analysis into Anki flashcards in your browser. Drop an .xg or .xgp file, pick the mistakes, then download the deck or send it to Anki. Free.">
+    <meta name="description" content="Turn backgammon analysis into Anki flashcards in your browser, with analysis by HedgeHog. Drop an XG, HedgeHog or .mat match file or paste position IDs, pick the mistakes, then download the deck or send it to Anki.">
     <meta name="author" content="AnkiGammon">
-    <title>AnkiGammon Web App - XG Analysis to Anki Flashcards in Your Browser</title>
+    <title>AnkiGammon Web App - Backgammon Analysis to Anki Flashcards in Your Browser</title>
 
     <!-- PARTIAL:favicons -->
 
@@ -14,7 +14,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/app/">
     <meta property="og:title" content="Backgammon flashcards in your browser - AnkiGammon">
-    <meta property="og:description" content="Turn eXtreme Gammon analysis into Anki flashcards in your browser. Free, with nothing to install.">
+    <meta property="og:description" content="Turn backgammon analysis into Anki flashcards in your browser. Free, with nothing to install.">
     <meta property="og:image" content="https://ankigammon.com/assets/images/app-og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -23,7 +23,7 @@
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Backgammon flashcards in your browser - AnkiGammon">
-    <meta name="twitter:description" content="Turn eXtreme Gammon analysis into Anki flashcards in your browser. Free, with nothing to install.">
+    <meta name="twitter:description" content="Turn backgammon analysis into Anki flashcards in your browser. Free, with nothing to install.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/app-og.png">
     <meta name="twitter:image:alt" content="An AnkiGammon flashcard in the browser: a backgammon position with the dice rolled 3-2 and five candidate moves to choose from">
 
@@ -34,13 +34,15 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "AnkiGammon Web App",
-      "description": "Turn eXtreme Gammon analysis into Anki flashcards in the browser: reads .xg and .xgp files and pasted XG analysis, filters mistakes by error and player, previews each card, and downloads an .apkg deck. Runs entirely in the browser.",
+      "description": "Turn backgammon analysis into Anki flashcards in the browser: reads eXtreme Gammon and HedgeHog files and pasted XG analysis, analyzes .mat files and position IDs with a HedgeHog account, filters mistakes by error and player, previews each card, and downloads an .apkg deck.",
       "url": "https://ankigammon.com/app/",
       "applicationCategory": "EducationalApplication",
       "operatingSystem": "Any (browser-based)",
       "featureList": [
         "Reads eXtreme Gammon .xg match files and .xgp position files",
         "Reads analysis copied from eXtreme Gammon with Ctrl+C",
+        "Reads HedgeHog .ogxm match analysis files",
+        "Analyzes .mat, .sgf and .txt match files and XGID, GNUID and OGID positions with a HedgeHog account",
         "Filters mistakes by error threshold and player",
         "Previews each flashcard, front and back",
         "Downloads an .apkg deck for Anki, AnkiMobile and AnkiDroid",
@@ -76,14 +78,20 @@
         <header class="app-bar">
             <div class="app-bar__group">
                 <button class="btn btn-primary btn-sm" id="browse-btn" type="button" disabled>Open file</button>
-                <button class="btn btn-secondary btn-sm" id="paste-open" type="button" disabled>Paste analysis</button>
-                <input type="file" id="file-input" accept=".xg,.xgp" hidden>
+                <button class="btn btn-secondary btn-sm" id="paste-open" type="button" disabled>Paste</button>
+                <input type="file" id="file-input" accept=".xg,.xgp,.ogxm,.mat,.txt,.sgf" hidden>
             </div>
             <p class="app-status app-bar__status" id="app-status" role="status" aria-live="polite">
                 <span class="app-status__dot" aria-hidden="true"></span>
                 <span id="app-status-text">Starting…</span>
             </p>
+            <button class="btn btn-secondary btn-sm" id="analysis-cancel" type="button" hidden>Cancel analysis</button>
             <div class="app-bar__group app-bar__actions">
+                <button class="app-deck-chip app-hh-chip" id="hedgehog-chip" type="button" title="Analysis by HedgeHog: your account and the analysis depth">
+                    <span class="app-hh-chip__dot" aria-hidden="true"></span>
+                    <span class="app-deck-chip__label">HedgeHog</span>
+                    <span class="app-deck-chip__name" id="hedgehog-chip-state">Connect</span>
+                </button>
                 <button class="app-deck-chip" id="deck-chip" type="button" title="Deck name and card options">
                     <span class="app-deck-chip__label">Deck</span>
                     <span class="app-deck-chip__name" id="deck-chip-name">AnkiGammon</span>
@@ -143,7 +151,7 @@
             <div class="app-empty" id="stage-empty">
                 <img class="app-empty__logo" src="../assets/images/icon.svg" alt="" width="112" height="112">
                 <h1 class="app-empty__title">Backgammon flashcards for Anki, in your browser</h1>
-                <p class="app-empty__lead">Open an eXtreme Gammon .xg or .xgp file, or drop one anywhere here. A match keeps only the mistakes above your thresholds; a position file becomes one card.</p>
+                <p class="app-empty__lead">Open a match file, or drop one anywhere here: eXtreme Gammon .xg and .xgp, HedgeHog .ogxm, or a .mat, .sgf or .txt match for HedgeHog to analyze. A match keeps only the mistakes above your thresholds.</p>
                 <div class="app-boot" id="app-boot" role="status" aria-live="polite">
                     <ol class="app-boot__steps">
                         <li class="app-boot__step" data-step="python" data-state="active">
@@ -164,13 +172,20 @@
                 <div class="app-start" id="app-start" hidden>
                     <div class="app-empty__actions">
                         <button class="btn btn-primary" id="empty-open" type="button" disabled>Open file</button>
-                        <button class="btn btn-secondary" id="empty-paste" type="button" disabled>Paste analysis</button>
+                        <button class="btn btn-secondary" id="empty-paste" type="button" disabled>Paste positions</button>
                     </div>
                     <p class="app-empty__sample">No XG file at hand? <button class="app-link-btn" id="sample-btn" type="button" disabled>Try a sample match</button></p>
                 </div>
+                <div class="app-hh-panel">
+                    <p class="app-hh-panel__text">
+                        <strong>Analysis by <a href="https://hedgehog-bg.com" target="_blank" rel="noopener">HedgeHog</a>.</strong>
+                        Position IDs and .mat, .sgf or .txt files are analyzed on HedgeHog with your own HedgeHog account,
+                        score matrices included. The free plan comes with a few analyses a day.
+                    </p>
+                    <button class="btn btn-secondary btn-sm" id="hedgehog-panel-btn" type="button">Connect HedgeHog</button>
+                </div>
                 <p class="app-empty__limits">
-                    This version uses analysis already done in eXtreme Gammon. To analyze position IDs or .mat files, or add score matrices,
-                    <a href="/#install">get the desktop app</a>.
+                    To analyze with GNU Backgammon or eXtreme Gammon on your own computer, <a href="/#install">get the desktop app</a>.
                 </p>
             </div>
 
@@ -190,7 +205,7 @@
             </div>
 
             <div class="app-drop" id="drop-overlay" hidden>
-                <p>Drop the .xg or .xgp file to open it</p>
+                <p>Drop the match file to open it</p>
             </div>
         </section>
     </div>
@@ -252,6 +267,31 @@
                 <label class="app-check"><input id="opt-split_cube_decisions" type="checkbox"> Split cube decisions by player</label>
             </section>
 
+            <section class="app-dialog__section" id="hedgehog-settings" aria-labelledby="options-hedgehog">
+                <h3 class="app-dialog__heading" id="options-hedgehog">HedgeHog analysis</h3>
+                <p class="app-dialog__note">Position IDs and .mat, .sgf or .txt match files are analyzed on
+                    <a href="https://hedgehog-bg.com" target="_blank" rel="noopener">hedgehog-bg.com</a> with your HedgeHog account.
+                    Every analysis counts toward your HedgeHog plan.</p>
+                <div class="app-hedgehog">
+                    <p class="app-hedgehog__status" id="hedgehog-status" role="status" aria-live="polite">Not connected.</p>
+                    <button class="btn btn-secondary btn-sm" id="hedgehog-connect" type="button">Connect HedgeHog</button>
+                </div>
+                <label class="app-field">
+                    <span>Analysis depth</span>
+                    <select id="hedgehog-preset">
+                        <option value="1ply">2-ply</option>
+                        <option value="2ply" selected>3-ply</option>
+                        <option value="3ply">4-ply</option>
+                        <option value="+">+</option>
+                        <option value="++">++</option>
+                    </select>
+                </label>
+                <p class="app-dialog__note">Added to the card back, like the desktop app. Each costs HedgeHog analyses: a 7-point score matrix takes about 2 at 2-ply and 5 at 3-ply (more for longer matches and deeper levels), the cube positions 1 at 2-ply and 3-ply. AnkiGammon asks first when a run would go past what your plan has left today.</p>
+                <label class="app-check"><input id="opt-generate_score_matrix" type="checkbox"> Score matrix on cube cards</label>
+                <label class="app-check"><input id="opt-generate_move_score_matrix" type="checkbox"> Best moves by score on checker cards</label>
+                <label class="app-check"><input id="opt-generate_move_cube_matrix" type="checkbox"> Checker play at every cube position</label>
+            </section>
+
             <section class="app-dialog__section" id="anki-settings" aria-labelledby="options-anki">
                 <h3 class="app-dialog__heading" id="options-anki">Anki connection</h3>
                 <p class="app-dialog__note">Used by Send to Anki. Change these only if you set a different port or an API key in AnkiConnect.</p>
@@ -273,8 +313,8 @@
 
     <dialog class="app-dialog" id="paste-dialog" aria-labelledby="paste-title">
         <form method="dialog" class="app-dialog__body">
-            <h2 class="app-dialog__title" id="paste-title">Paste analysis</h2>
-            <label class="app-dialog__note" for="paste-input">In eXtreme Gammon, analyze a position, press Ctrl+C and paste it here. Several positions can go in one paste.</label>
+            <h2 class="app-dialog__title" id="paste-title">Paste positions</h2>
+            <label class="app-dialog__note" for="paste-input">Paste analysis copied from eXtreme Gammon (Ctrl+C), or position IDs (XGID, GNU BG ID or OGID), one per line, for HedgeHog to analyze. Text under an ID becomes a note on its card.</label>
             <textarea id="paste-input" class="input-area__textarea app-dialog__textarea" rows="10" spellcheck="false"></textarea>
             <div class="app-dialog__footer">
                 <button class="btn btn-secondary btn-sm" value="cancel" formnovalidate>Cancel</button>
@@ -306,7 +346,7 @@
     <section class="tool-info section">
         <div class="container tool-guide">
             <h2>Browser or desktop?</h2>
-            <p>Both make the same cards. The browser version needs no install and works on a phone or tablet, but it has no analysis engine, so it only takes positions eXtreme Gammon has already analyzed.</p>
+            <p>Both make the same cards. The browser version needs no install and works on a phone or tablet. It has no analysis engine of its own: it reads analysis done in eXtreme Gammon or HedgeHog, and sends anything else to HedgeHog to analyze with your HedgeHog account.</p>
             <div class="tool-guide__scroll">
                 <table class="app-compare">
                     <thead>
@@ -316,16 +356,26 @@
                         <tr><th scope="row">Install</th><td>None</td><td>Download for Windows, macOS or Linux</td></tr>
                         <tr><th scope="row">eXtreme Gammon .xg and .xgp files</th><td>Yes</td><td>Yes</td></tr>
                         <tr><th scope="row">Analysis copied from eXtreme Gammon</th><td>Yes</td><td>Yes</td></tr>
-                        <tr><th scope="row">Position IDs (XGID, GNUID, OGID)</th><td>No</td><td>Yes, analyzed with GNU Backgammon or eXtreme Gammon</td></tr>
-                        <tr><th scope="row">.mat, .sgf and .txt match files</th><td>No</td><td>Yes</td></tr>
-                        <tr><th scope="row">Score matrix and cube comparisons</th><td>No</td><td>Yes</td></tr>
+                        <tr><th scope="row">HedgeHog .ogxm files</th><td>Yes</td><td>Yes</td></tr>
+                        <tr><th scope="row">Position IDs (XGID, GNUID, OGID)</th><td>Yes, analyzed by HedgeHog</td><td>Yes, analyzed with GNU Backgammon, eXtreme Gammon or HedgeHog</td></tr>
+                        <tr><th scope="row">.mat, .sgf and .txt match files</th><td>Yes, analyzed by HedgeHog</td><td>Yes</td></tr>
+                        <tr><th scope="row">Score matrix and cube comparisons</th><td>Yes, with HedgeHog</td><td>Yes</td></tr>
                         <tr><th scope="row">Your own notes on cards</th><td>Notes written in XG</td><td>Notes written in XG, or add your own</td></tr>
                         <tr><th scope="row">Getting cards into Anki</th><td>.apkg, or straight into Anki with AnkiConnect (Chrome, Edge, Firefox)</td><td>.apkg, or straight into Anki with AnkiConnect</td></tr>
                         <tr><th scope="row">Decks organized in a tree, saved collections</th><td>No</td><td>Yes</td></tr>
                     </tbody>
                 </table>
             </div>
-            <p><a href="/#install">Download the desktop app</a>: it is free, and GNU Backgammon, which it uses to analyze positions, is free too.</p>
+            <p><a href="/#install">Download the desktop app</a>: it is free, and analyzes with GNU Backgammon (free), eXtreme Gammon or HedgeHog.</p>
+
+            <h2>Analysis by HedgeHog</h2>
+            <p><a href="https://hedgehog-bg.com" target="_blank" rel="noopener">HedgeHog</a> is a backgammon engine that analyzes on its own servers, and AnkiGammon works with it for everything that arrives without analysis: position IDs, .mat, .sgf and .txt match files, and the score matrices on the card back.</p>
+            <ul>
+                <li><strong>Connect once:</strong> click <em>Connect HedgeHog</em> on the start screen, or <em>HedgeHog</em> at the top of the app and then <em>Connect HedgeHog</em>. A HedgeHog window opens; sign in or create an account and click Allow. AnkiGammon never sees your password, and stays connected in this browser until you disconnect, or after 30 days without use.</li>
+                <li><strong>Your plan, your analyses:</strong> every analysis counts toward your own HedgeHog plan. The free plan has a small daily allowance, and AnkiGammon asks before a run would use more than you have left. Paid plans add deeper levels and rollouts.</li>
+                <li><strong>Depth and matrices:</strong> choose the analysis depth and turn score matrices on in the same HedgeHog settings.</li>
+                <li><strong>Disconnect</strong> there too, or under Connected apps in your HedgeHog account.</li>
+            </ul>
 
             <h2>Getting analysis out of eXtreme Gammon</h2>
             <ul>
@@ -338,11 +388,11 @@
             <div class="faq-details">
                 <details class="faq-details__item">
                     <summary>Is my file uploaded anywhere?</summary>
-                    <p>No. The page downloads Python and AnkiGammon into your browser once, then reads your file and builds the deck on your device.</p>
+                    <p>Files that already carry analysis (.xg, .xgp, .ogxm, pasted XG analysis) stay on your device: the page downloads Python and AnkiGammon into your browser once, then builds the deck there. Only with HedgeHog connected does anything go out: a match file without analysis is saved to your HedgeHog account, like one you upload there; pasted positions, and the positions score matrices and the cube comparison need, are sent to HedgeHog to analyze.</p>
                 </details>
                 <details class="faq-details__item">
-                    <summary>Why can't it analyze a position ID?</summary>
-                    <p>Analysis needs an engine such as GNU Backgammon, and neither it nor eXtreme Gammon runs in a browser. The desktop app runs GNU Backgammon for you.</p>
+                    <summary>How does it analyze position IDs and .mat files?</summary>
+                    <p>With <a href="https://hedgehog-bg.com" target="_blank" rel="noopener">HedgeHog</a>, a backgammon engine that runs on its own servers. Connect your HedgeHog account under Card options: a HedgeHog window opens, you sign in and click Allow, and AnkiGammon never sees your password. Analyses count toward your HedgeHog plan; the free plan has a small daily allowance.</p>
                 </details>
                 <details class="faq-details__item">
                     <summary>Are these the same cards as the desktop app makes?</summary>
@@ -368,6 +418,7 @@
     <!-- PARTIAL:footer -->
 
     <script src="../js/train-store.js"></script>
+    <script src="../js/hedgehog.js"></script>
     <script src="../js/app.js"></script>
 
     <!-- PARTIAL:kofi -->
