@@ -110,9 +110,9 @@ Each JS file is self-contained and handles one feature. When adding new interact
 ### Major Components
 
 1. **Hero Section** - CTA buttons with platform-specific download links
-2. **Embla Carousel** - 9-slide screenshot gallery with lightbox zoom
+2. **Embla Carousel** - 11-slide screenshot gallery with lightbox zoom (desktop shots from `scripts/take_website_screenshots.py`; the two web app slides are taken by hand from the live app)
 3. **Platform Switcher** - Auto-detects OS (Windows/macOS/Linux) and shows appropriate install instructions
-4. **FAQ Accordion** - 9 collapsible Q&A items with Schema.org structured data
+4. **FAQ Accordion** - 15 collapsible Q&A items; most are mirrored in the FAQPage JSON-LD. `faq.js` sizes each open answer to its content
 
 ### Tools Section
 
@@ -129,7 +129,7 @@ Tool pages share the site's core CSS and add [tool.css](website/public/css/tool.
 A limited AnkiGammon in the browser, linked from the homepage hero next to the desktop download (deliberately not under Tools). It runs the real `ankigammon` Python package under Pyodide, so cards are identical to the desktop app's. It reads analyzed input directly (.xg, .xgp, HedgeHog's .ogxm, XG text export); anything else (.mat/.txt/.sgf, pasted XGID/GNUID/OGID) is analyzed by HedgeHog with the user's HedgeHog account. Cards leave as an .apkg download or through Send to Anki.
 
 - [app/index.html](website/public/app/index.html) + [js/app.js](website/public/js/app.js) (UI, IIFE) + [js/app-worker.js](website/public/js/app-worker.js) (module worker; Pyodide 314 requires one) + [css/app.css](website/public/css/app.css). `app/sample-match.xg` is `tests/data/sample_match.xg` from the app repo.
-- The page is an in-place app shell that fills the window below the sticky nav (`--app-nav` is measured by `app.js`): an app bar (Open/Paste, status, deck chip, Card options, Study in the trainer, Send to Anki, Download), a sidebar (filter + position list), and a stage (startup progress and empty state, or the Anki-style card preview). Card options, Paste and the Send-to-Anki help are `<dialog>`s. The guide and FAQ stay below the shell for search engines. Under 900px it stacks and scrolls with the page.
+- The page is an in-place app shell that fills the window below the sticky nav (`--app-nav` is measured by `app.js`): an app bar (Open/Paste, status, deck chip, Card options, Study in the trainer, Send to Anki, Download), a sidebar (filter + position list), and a stage (startup progress and empty state, or the Anki-style card preview). Card options (tabs: Cards, HedgeHog, Anki; `openOptions(id)` switches to the tab holding the field it focuses), Paste and the Send-to-Anki help are `<dialog>`s. The guide and FAQ stay below the shell for search engines. Under 900px it stacks and scrolls with the page.
 - `css/app.css` is also loaded by the trainer page, which relies on `.app-status`, `.app-field`, `.app-check` and `.app-link-btn`; keep those rules when changing the app.
 - `build.py` versions the app page's local scripts and stylesheets and writes a content-hashed worker URL into `data-worker` (`{{APP_WORKER}}`), so a deploy never pairs the page with an older `app.js` or worker.
 - The worker only calls `ankigammon.web` (app repo `ankigammon/web.py`); change both sides together.
@@ -142,7 +142,7 @@ A limited AnkiGammon in the browser, linked from the homepage hero next to the d
   - Connecting is OAuth with PKCE in a popup that returns to `/app/` (`https://ankigammon.com/app/`, or `http://127.0.0.1/app/` for a local preview on any port; both are in `public/oauth/client.json`). HedgeHog's pages send `Cross-Origin-Opener-Policy: same-origin`, which severs the popup from the page, so the reply goes back through a `BroadcastChannel` plus a `localStorage` event, keyed by a pending `state` stored before the popup is sent to HedgeHog; `AgHedgeHog.handleCallback()` runs first thing in `app.js` so the returning window never boots the app. Preview on `127.0.0.1`, not `localhost`: HedgeHog refuses the `localhost` hostname.
   - The refresh token and the current access token stay in `localStorage['ankigammon-hedgehog-v1']`. HedgeHog revokes the whole connection when one refresh token is used twice, so refreshes run under `navigator.locks` (`ankigammon-hedgehog-refresh`) and re-read storage inside the lock. Show HedgeHog's `message` as returned (its Developer Terms).
   - HedgeHog is kept visible: a HedgeHog chip in the app bar (Connect / Connected) and an "Analysis by HedgeHog" panel on the start screen both open its settings (`openHedgeHogSettings`); the panel's button connects directly, inside the click so the popup isn't blocked. The guide below the app has an "Analysis by HedgeHog" section.
-  - Card options has the HedgeHog section (status, Connect/Disconnect, depth from `me.presets`/`me.preset_labels`, saved as `hedgehog_preset`, and the score-matrix options). A file or paste that needs analysis while disconnected opens it and resumes after connecting.
+  - Card options has the HedgeHog tab (status, Connect/Disconnect, depth from `me.presets`/`me.preset_labels`, saved as `hedgehog_preset`, and the score-matrix options). A file or paste that needs analysis while disconnected opens it and resumes after connecting.
   - Score matrices and the other card-back analyses: before a preview or export, `web.matrix_requests` returns the XGIDs the cards will ask about, `fetchMatrices` (one at a time) gets them from HedgeHog, and `web.apply_matrix_analysis` takes the XGIDs back with the answers and caches the successes per (depth, XGID) for the session; the cards are built from that cache. `web.generation_warnings` / the `warnings` fields report analyses that still ended up missing.
   - `confirmCost` asks before any run needs more analyses than the free plan has left today (`me.allowance`); `estimated_cost` counts a 1ply/2ply batch once and deeper presets per position. Paid plans have no allowance and are never asked.
 - The card preview iframe mimics Anki 25.9's reviewer (theme variables, night-mode classes, `pycmd('ans')`); card CSS depends on those.
@@ -177,10 +177,10 @@ A spaced-repetition trainer that needs neither Anki nor Pyodide: it quizzes posi
 
 The site includes extensive SEO optimization in [index.html](website/public/index.html:1-100):
 
-- Open Graph meta tags for social sharing
-- Twitter Card metadata
+- Open Graph and Twitter Card tags; the homepage shares `home-og.png`, the web app and trainer `app-og.png` (1200x630, hand-made from real screenshots)
 - **5 Schema.org JSON-LD blocks**: SoftwareApplication, FAQPage, Organization, WebSite, HowTo
-- Sitemap.xml with 5 URLs
+- Sitemap.xml with 8 hand-maintained URLs (build.py adds one per community deck); bump `<lastmod>` when a page changes
+- `llms.txt`: a short summary for AI crawlers; keep it in step with what the apps do
 
 When editing content, **maintain the structured data** to preserve search rankings.
 
@@ -196,12 +196,13 @@ When editing content, **maintain the structured data** to preserve search rankin
 
 ## Application Context (What This Site Markets)
 
-AnkiGammon is a desktop Python application that:
+AnkiGammon is a desktop Python application, plus the web app at `/app/`, that:
 
 - Converts backgammon position analysis to Anki flashcards
 - Supports drag-and-drop `.xg` files with auto-blunder filtering
-- Accepts position IDs (XGID/OGID/GNUID) and auto-generates GnuBG analysis
-- Features score matrices, 7 color schemes, dual analysis engines (GnuBG cross-platform, XG Windows-only experimental), drag-and-drop deck tree with AnkiConnect sync, interactive move visualization
+- Reads .xg, .xgp, .ogxm, .mat, .sgf and .txt files and position IDs (XGID/OGID/GNUID), analyzing whatever has no analysis yet
+- Has three analysis engines: GnuBG (cross-platform), XG (Windows-only, experimental) and HedgeHog (online, the analysis partner; the only engine in the web app)
+- Features score matrices, 7 color schemes, drag-and-drop deck tree with AnkiConnect sync, interactive move visualization
 - Exports via AnkiConnect API or APKG files
 - **Installation methods**:
   - Windows: Pre-built `.exe` (no Python required)

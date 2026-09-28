@@ -1,0 +1,28 @@
+# AnkiGammon
+
+> Free, open-source software that turns backgammon analysis into Anki flashcards. It reads match and position files, analyzes what has no analysis yet with GNU Backgammon, eXtreme Gammon or HedgeHog, keeps the mistakes, and makes multiple-choice cards for spaced repetition. It runs as a desktop app (Windows, macOS, Linux) and as a web app in the browser.
+
+## Apps
+
+- [Desktop app](https://ankigammon.com/#install): Windows, macOS and Linux, also `pip install ankigammon`. Reads .xg, .xgp, .ogxm, .mat, .sgf, .txt and DailyGammon files and pasted XGID, OGID and GNUID positions. Analyzes with GNU Backgammon (0-4 ply), eXtreme Gammon (Windows, experimental) or HedgeHog. Filters by error threshold and player, adds score matrices and cube comparisons, keeps positions in a deck tree synced with Anki, and exports with AnkiConnect or as an .apkg.
+- [Web app](https://ankigammon.com/app/): runs in the browser with nothing to install, on phones too. Reads .xg, .xgp and .ogxm files and text copied from XG on the device. With a free HedgeHog account connected it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices. Downloads an .apkg or sends cards to Anki with AnkiConnect.
+- [Trainer](https://ankigammon.com/train/): studies AnkiGammon decks in the browser without Anki, with FSRS scheduling, Blunder Streak and Storm drills, and offline use.
+- [Community decks](https://ankigammon.com/decks/): free backgammon Anki decks shared by players, CC BY 4.0.
+
+## Analysis engines
+
+- GNU Backgammon: free, installed separately, cross-platform.
+- eXtreme Gammon: Windows only, drives an installed copy of XG2.
+- HedgeHog (https://hedgehog-bg.com/): online engine and AnkiGammon's analysis partner. Nothing to install; connect a HedgeHog account once. Analyses count toward the HedgeHog plan; the free plan has a daily allowance.
+
+## Tools
+
+- [XG to MAT converter](https://ankigammon.com/tools/xg-to-mat): converts eXtreme Gammon .xg matches to .mat in the browser.
+- [Position editor](https://ankigammon.com/tools/position-editor): set up a position, convert between XGID, GNUID and OGID, and export board images.
+- [Match equity calculator](https://ankigammon.com/tools/met-calculator): match winning chances at any score from the Kazaross XG2 match equity table, with equity swings.
+
+## Source
+
+- [GitHub](https://github.com/Deinonychus999/AnkiGammon): source, releases and issues.
+- [Discord](https://discord.gg/vyFSgtWXSr)
+- Contact: contact@ankigammon.com

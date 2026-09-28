@@ -533,16 +533,23 @@
         if (!$('anki-help').open) $('anki-help').showModal();
     }
 
+    function selectOptionsTab(tab) {
+        document.querySelectorAll('#options-dialog [role="tab"]').forEach(function (t) {
+            var on = t === tab;
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            t.tabIndex = on ? 0 : -1;
+            $(t.getAttribute('aria-controls')).hidden = !on;
+        });
+    }
+
     function openOptions(focusId) {
         var dialog = $('options-dialog');
+        if (focusId) selectOptionsTab($($(focusId).closest('[role="tabpanel"]').getAttribute('aria-labelledby')));
         if (!dialog.open) {
             dialog.showModal();
             if (!connecting) refreshHedgeHogStatus();
         }
-        if (focusId) {
-            $(focusId).scrollIntoView({ block: 'nearest' });
-            $(focusId).focus();
-        }
+        if (focusId) $(focusId).focus();
     }
 
     function syncDeckChip() {
@@ -724,7 +731,6 @@
 
     function openHedgeHogSettings() {
         openOptions('hedgehog-connect');
-        $('hedgehog-settings').scrollIntoView({ block: 'start' });
     }
 
     function refreshHedgeHogStatus() {
@@ -1043,6 +1049,17 @@
     });
 
     $('options-open').addEventListener('click', function () { openOptions(); });
+    document.querySelectorAll('#options-dialog [role="tab"]').forEach(function (tab, i, tabs) {
+        tab.addEventListener('click', function () { selectOptionsTab(tab); });
+        tab.addEventListener('keydown', function (e) {
+            var step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+            if (!step) return;
+            e.preventDefault();
+            var next = tabs[(i + step + tabs.length) % tabs.length];
+            selectOptionsTab(next);
+            next.focus();
+        });
+    });
     $('deck-chip').addEventListener('click', function () { openOptions('deck-name'); });
     $('anki-help-settings').addEventListener('click', function () {
         $('anki-help').close();

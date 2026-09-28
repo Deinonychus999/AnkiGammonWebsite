@@ -188,7 +188,7 @@
         max-height: 300px;
     }
 
-    .embla__dot {
+    .embla__dot::before {
         width: 10px;
         height: 10px;
     }

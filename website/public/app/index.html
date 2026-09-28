@@ -18,14 +18,14 @@
     <meta property="og:image" content="https://ankigammon.com/assets/images/app-og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="An AnkiGammon flashcard in the browser: a backgammon position with the dice rolled 3-2 and five candidate moves to choose from">
+    <meta property="og:image:alt" content="The AnkiGammon web app with HedgeHog connected, showing a flashcard that asks for the best cube action in a 7-point match">
     <meta property="og:site_name" content="AnkiGammon">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Backgammon flashcards in your browser - AnkiGammon">
     <meta name="twitter:description" content="Turn backgammon analysis into Anki flashcards in your browser. Free, with nothing to install.">
     <meta name="twitter:image" content="https://ankigammon.com/assets/images/app-og.png">
-    <meta name="twitter:image:alt" content="An AnkiGammon flashcard in the browser: a backgammon position with the dice rolled 3-2 and five candidate moves to choose from">
+    <meta name="twitter:image:alt" content="The AnkiGammon web app with HedgeHog connected, showing a flashcard that asks for the best cube action in a 7-point match">
 
     <meta name="robots" content="index, follow">
 
@@ -214,6 +214,13 @@
         <form method="dialog" class="app-dialog__body">
             <h2 class="app-dialog__title" id="options-title">Card options</h2>
 
+            <div class="app-tabs" role="tablist" aria-label="Card options">
+                <button type="button" class="app-tabs__tab" role="tab" id="tab-cards" aria-controls="panel-cards" aria-selected="true">Cards</button>
+                <button type="button" class="app-tabs__tab" role="tab" id="tab-hedgehog" aria-controls="panel-hedgehog" aria-selected="false" tabindex="-1">HedgeHog</button>
+                <button type="button" class="app-tabs__tab" role="tab" id="tab-anki" aria-controls="panel-anki" aria-selected="false" tabindex="-1">Anki</button>
+            </div>
+
+            <div class="app-tabpanel" role="tabpanel" id="panel-cards" aria-labelledby="tab-cards">
             <section class="app-dialog__section" aria-labelledby="options-deck">
                 <h3 class="app-dialog__heading" id="options-deck">Deck</h3>
                 <label class="app-field">
@@ -266,7 +273,9 @@
                 <label class="app-check"><input id="opt-swap_checker_colors" type="checkbox"> Swap checker colors</label>
                 <label class="app-check"><input id="opt-split_cube_decisions" type="checkbox"> Split cube decisions by player</label>
             </section>
+            </div>
 
+            <div class="app-tabpanel" role="tabpanel" id="panel-hedgehog" aria-labelledby="tab-hedgehog" hidden>
             <section class="app-dialog__section" id="hedgehog-settings" aria-labelledby="options-hedgehog">
                 <h3 class="app-dialog__heading" id="options-hedgehog">HedgeHog analysis</h3>
                 <p class="app-dialog__note">Position IDs and .mat, .sgf or .txt match files are analyzed on
@@ -291,7 +300,9 @@
                 <label class="app-check"><input id="opt-generate_move_score_matrix" type="checkbox"> Best moves by score on checker cards</label>
                 <label class="app-check"><input id="opt-generate_move_cube_matrix" type="checkbox"> Checker play at every cube position</label>
             </section>
+            </div>
 
+            <div class="app-tabpanel" role="tabpanel" id="panel-anki" aria-labelledby="tab-anki" hidden>
             <section class="app-dialog__section" id="anki-settings" aria-labelledby="options-anki">
                 <h3 class="app-dialog__heading" id="options-anki">Anki connection</h3>
                 <p class="app-dialog__note">Used by Send to Anki. Change these only if you set a different port or an API key in AnkiConnect.</p>
@@ -304,6 +315,7 @@
                     <input id="anki-key" type="password" autocomplete="off">
                 </label>
             </section>
+            </div>
 
             <div class="app-dialog__footer">
                 <button class="btn btn-primary btn-sm" value="done">Done</button>

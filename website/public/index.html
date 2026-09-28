@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Turn backgammon analysis into Anki flashcards. The free desktop app analyzes position IDs and match files; the web app turns XG files into cards in your browser.">
+    <meta name="description" content="Turn your backgammon mistakes into Anki flashcards. Analyze matches and positions with GNU Backgammon, eXtreme Gammon or HedgeHog, on desktop or in your browser.">
     <meta name="author" content="AnkiGammon">
     <title>AnkiGammon - Backgammon Anki Flashcard Generator</title>
 
@@ -16,22 +16,22 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankigammon.com/">
     <meta property="og:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta property="og:description" content="Turn backgammon analysis into Anki flashcards. Drag match files or paste positions for automatic analysis, filter blunders and export to Anki. Free desktop app, plus a web app that runs in your browser.">
-    <meta property="og:image" content="https://ankigammon.com/assets/images/icon-og.webp">
-    <meta property="og:image:width" content="100">
-    <meta property="og:image:height" content="100">
-    <meta property="og:image:type" content="image/webp">
-    <meta property="og:image:alt" content="AnkiGammon application icon - backgammon to Anki flashcard converter">
+    <meta property="og:description" content="Turn backgammon analysis into Anki flashcards. Analyze matches and position IDs with GNU Backgammon, eXtreme Gammon or HedgeHog, filter blunders and export to Anki. Free desktop app, plus a web app that runs in your browser.">
+    <meta property="og:image" content="https://ankigammon.com/assets/images/home-og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="AnkiGammon: a score matrix of cube actions at every match score, analyzed by HedgeHog, on the back of an Anki flashcard">
     <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="AnkiGammon">
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://ankigammon.com/">
     <meta name="twitter:title" content="AnkiGammon - Turn Backgammon Analysis Into Anki Flashcards">
-    <meta name="twitter:description" content="Turn backgammon analysis into Anki flashcards. Drag match files or paste positions for automatic analysis, filter blunders and export to Anki. Free desktop app, plus a web app that runs in your browser.">
-    <meta name="twitter:image" content="https://ankigammon.com/assets/images/icon-og.webp">
-    <meta name="twitter:image:alt" content="AnkiGammon application icon - backgammon to Anki flashcard converter">
+    <meta name="twitter:description" content="Turn backgammon analysis into Anki flashcards. Analyze matches and position IDs with GNU Backgammon, eXtreme Gammon or HedgeHog, filter blunders and export to Anki. Free desktop app, plus a web app that runs in your browser.">
+    <meta name="twitter:image" content="https://ankigammon.com/assets/images/home-og.png">
+    <meta name="twitter:image:alt" content="AnkiGammon: a score matrix of cube actions at every match score, analyzed by HedgeHog, on the back of an Anki flashcard">
 
     <!-- SEO Meta Tags -->
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -46,13 +46,23 @@
       "@type": "SoftwareApplication",
       "name": "AnkiGammon",
       "applicationCategory": "EducationalApplication",
-      "operatingSystem": "Windows, macOS, Linux",
+      "operatingSystem": "Windows, macOS, Linux, Web browser",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "Convert backgammon analysis into Anki flashcards for spaced repetition learning. Import match files or paste positions for automatic analysis. Automatic blunder filtering, custom notes, score matrices, interactive moves. Export via AnkiConnect or APKG files. Free and open source.",
+      "description": "Convert backgammon analysis into Anki flashcards for spaced repetition learning. Import match files or paste positions and analyze them with GNU Backgammon, eXtreme Gammon or HedgeHog, on desktop or in the browser. Automatic blunder filtering, custom notes, score matrices, interactive moves. Export via AnkiConnect or APKG files. Free and open source.",
+      "featureList": [
+        "Analysis with GNU Backgammon, eXtreme Gammon (Windows) or the online HedgeHog engine",
+        "Reads .xg, .xgp, .ogxm, .mat, .sgf and .txt files, DailyGammon matches and pasted XGID, OGID and GNUID positions",
+        "Web app that analyzes matches and position IDs with HedgeHog, with nothing to install",
+        "Filters positions by error threshold and player",
+        "Cube score matrices, move score matrices and cube comparisons",
+        "Multiple-choice cards with animated moves and 7 board color schemes",
+        "Export to Anki with AnkiConnect or as an .apkg file",
+        "Free browser trainer with spaced repetition, no Anki needed"
+      ],
       "url": "https://ankigammon.com/",
       "downloadUrl": "https://github.com/Deinonychus999/AnkiGammon/releases/latest/download/ankigammon-windows.zip",
       "author": {
@@ -91,7 +101,7 @@
           "name": "Do I need XG analysis or can I just paste position IDs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon runs an analysis engine in the background to generate complete move and cube analysis. Pick GNU Backgammon (cross-platform, configurable 0-4 ply) or eXtreme Gammon (Windows only, drives an installed XG copy via UI automation - currently experimental). The chosen engine needs to be installed separately and configured in AnkiGammon settings."
+            "text": "You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon sends them to an analysis engine for complete move and cube analysis. Pick GNU Backgammon (free, cross-platform, configurable 0-4 ply), eXtreme Gammon (Windows only, drives an installed XG copy via UI automation - currently experimental) or HedgeHog (an online engine: nothing to install, just a HedgeHog account, and it also works in the web app). GnuBG and XG need to be installed separately and configured in AnkiGammon settings. Any of the three can generate full score matrices for cube decisions."
           }
         },
         {
@@ -99,7 +109,7 @@
           "name": "Is there a web version?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes: the AnkiGammon web app at ankigammon.com/app/ runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app. It has no analysis engine, so it reads positions eXtreme Gammon has already analyzed: .xg and .xgp files, or analysis copied from XG with Ctrl+C. It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. To analyze position IDs or .mat and .sgf files with GNU Backgammon, or add score matrices, use the desktop app."
+            "text": "Yes: the AnkiGammon web app at ankigammon.com/app/ runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app. It reads files eXtreme Gammon or HedgeHog already analyzed (.xg, .xgp and .ogxm, or analysis copied from XG with Ctrl+C) right on your device. Connect a free HedgeHog account and it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices. It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. The desktop app adds GNU Backgammon and eXtreme Gammon as engines, and keeps your positions in a deck tree that stays in sync with Anki."
           }
         },
         {
@@ -107,7 +117,7 @@
           "name": "Do I need Anki?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. Anki is the main way to study AnkiGammon decks, but the free AnkiGammon trainer at ankigammon.com/train/ runs in the browser on a phone or computer, with no Anki and no account. It asks for the best move or cube action, shows the analysis, grades your answer and schedules reviews with FSRS, the scheduler modern Anki uses. It also has Blunder Streak and Storm drills, and works offline once added to your Home Screen. Decks come from the community decks, from your own eXtreme Gammon matches through the web app, or from the desktop app with File, Export to Trainer. Progress stays in that browser; a backup file moves it to another device."
+            "text": "No. Anki is the main way to study AnkiGammon decks, but the free AnkiGammon trainer at ankigammon.com/train/ runs in the browser on a phone or computer, with no Anki and no account. It asks for the best move or cube action, shows the analysis, grades your answer and schedules reviews with FSRS, the scheduler modern Anki uses. It also has Blunder Streak and Storm drills, and works offline once added to your Home Screen. Decks come from the community decks, from your own matches through the web app, or from the desktop app with File, Export to Trainer. Progress stays in that browser; a backup file moves it to another device."
           }
         },
         {
@@ -131,7 +141,7 @@
           "name": "What file formats are supported?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiGammon supports all common backgammon file formats: .xg and .xgp (eXtreme Gammon files that can include pre-existing analysis), .sgf (Smart Game Format), .mat (match files), .txt (text-based match files), and DailyGammon match files (no file extension). Files with existing analysis are used directly. Files without analysis are automatically analyzed by GnuBG if installed and configured."
+            "text": "AnkiGammon supports all common backgammon file formats: .xg and .xgp (eXtreme Gammon files that can include pre-existing analysis), .ogxm (HedgeHog analysis files), .sgf (Smart Game Format), .mat (match files), .txt (text-based match files), and DailyGammon match files (no file extension). Files with existing analysis are used directly. Files without analysis are analyzed by the engine you choose: GNU Backgammon, eXtreme Gammon or HedgeHog."
           }
         },
         {
@@ -147,7 +157,7 @@
           "name": "What other customization options are available?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: deck tree organization (drag-and-drop positions into named decks and subdecks, with AnkiConnect sync), show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), move score matrix (see best moves across different match scores), split subdecks (separate checker and cube decisions into different subdecks), choice of analysis engine (GnuBG 0-4 ply or eXtreme Gammon on Windows), pip count display toggle, and export method choice (AnkiConnect for instant export or APKG for portable files)."
+            "text": "AnkiGammon offers extensive customization options for how cards are generated and displayed, all automatically saved: deck tree organization (drag-and-drop positions into named decks and subdecks, with AnkiConnect sync), show/hide options toggle (display multiple-choice options on card front or hide them, with customizable number of choices), interactive moves (enable/disable animated checker movements when clicking moves on the card back), score matrix generation (optionally generate detailed cube equity matrices for match play), move score matrix (see best moves across different match scores), split subdecks (separate checker and cube decisions into different subdecks), choice of analysis engine (GnuBG 0-4 ply, eXtreme Gammon on Windows, or HedgeHog online), pip count display toggle, and export method choice (AnkiConnect for instant export or APKG for portable files)."
           }
         },
         {
@@ -163,7 +173,15 @@
           "name": "What information is in the score matrix?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The score matrix shows optimal cube actions across all score combinations in a match. Each cell contains the best action (D/T, D/P, N/T, TG/T, or TG/P) and error values for the two alternative actions. For example, if the best action is D/T and it shows 15/412, then N/T costs 0.015 equity and D/P costs 0.412 equity. Yellow borders highlight the current match score, and darker highlighting indicates close decisions with error less than 20 (0.020 equity). The matrix is generated by GnuBG at your configured ply level and only includes scores where the cube is still live."
+            "text": "The score matrix shows optimal cube actions across all score combinations in a match. Each cell contains the best action (D/T, D/P, N/T, TG/T, or TG/P) and error values for the two alternative actions. For example, if the best action is D/T and it shows 15/412, then N/T costs 0.015 equity and D/P costs 0.412 equity. Yellow borders highlight the current match score, and darker highlighting indicates close decisions with error less than 20 (0.020 equity). The matrix is generated by your selected analysis engine at its configured depth and only includes scores where the cube is still live."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is HedgeHog and how do I connect it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HedgeHog (hedgehog-bg.com) is an online backgammon engine and AnkiGammon's analysis partner. It analyzes on its own servers, so there is nothing to install, and it works in the desktop app and in the web app, on phones too. In the desktop app, choose HedgeHog under Settings, Analysis Engine, then click Connect; in the web app, click Connect HedgeHog. Sign in to HedgeHog (or create a free account) and click Allow; AnkiGammon never sees your password. Analyses count toward your HedgeHog plan: the free plan has a daily allowance, deeper levels need a paid plan, and AnkiGammon asks first when a run would go past what you have left. Match files you analyze are saved to your HedgeHog account. Disconnect any time from the same place you connected."
           }
         },
         {
@@ -270,7 +288,7 @@
         <div class="container">
             <h1>Master Backgammon: Turn Your Mistakes Into Anki Flashcards</h1>
             <p class="hero-subtitle">
-                Drag match files or paste position IDs. Filter blunders, export in one click.
+                Drag match files or paste position IDs. Analyze with GNU Backgammon, eXtreme Gammon or HedgeHog, filter blunders, export in one click.
             </p>
 
             <div class="start-paths" id="start">
@@ -278,8 +296,8 @@
                     <h2 class="start-path__title">Desktop app</h2>
                     <p class="start-path__lead">The full version for Windows, macOS and Linux.</p>
                     <ul class="start-path__list">
-                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Paste a position ID and get it analyzed with GNU Backgammon</li>
-                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp, .mat, .sgf and .txt files, and text copied from eXtreme Gammon</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Paste a position ID and get it analyzed with GNU Backgammon, eXtreme Gammon or HedgeHog</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp, .ogxm, .mat, .sgf and .txt files, and text copied from eXtreme Gammon</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Score matrices and cube comparisons</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Decks organized in a tree that stays in sync with Anki</li>
                     </ul>
@@ -290,10 +308,10 @@
                     <h2 class="start-path__title">In your browser</h2>
                     <p class="start-path__lead">Nothing to install, works on phones and tablets.</p>
                     <ul class="start-path__list">
-                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> eXtreme Gammon .xg and .xgp files, and text copied from XG</li>
-                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> The same cards as the desktop app</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp and HedgeHog .ogxm files, and text copied from XG</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .mat, .sgf and .txt matches and pasted position IDs, analyzed with HedgeHog (free account)</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> The same cards as the desktop app, score matrices included</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Download an .apkg, or send cards straight to Anki from Chrome, Edge or Firefox</li>
-                        <li class="start-path__no"><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Needs analysis already done in XG: no position IDs or .mat files</li>
                     </ul>
                     <a href="app/" class="btn btn-secondary start-path__cta">Open the web app</a>
                 </article>
@@ -317,6 +335,11 @@
                     Windows, macOS, Linux & your browser
                 </span>
             </div>
+
+            <p class="partner-strip">
+                <span class="partner-strip__label">Analysis partner</span>
+                <a href="https://hedgehog-bg.com/" target="_blank" rel="noopener noreferrer">HedgeHog</a>, the online backgammon engine, is built into AnkiGammon on desktop and in the browser. Connect a free account once, nothing to install.
+            </p>
         </div>
     </section>
 
@@ -357,7 +380,7 @@
                         <!-- ICON:cpu -->
                     </div>
                     <h3>Pair With Your Favorite Engine</h3>
-                    <p>Point AnkiGammon at your install of GNU Backgammon (free, cross-platform) at the depth you choose, or eXtreme Gammon on Windows <em>(experimental)</em>. It runs the analysis for you.</p>
+                    <p>Point AnkiGammon at your install of GNU Backgammon (free, cross-platform) at the depth you choose, or eXtreme Gammon on Windows <em>(experimental)</em>. Or connect a HedgeHog account and analyze online, with nothing to install, on desktop or in the web app. AnkiGammon runs the analysis for you.</p>
                 </div>
 
                 <div class="feature-card">
@@ -414,13 +437,13 @@
                 <div class="workflow-step">
                     <div class="step-number">1</div>
                     <h3>Launch the App</h3>
-                    <p>No installation necessary. Just download and run.</p>
+                    <p>No installation necessary. Download and run, or open the web app in your browser.</p>
                 </div>
 
                 <div class="workflow-step">
                     <div class="step-number">2</div>
                     <h3>Import Positions</h3>
-                    <p>Drag files or paste position IDs. Filter by error threshold and player.</p>
+                    <p>Drag files or paste position IDs. Anything not yet analyzed goes to GNU Backgammon, eXtreme Gammon or HedgeHog. Filter by error threshold and player.</p>
                 </div>
 
                 <div class="workflow-step">
@@ -457,15 +480,23 @@
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/drag-and-drop.webp" alt="Dropping a match file onto the AnkiGammon window" width="1300" height="750" loading="lazy">
-                            <p class="slide-caption">Drag &amp; Drop - Import .xg, .xgp, .mat and .sgf files, keeping only the mistakes</p>
+                            <p class="slide-caption">Drag &amp; Drop - Import .xg, .xgp, .ogxm, .mat and .sgf files, keeping only the mistakes</p>
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/edit-note.webp" alt="Editing the note on a position" width="1300" height="750" loading="lazy">
                             <p class="slide-caption">Edit Notes - Add your own explanations and insights to each position</p>
                         </div>
                         <div class="embla__slide">
-                            <img src="assets/images/settings.webp" alt="Settings dialog with export, analysis engine, board and study options" width="795" height="722" loading="lazy">
-                            <p class="slide-caption">Settings - Analysis engine, score matrices, board themes and study options</p>
+                            <img src="assets/images/settings.webp" alt="Settings dialog with HedgeHog chosen as the analysis engine and a connected HedgeHog account, plus export, board and study options" width="801" height="710" loading="lazy">
+                            <p class="slide-caption">Settings - GNU Backgammon, eXtreme Gammon or HedgeHog, score matrices, board themes and study options</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/web-app.webp" alt="AnkiGammon web app in the browser with HedgeHog connected, showing a cube decision flashcard from a pasted XGID" width="1300" height="996" loading="lazy">
+                            <p class="slide-caption">Web App - Paste a position ID or open a match in your browser, and HedgeHog analyzes it</p>
+                        </div>
+                        <div class="embla__slide">
+                            <img src="assets/images/web-app-score-matrix.webp" alt="Score matrix of cube actions at every score of a 7-point match, analyzed by HedgeHog in the AnkiGammon web app" width="1300" height="750" loading="lazy">
+                            <p class="slide-caption">Web App Score Matrix - Cube actions at every match score, analyzed by HedgeHog</p>
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/anki-front.webp" alt="Anki flashcard front with a backgammon position and multiple-choice moves" width="848" height="847" loading="lazy">
@@ -563,7 +594,7 @@
                             <li class="required">Anki 2.1.x installed</li>
                             <li>AnkiConnect addon (code: 2055492159, optional for direct export)</li>
                             <li>Windows 10 or later</li>
-                            <li>GnuBG (optional, for automatic analysis of position IDs)</li>
+                            <li>GnuBG, eXtreme Gammon or a free HedgeHog account (optional, for automatic analysis)</li>
                         </ul>
                         <p class="requirement-note">
                             <strong>No installation needed</strong> - just download and run.
@@ -601,7 +632,7 @@
                         <ul>
                             <li class="required">Anki 2.1.x</li>
                             <li>AnkiConnect addon (2055492159, optional for direct export)</li>
-                            <li>GnuBG (optional, for automatic analysis)</li>
+                            <li>GnuBG or a free HedgeHog account (optional, for automatic analysis)</li>
                         </ul>
                         <p class="requirement-note">
                             <strong>PyPI installation requires Python 3.8+</strong> - DMG is a standalone app with no Python needed.
@@ -645,7 +676,7 @@
                             <li class="required">Anki 2.1.x</li>
                             <li>AnkiConnect addon (2055492159, optional for direct export)</li>
                             <li>Ubuntu 20.04+ or equivalent</li>
-                            <li>GnuBG (optional, for automatic analysis)</li>
+                            <li>GnuBG or a free HedgeHog account (optional, for automatic analysis)</li>
                         </ul>
                         <p class="requirement-note">
                             <strong>Requires Python 3.8+ for pip install</strong> - AppImage is a standalone package with no Python needed.
@@ -711,12 +742,13 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon runs an analysis engine in the background to generate complete move and cube analysis. Pick the engine that fits your setup:</p>
+                            <p>You can paste just position IDs (XGID, OGID, or GNUID format) without any analysis. AnkiGammon sends them to an analysis engine for complete move and cube analysis. Pick the engine that fits your setup:</p>
                             <ul>
                                 <li><strong>GNU Backgammon:</strong> free, open-source, cross-platform (Windows/macOS/Linux). Configurable depth (0-4 ply).</li>
                                 <li><strong>eXtreme Gammon:</strong> Windows only, drives your installed copy of XG2 via UI automation. Currently experimental, so fall back to GnuBG if it doesn't work on your setup.</li>
+                                <li><strong>HedgeHog:</strong> an online engine, so nothing to install: connect a HedgeHog account once. It also analyzes in the <a href="app/">web app</a>. See <em>What is HedgeHog?</em> below.</li>
                             </ul>
-                            <p>The engine you pick needs to be installed separately and configured in AnkiGammon settings. For cube decisions, either engine can generate full score matrices showing equity at different match scores.</p>
+                            <p>GnuBG and XG need to be installed separately and their path set in AnkiGammon settings. For cube decisions, any of the three can generate full score matrices showing equity at different match scores.</p>
                         </div>
                     </div>
                 </div>
@@ -733,7 +765,8 @@
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes: the <a href="app/">AnkiGammon web app</a> runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app.</p>
-                            <p>It has no analysis engine, so it reads positions eXtreme Gammon has already analyzed: .xg and .xgp files, or analysis copied from XG with Ctrl+C. It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. To analyze position IDs or .mat and .sgf files with GNU Backgammon, or add score matrices, use the desktop app.</p>
+                            <p>It reads files eXtreme Gammon or HedgeHog already analyzed (.xg, .xgp and .ogxm, or analysis copied from XG with Ctrl+C) right on your device. Connect a free <a href="https://hedgehog-bg.com/" target="_blank" rel="noopener noreferrer">HedgeHog</a> account and it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices.</p>
+                            <p>It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. The desktop app adds GNU Backgammon and eXtreme Gammon as engines, and keeps your positions in a deck tree that stays in sync with Anki.</p>
                         </div>
                     </div>
                 </div>
@@ -750,7 +783,7 @@
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>No. Anki is the main way to study AnkiGammon decks, but the free <a href="train/">AnkiGammon trainer</a> runs in the browser on a phone or computer, with no Anki and no account. It asks for the best move or cube action, shows the analysis, grades your answer and schedules reviews with FSRS, the scheduler modern Anki uses. It also has Blunder Streak and Storm drills, and works offline once added to your Home Screen.</p>
-                            <p>Decks come from the <a href="decks/">community decks</a>, from your own eXtreme Gammon matches through the <a href="app/">web app</a>, or from the desktop app with File &rarr; Export to Trainer. Progress stays in that browser; a backup file moves it to another device.</p>
+                            <p>Decks come from the <a href="decks/">community decks</a>, from your own matches through the <a href="app/">web app</a>, or from the desktop app with File &rarr; Export to Trainer. Progress stays in that browser; a backup file moves it to another device.</p>
                         </div>
                     </div>
                 </div>
@@ -829,7 +862,7 @@
                                 <li><strong>Score matrix generation:</strong> Optionally generate detailed cube equity matrices for match play</li>
                                 <li><strong>Move score matrix:</strong> See how the best moves change across different match scores</li>
                                 <li><strong>Split subdecks:</strong> Separate checker and cube decisions into different subdecks</li>
-                                <li><strong>Analysis engine &amp; depth:</strong> Choose GnuBG (0-4 ply) or eXtreme Gammon (Very Quick to Extensive, Windows only)</li>
+                                <li><strong>Analysis engine &amp; depth:</strong> Choose GnuBG (0-4 ply), eXtreme Gammon (Very Quick to Extensive, Windows only) or HedgeHog (2-ply to ++, online)</li>
                                 <li><strong>Pip count display:</strong> Toggle pip counts on/off</li>
                                 <li><strong>Export method:</strong> AnkiConnect (instant) or APKG (portable files)</li>
                             </ul>
@@ -852,12 +885,13 @@
                             <ul>
                                 <li><strong>.xg</strong> - eXtreme Gammon match files</li>
                                 <li><strong>.xgp</strong> - eXtreme Gammon position files</li>
+                                <li><strong>.ogxm</strong> - HedgeHog analysis files</li>
                                 <li><strong>.sgf</strong> - Smart Game Format</li>
                                 <li><strong>.mat</strong> - Match files</li>
                                 <li><strong>.txt</strong> - Text-based match files</li>
                                 <li><strong>DailyGammon</strong> - DailyGammon match files (no file extension)</li>
                             </ul>
-                            <p>Files with existing analysis (.xg and .xgp can include this) are used directly. Files without analysis are automatically analyzed by GnuBG if installed and configured.</p>
+                            <p>Files with existing analysis (.xg, .xgp and .ogxm can include this) are used directly. Files without analysis are analyzed by the engine you choose in settings: GNU Backgammon, eXtreme Gammon or HedgeHog.</p>
                         </div>
                     </div>
                 </div>
@@ -887,7 +921,7 @@
                                 <li><strong>Low error cells:</strong> Darker highlighting when error &lt; 20 (0.020 equity), indicating a close decision worth studying</li>
                             </ul>
 
-                            <p>The matrix is generated by GnuBG at your configured ply level and only includes scores where the cube is still live (can be legally doubled).</p>
+                            <p>The matrix is generated by your selected analysis engine at its configured depth and only includes scores where the cube is still live (can be legally doubled).</p>
                         </div>
                     </div>
                 </div>
@@ -910,6 +944,31 @@
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
+                        <h3>What is HedgeHog and how do I connect it?</h3>
+                        <span class="faq-toggle">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>What is HedgeHog?</strong><br>
+                            <a href="https://hedgehog-bg.com/" target="_blank" rel="noopener noreferrer">HedgeHog</a> is an online backgammon engine and AnkiGammon's analysis partner. It analyzes on its own servers, so there is nothing to install, and it works in the desktop app and in the <a href="app/">web app</a>, on phones too.</p>
+
+                            <p><strong>Connecting:</strong></p>
+                            <ul>
+                                <li><strong>Desktop app:</strong> Settings &rarr; Analysis Engine &rarr; HedgeHog, then Connect. Sign in to HedgeHog in your browser (or create a free account) and click Allow.</li>
+                                <li><strong>Web app:</strong> click <em>Connect HedgeHog</em> on the start screen, or <em>HedgeHog</em> at the top of the app.</li>
+                            </ul>
+
+                            <p>AnkiGammon never sees your HedgeHog password. Analyses count toward your HedgeHog plan: the free plan has a daily allowance, deeper levels need a paid plan, and AnkiGammon asks first when a run would go past what you have left. Match files you analyze are saved to your HedgeHog account, like ones you upload there. Disconnect any time from the same place you connected.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
                         <h3>What is GNU Backgammon (GnuBG) and how do I install it?</h3>
                         <span class="faq-toggle">
                             <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
@@ -920,7 +979,7 @@
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p><strong>What is GnuBG?</strong><br>
-                            GNU Backgammon is a free, world-class backgammon engine that plays and analyzes at expert level. AnkiGammon uses it to automatically analyze positions when you paste just position IDs without analysis. It's completely optional but enables the automatic analysis feature.</p>
+                            GNU Backgammon is a free, world-class backgammon engine that plays and analyzes at expert level. AnkiGammon can use it to analyze positions and match files that have no analysis yet. It's optional: eXtreme Gammon or HedgeHog can do the job instead.</p>
 
                             <p><strong>Installation:</strong></p>
                             <ul>
