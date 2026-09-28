@@ -5,7 +5,8 @@
   "logo_uri": "https://ankigammon.com/assets/images/icon-192.png",
   "redirect_uris": [
     "http://127.0.0.1/callback",
-    "https://ankigammon.com/app/"
+    "https://ankigammon.com/app/",
+    "http://127.0.0.1/app/"
   ],
   "token_endpoint_auth_method": "none",
   "grant_types": ["authorization_code", "refresh_token"],
