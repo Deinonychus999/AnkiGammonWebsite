@@ -668,10 +668,15 @@
         return ACTION_CLASS[a] || (a.indexOf('TG') === 0 ? 'tg' : 'none');
     }
 
-    // The two errors a card cell shows, the best action's own left out, in
-    // thousandths (as score_matrix.ScoreMatrixCell.format_errors).
+    // The doubler's and taker's errors in thousandths, as
+    // score_matrix.ScoreMatrixCell.format_errors. Packs from AnkiGammon
+    // 1.17.2 and older carry error_* fields instead, wrong for no-double cells.
     function cellErrors(c) {
         var k = function (e) { return e === null || e === undefined ? null : Math.round(e * 1000); };
+        if ('doubler_error' in c) {
+            if (c.doubler_error === null || c.taker_error === null) return null;
+            return [k(c.doubler_error), k(c.taker_error)];
+        }
         var a = String(c.best_action || '').toUpperCase();
         var shown = a === 'D/T' ? [c.error_no_double, c.error_pass]
             : a === 'D/P' ? [c.error_no_double, c.error_double]
