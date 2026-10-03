@@ -49,6 +49,21 @@
     <priority>0.3</priority>
   </url>
 
+  <!-- Terms -->
+  <url>
+    <loc>https://ankigammon.com/terms/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://ankigammon.com/terms/fr/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
   <!-- Tools -->
   <url>
     <loc>https://ankigammon.com/tools/</loc>
