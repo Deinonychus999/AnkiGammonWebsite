@@ -10,13 +10,13 @@ Cloudflare Worker + R2 bucket behind the [Community Decks](https://ankigammon.co
 | GET | `/decks/<id>/deck.apkg` | none | Download a published deck |
 | GET | `/decks/<id>/pack.json` | none | Position pack for a published deck (see below) |
 | GET | `/decks/<id>/stats` | none | `{ downloads, up, down }` for a published deck |
-| POST | `/decks/<id>/vote` | none | JSON `{ voter, value }`, value 1, -1 or 0 (remove); one vote per voter, at most 3 voters per deck per IP |
+| POST | `/decks/<id>/vote` | none | JSON `{ voter, value }`, value 1, -1 or 0 (remove); one vote per voter, at most 3 voters per deck per IP in the last 30 days (the salted IP hash is cleared after 30 days) |
 | POST | `/submit` | none | Multipart form: `meta` (JSON), `apkg` (file), `pack` (file). Stored under `pending/` |
 | GET | `/admin/pending` | bearer | List pending submissions and storage totals |
 | GET | `/admin/state` | bearer | Storage totals used by the cost guard |
 | POST | `/admin/recount` | bearer | Rebuild the totals from a bucket listing |
 | GET | `/admin/pending/<id>/deck.apkg` | bearer | Download a pending deck for review |
-| POST | `/admin/approve/<id>` | bearer | Move to `public/`, add to catalog |
+| POST | `/admin/approve/<id>` | bearer | Move to `public/` without the submitter's contact email, add to catalog |
 | POST | `/admin/reject/<id>` | bearer | Delete the pending submission |
 | DELETE | `/admin/decks/<id>` | bearer | Remove a published deck |
 | POST | `/admin/edit/<id>` | bearer | JSON `{ title?, description? }`: change a pending or published deck's text |

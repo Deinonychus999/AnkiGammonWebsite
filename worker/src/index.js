@@ -28,6 +28,9 @@ const LICENSE = 'CC-BY-4.0';
 const XGID_RE = /^XGID=[a-pA-P-]{26}(:-?\d+){9}$/;
 const NO_STORE = { 'Cache-Control': 'no-store' };
 const MAX_VOTES_PER_IP = 3;
+// The IP hash only enforces MAX_VOTES_PER_IP; after this it is cleared, so the
+// cap covers votes from the last 30 days.
+const IP_HASH_DAYS = 30;
 const VOTER_RE = /^[a-f0-9-]{16,64}$/;
 const BOT_UA_RE = /bot|crawl|spider|slurp|preview|facebookexternalhit|headlesschrome/i;
 const EMPTY_STATS = { downloads: 0, up: 0, down: 0 };
@@ -138,6 +141,9 @@ async function vote(request, env, id) {
   const value = body.value;
   if (value !== 1 && value !== -1 && value !== 0) throw new HttpError(400, 'value must be 1, -1 or 0');
   if (!(await readStats(env, id))) throw new HttpError(404, 'No published deck with that id');
+
+  const expired = new Date(Date.now() - IP_HASH_DAYS * 86400000).toISOString();
+  await env.DB.prepare("UPDATE votes SET ip_hash = '' WHERE ip_hash != '' AND voted_at < ?").bind(expired).run();
 
   if (value === 0) {
     await env.DB.prepare('DELETE FROM votes WHERE deck_id = ? AND voter = ?').bind(id, voter).run();
@@ -304,7 +310,9 @@ async function approve(env, ctx, id) {
   }
 
   const publishedAt = new Date().toISOString();
-  const published = { ...meta, published_at: publishedAt };
+  // The contact email is only for reviewing the submission.
+  const { contact_email: _contactEmail, ...publicMeta } = meta;
+  const published = { ...publicMeta, published_at: publishedAt };
   await env.DECKS.put(`public/${id}/meta.json`, JSON.stringify(published), {
     httpMetadata: { contentType: 'application/json' },
   });

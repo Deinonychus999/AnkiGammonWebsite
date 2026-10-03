@@ -830,15 +830,6 @@
     font-size: 0.9rem;
 }
 
-.footer-privacy {
-    flex: 1 1 100%;
-    margin: 0;
-    color: var(--text-dim);
-    font-size: 0.8rem;
-    line-height: 1.5;
-    text-align: center;
-}
-
 /* ===== Lucide Icons ===== */
 .icon {
     display: inline-block;
@@ -970,4 +961,44 @@
 
 .lightbox__close .icon {
     stroke-width: 2.5;
+}
+
+/* ===== Ko-fi link =====
+   A plain link instead of Ko-fi's widget, which loaded Ko-fi and Google
+   Fonts for every visitor before anyone clicked. */
+.kofi-button {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: #323842;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.kofi-button:hover,
+.kofi-button:focus-visible {
+    background: #3d4450;
+    color: #fff;
+}
+
+.kofi-button__icon {
+    width: 18px;
+    height: 18px;
+    fill: #ff5e5b;
+}
+
+@media print {
+    .kofi-button {
+        display: none;
+    }
 }
