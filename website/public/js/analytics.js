@@ -9,7 +9,9 @@
     'use strict';
 
     var POSTHOG_KEY = 'phc_vTE7UuEgJKAYN3YiZuvfcJCTcE6E8UfxTEx8DPa3WFcM';
-    var POSTHOG_HOST = 'https://us.i.posthog.com';
+    // PostHog's managed reverse proxy, so content blockers that block
+    // posthog.com don't drop the counts.
+    var POSTHOG_HOST = 'https://t.ankigammon.com';
 
     var queue = [];
     var client = null;
@@ -51,11 +53,12 @@
     var script = document.createElement('script');
     script.async = true;
     script.crossOrigin = 'anonymous';
-    script.src = POSTHOG_HOST.replace('.i.posthog.com', '-assets.i.posthog.com') + '/static/array.js';
+    script.src = POSTHOG_HOST + '/static/array.js';
     script.onload = function () {
         if (!window.posthog || typeof window.posthog.init !== 'function') return;
         window.posthog.init(POSTHOG_KEY, {
             api_host: POSTHOG_HOST,
+            ui_host: 'https://us.posthog.com',
             cookieless_mode: 'always',
             person_profiles: 'identified_only',
             autocapture: false,
