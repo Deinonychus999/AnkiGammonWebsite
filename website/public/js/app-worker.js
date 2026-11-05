@@ -63,7 +63,7 @@ const commands = {
     async loadFile(args) {
         const { py, web } = await ready;
         const path = writeInput(py, args.name, args.bytes);
-        const players = /\.(xg|ogxm)$/i.test(args.name) ? JSON.parse(web.read_player_names(path)) : null;
+        const players = /\.(xg|ogxm|bgf)$/i.test(args.name) ? JSON.parse(web.read_player_names(path)) : null;
         const loaded = JSON.parse(web.load_file(path, args.checker, args.cube, args.includeX, args.includeO,
             args.sourceDescription || null));
         return Object.assign({ players: players }, loaded);

@@ -42,6 +42,7 @@
         "Reads eXtreme Gammon .xg match files and .xgp position files",
         "Reads analysis copied from eXtreme Gammon with Ctrl+C",
         "Reads HedgeHog .ogxm match analysis files",
+        "Reads BGBlitz .bgf match analysis files",
         "Analyzes .mat, .sgf and .txt match files and XGID, GNUID and OGID positions with a HedgeHog account",
         "Filters mistakes by error threshold and player",
         "Previews each flashcard, front and back",
@@ -79,7 +80,7 @@
             <div class="app-bar__group">
                 <button class="btn btn-primary btn-sm" id="browse-btn" type="button" disabled>Open file</button>
                 <button class="btn btn-secondary btn-sm" id="paste-open" type="button" disabled>Paste</button>
-                <input type="file" id="file-input" accept=".xg,.xgp,.ogxm,.mat,.txt,.sgf" hidden>
+                <input type="file" id="file-input" accept=".xg,.xgp,.ogxm,.bgf,.mat,.txt,.sgf" hidden>
             </div>
             <p class="app-status app-bar__status" id="app-status" role="status" aria-live="polite">
                 <span class="app-status__dot" aria-hidden="true"></span>
@@ -151,7 +152,7 @@
             <div class="app-empty" id="stage-empty">
                 <img class="app-empty__logo" src="../assets/images/icon.svg" alt="" width="112" height="112">
                 <h1 class="app-empty__title">Backgammon flashcards for Anki, in your browser</h1>
-                <p class="app-empty__lead">Open a match file, or drop one anywhere here: eXtreme Gammon .xg and .xgp, HedgeHog .ogxm, or a .mat, .sgf or .txt match for HedgeHog to analyze. A match keeps only the mistakes above your thresholds.</p>
+                <p class="app-empty__lead">Open a match file, or drop one anywhere here: eXtreme Gammon .xg and .xgp, HedgeHog .ogxm, BGBlitz .bgf, or a .mat, .sgf or .txt match for HedgeHog to analyze. A match keeps only the mistakes above your thresholds.</p>
                 <div class="app-boot" id="app-boot" role="status" aria-live="polite">
                     <ol class="app-boot__steps">
                         <li class="app-boot__step" data-step="python" data-state="active">
@@ -358,7 +359,7 @@
     <section class="tool-info section">
         <div class="container tool-guide">
             <h2>Browser or desktop?</h2>
-            <p>Both make the same cards. The browser version needs no install and works on a phone or tablet. It has no analysis engine of its own: it reads analysis done in eXtreme Gammon or HedgeHog, and sends anything else to HedgeHog to analyze with your HedgeHog account.</p>
+            <p>Both make the same cards. The browser version needs no install and works on a phone or tablet. It has no analysis engine of its own: it reads analysis done in eXtreme Gammon, HedgeHog or BGBlitz, and sends anything else to HedgeHog to analyze with your HedgeHog account.</p>
             <div class="tool-guide__scroll">
                 <table class="app-compare">
                     <thead>
@@ -369,10 +370,12 @@
                         <tr><th scope="row">eXtreme Gammon .xg and .xgp files</th><td>Yes</td><td>Yes</td></tr>
                         <tr><th scope="row">Analysis copied from eXtreme Gammon</th><td>Yes</td><td>Yes</td></tr>
                         <tr><th scope="row">HedgeHog .ogxm files</th><td>Yes</td><td>Yes</td></tr>
+                        <tr><th scope="row">BGBlitz .bgf files</th><td>Yes</td><td>Yes</td></tr>
+                        <tr><th scope="row">BGBlitz and JellyFish .pos positions</th><td>No</td><td>Yes, analyzed with GNU Backgammon, eXtreme Gammon or HedgeHog</td></tr>
                         <tr><th scope="row">Position IDs (XGID, GNUID, OGID)</th><td>Yes, analyzed by HedgeHog</td><td>Yes, analyzed with GNU Backgammon, eXtreme Gammon or HedgeHog</td></tr>
                         <tr><th scope="row">.mat, .sgf and .txt match files</th><td>Yes, analyzed by HedgeHog</td><td>Yes</td></tr>
                         <tr><th scope="row">Score matrix and cube comparisons</th><td>Yes, with HedgeHog</td><td>Yes</td></tr>
-                        <tr><th scope="row">Your own notes on cards</th><td>Notes written in XG or HedgeHog</td><td>Notes written in XG or HedgeHog, or add your own</td></tr>
+                        <tr><th scope="row">Your own notes on cards</th><td>Notes written in XG, HedgeHog or BGBlitz</td><td>Notes written in XG, HedgeHog or BGBlitz, or add your own</td></tr>
                         <tr><th scope="row">Getting cards into Anki</th><td>.apkg, or straight into Anki with AnkiConnect (Chrome, Edge, Firefox)</td><td>.apkg, or straight into Anki with AnkiConnect</td></tr>
                         <tr><th scope="row">Decks organized in a tree, saved collections</th><td>No</td><td>Yes</td></tr>
                     </tbody>
@@ -400,7 +403,7 @@
             <div class="faq-details">
                 <details class="faq-details__item">
                     <summary>Is my file uploaded anywhere?</summary>
-                    <p>Files that already carry analysis (.xg, .xgp, .ogxm, pasted XG analysis) stay on your device: the page downloads Python and AnkiGammon into your browser once, then builds the deck there. Only with HedgeHog connected does anything go out: a match file without analysis is saved to your HedgeHog account, like one you upload there; pasted positions, and the positions score matrices and the cube comparison need, are sent to HedgeHog to analyze.</p>
+                    <p>Files that already carry analysis (.xg, .xgp, .ogxm, .bgf, pasted XG analysis) stay on your device: the page downloads Python and AnkiGammon into your browser once, then builds the deck there. Only with HedgeHog connected does anything go out: a match file without analysis is saved to your HedgeHog account, like one you upload there; pasted positions, and the positions score matrices and the cube comparison need, are sent to HedgeHog to analyze.</p>
                 </details>
                 <details class="faq-details__item">
                     <summary>How does it analyze position IDs and .mat files?</summary>

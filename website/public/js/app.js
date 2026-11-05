@@ -227,7 +227,7 @@
     }
 
     function isMatchFile() {
-        return source && source.kind === 'file' && /\.(xg|ogxm)$/i.test(source.name);
+        return source && source.kind === 'file' && /\.(xg|ogxm|bgf)$/i.test(source.name);
     }
 
     function load(newSource) {
@@ -1001,7 +1001,7 @@
                 } else if (kind.import) {
                     analyzeFile(file.name, bytes, kind.import);
                 } else {
-                    showError(file.name + ' is not a match file. Open an .xg, .xgp, .ogxm, .mat, .sgf or .txt match.');
+                    showError(file.name + ' is not a match file. Open an .xg, .xgp, .ogxm, .bgf, .mat, .sgf or .txt match.');
                 }
             });
         }).catch(function (e) { showError(e.message); });

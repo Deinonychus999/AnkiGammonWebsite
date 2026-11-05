@@ -4,8 +4,8 @@
 
 ## Apps
 
-- [Desktop app](https://ankigammon.com/#install): Windows, macOS and Linux, also `pip install ankigammon`. Reads .xg, .xgp, .ogxm, .mat, .sgf, .txt and DailyGammon files and pasted XGID, OGID and GNUID positions. Analyzes with GNU Backgammon (0-4 ply), eXtreme Gammon (Windows, experimental) or HedgeHog. Filters by error threshold and player, adds score matrices and cube comparisons, keeps positions in a deck tree synced with Anki, and exports with AnkiConnect or as an .apkg.
-- [Web app](https://ankigammon.com/app/): runs in the browser with nothing to install, on phones too. Reads .xg, .xgp and .ogxm files and text copied from XG on the device. With a free HedgeHog account connected it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices. Downloads an .apkg or sends cards to Anki with AnkiConnect.
+- [Desktop app](https://ankigammon.com/#install): Windows, macOS and Linux, also `pip install ankigammon`. Reads .xg, .xgp, .ogxm, .bgf, .pos, .mat, .sgf, .txt and DailyGammon files and pasted XGID, OGID and GNUID positions. Analyzes with GNU Backgammon (0-4 ply), eXtreme Gammon (Windows, experimental) or HedgeHog. Filters by error threshold and player, adds score matrices and cube comparisons, keeps positions in a deck tree synced with Anki, and exports with AnkiConnect or as an .apkg.
+- [Web app](https://ankigammon.com/app/): runs in the browser with nothing to install, on phones too. Reads .xg, .xgp, .ogxm and .bgf files and text copied from XG on the device. With a free HedgeHog account connected it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices. Downloads an .apkg or sends cards to Anki with AnkiConnect.
 - [Trainer](https://ankigammon.com/train/): studies AnkiGammon decks in the browser without Anki, with FSRS scheduling, Blunder Streak and Storm drills, and offline use.
 - [Community decks](https://ankigammon.com/decks/): free backgammon Anki decks shared by players, CC BY 4.0.
 

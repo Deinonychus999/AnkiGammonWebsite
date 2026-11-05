@@ -55,7 +55,7 @@
       "description": "Convert backgammon analysis into Anki flashcards for spaced repetition learning. Import match files or paste positions and analyze them with GNU Backgammon, eXtreme Gammon or HedgeHog, on desktop or in the browser. Automatic blunder filtering, custom notes, score matrices, interactive moves. Export via AnkiConnect or APKG files. Free and open source.",
       "featureList": [
         "Analysis with GNU Backgammon, eXtreme Gammon (Windows) or the online HedgeHog engine",
-        "Reads .xg, .xgp, .ogxm, .mat, .sgf and .txt files, DailyGammon matches and pasted XGID, OGID and GNUID positions",
+        "Reads .xg, .xgp, .ogxm, .bgf, .pos, .mat, .sgf and .txt files, DailyGammon matches and pasted XGID, OGID and GNUID positions",
         "Web app that analyzes matches and position IDs with HedgeHog, with nothing to install",
         "Filters positions by error threshold and player",
         "Cube score matrices, move score matrices and cube comparisons",
@@ -109,7 +109,7 @@
           "name": "Is there a web version?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes: the AnkiGammon web app at ankigammon.com/app/ runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app. It reads files eXtreme Gammon or HedgeHog already analyzed (.xg, .xgp and .ogxm, or analysis copied from XG with Ctrl+C) right on your device. Connect a free HedgeHog account and it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices. It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. The desktop app adds GNU Backgammon and eXtreme Gammon as engines, and keeps your positions in a deck tree that stays in sync with Anki."
+            "text": "Yes: the AnkiGammon web app at ankigammon.com/app/ runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app. It reads files eXtreme Gammon, HedgeHog or BGBlitz already analyzed (.xg, .xgp, .ogxm and .bgf, or analysis copied from XG with Ctrl+C) right on your device. Connect a free HedgeHog account and it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices. It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. The desktop app adds GNU Backgammon and eXtreme Gammon as engines, and keeps your positions in a deck tree that stays in sync with Anki."
           }
         },
         {
@@ -141,7 +141,7 @@
           "name": "What file formats are supported?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "AnkiGammon supports all common backgammon file formats: .xg and .xgp (eXtreme Gammon files that can include pre-existing analysis), .ogxm (HedgeHog analysis files), .sgf (Smart Game Format), .mat (match files), .txt (text-based match files), and DailyGammon match files (no file extension). Files with existing analysis are used directly. Files without analysis are analyzed by the engine you choose: GNU Backgammon, eXtreme Gammon or HedgeHog."
+            "text": "AnkiGammon supports all common backgammon file formats: .xg and .xgp (eXtreme Gammon files that can include pre-existing analysis), .ogxm (HedgeHog analysis files), .bgf (BGBlitz analysis files), .pos (BGBlitz and JellyFish positions), .sgf (Smart Game Format), .mat (match files), .txt (text-based match files), and DailyGammon match files (no file extension). Files with existing analysis are used directly. Files without analysis are analyzed by the engine you choose: GNU Backgammon, eXtreme Gammon or HedgeHog."
           }
         },
         {
@@ -297,7 +297,7 @@
                     <p class="start-path__lead">The full version for Windows, macOS and Linux.</p>
                     <ul class="start-path__list">
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Paste a position ID and get it analyzed with GNU Backgammon, eXtreme Gammon or HedgeHog</li>
-                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp, .ogxm, .mat, .sgf and .txt files, and text copied from eXtreme Gammon</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp, .ogxm, .bgf, .pos, .mat, .sgf and .txt files, and text copied from eXtreme Gammon</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Score matrices and cube comparisons</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Decks organized in a tree that stays in sync with Anki</li>
                     </ul>
@@ -308,7 +308,7 @@
                     <h2 class="start-path__title">In your browser</h2>
                     <p class="start-path__lead">Nothing to install, works on phones and tablets.</p>
                     <ul class="start-path__list">
-                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp and HedgeHog .ogxm files, and text copied from XG</li>
+                        <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .xg, .xgp, HedgeHog .ogxm and BGBlitz .bgf files, and text copied from XG</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> .mat, .sgf and .txt matches and pasted position IDs, analyzed with HedgeHog (free account)</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> The same cards as the desktop app, score matrices included</li>
                         <li><svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Download an .apkg, or send cards straight to Anki from Chrome, Edge or Firefox</li>
@@ -480,7 +480,7 @@
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/drag-and-drop.webp" alt="Dropping a match file onto the AnkiGammon window" width="1300" height="750" loading="lazy">
-                            <p class="slide-caption">Drag &amp; Drop - Import .xg, .xgp, .ogxm, .mat and .sgf files, keeping only the mistakes</p>
+                            <p class="slide-caption">Drag &amp; Drop - Import .xg, .xgp, .ogxm, .bgf, .mat and .sgf files, keeping only the mistakes</p>
                         </div>
                         <div class="embla__slide">
                             <img src="assets/images/edit-note.webp" alt="Editing the note on a position" width="1300" height="750" loading="lazy">
@@ -765,7 +765,7 @@
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes: the <a href="app/">AnkiGammon web app</a> runs in your browser with nothing to install, including on phones and tablets, and makes the same cards as the desktop app.</p>
-                            <p>It reads files eXtreme Gammon or HedgeHog already analyzed (.xg, .xgp and .ogxm, or analysis copied from XG with Ctrl+C) right on your device. Connect a free <a href="https://hedgehog-bg.com/" target="_blank" rel="noopener noreferrer">HedgeHog</a> account and it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices.</p>
+                            <p>It reads files eXtreme Gammon, HedgeHog or BGBlitz already analyzed (.xg, .xgp, .ogxm and .bgf, or analysis copied from XG with Ctrl+C) right on your device. Connect a free <a href="https://hedgehog-bg.com/" target="_blank" rel="noopener noreferrer">HedgeHog</a> account and it also analyzes .mat, .sgf and .txt matches and pasted position IDs, and adds score matrices.</p>
                             <p>It downloads an .apkg file to import into Anki or, in Chrome, Edge and Firefox, sends cards straight to a running Anki with AnkiConnect. The desktop app adds GNU Backgammon and eXtreme Gammon as engines, and keeps your positions in a deck tree that stays in sync with Anki.</p>
                         </div>
                     </div>
@@ -886,12 +886,14 @@
                                 <li><strong>.xg</strong> - eXtreme Gammon match files</li>
                                 <li><strong>.xgp</strong> - eXtreme Gammon position files</li>
                                 <li><strong>.ogxm</strong> - HedgeHog analysis files</li>
+                                <li><strong>.bgf</strong> - BGBlitz analysis files</li>
+                                <li><strong>.pos</strong> - BGBlitz and JellyFish positions</li>
                                 <li><strong>.sgf</strong> - Smart Game Format</li>
                                 <li><strong>.mat</strong> - Match files</li>
                                 <li><strong>.txt</strong> - Text-based match files</li>
                                 <li><strong>DailyGammon</strong> - DailyGammon match files (no file extension)</li>
                             </ul>
-                            <p>Files with existing analysis (.xg, .xgp and .ogxm can include this) are used directly. Files without analysis are analyzed by the engine you choose in settings: GNU Backgammon, eXtreme Gammon or HedgeHog.</p>
+                            <p>Files with existing analysis (.xg, .xgp, .ogxm and .bgf can include this) are used directly. Files without analysis are analyzed by the engine you choose in settings: GNU Backgammon, eXtreme Gammon or HedgeHog.</p>
                         </div>
                     </div>
                 </div>
