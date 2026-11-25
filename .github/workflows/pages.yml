@@ -58,32 +58,40 @@ jobs:
           test -d website/build/assets && echo "✓ assets directory exists" || exit 1
           echo "Validation complete!"
 
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    # Only deploy on pushes to main/master, not on PRs
-    if: github.event_name != 'pull_request'
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Build HTML from partials
-        run: python website/build.py
-
       - name: Setup Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v6
 
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5
         with:
           path: 'website/build'
 
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
+
+    steps:
+      # GitHub sometimes doesn't list a just-uploaded artifact yet ("No artifacts
+      # named github-pages were found"); that lookup fails before any deployment
+      # is created, so trying again is safe.
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+
+      - name: Wait before retrying
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+
+      - name: Deploy to GitHub Pages (retry)
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
